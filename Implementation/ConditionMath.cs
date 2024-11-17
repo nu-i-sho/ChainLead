@@ -17,7 +17,7 @@
                 new Condition<T>(predicate);
 
         public ICondition<T> MakeCondition<T>(
-            System.Predicate<T> predicate) =>
+            Predicate<T> predicate) =>
                 new Condition<T>(new Func<T, bool>(predicate));
 
         public bool IsPredictableTrue<T>(

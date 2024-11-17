@@ -442,7 +442,6 @@
             Assert.IsTrue(result);
         }
 
-
         [Test]
         public void BaseTrueOrSomethingDerivedCheckIsTrue(
             [Values(False, True, Mock)] string something)

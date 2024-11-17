@@ -75,9 +75,9 @@
                 .Setup(o => o.DeepWrap(_handlerA.Object, _handlerB.Object))
                 .Returns(_deepWrappedAB.Object);
 
-            ConfigureMath
-                .ForHandlers(_handlerMath.Object)
-                .AndForConditions(_conditionMath.Object);
+            ConfigureChainLeadSyntax
+                .WithHandlerMath(_handlerMath.Object)
+                .AndWithConditionMath(_conditionMath.Object);
         }
 
         [Test]

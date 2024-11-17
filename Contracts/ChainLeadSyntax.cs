@@ -9,14 +9,14 @@
 
     public static class ChainLeadSyntax
     {
-        public static FirstConfigurationStep ConfigureMath =>
+        public static FirstConfigurationStep ConfigureChainLeadSyntax =>
             new FirstConfigurationStep();
 
         public class FirstConfigurationStep
         {
             internal FirstConfigurationStep() { }
 
-            public SecondConfigurationStep ForHandlers(IHandlerMath math)
+            public SecondConfigurationStep WithHandlerMath(IHandlerMath math)
             {
                 Math.ForHandler = math;
                 return new SecondConfigurationStep();
@@ -27,7 +27,7 @@
         {
             internal SecondConfigurationStep() { }
 
-            public void AndForConditions(IConditionMath math) =>
+            public void AndWithConditionMath(IConditionMath math) =>
                 Math.ForCondition = math;
         }
 

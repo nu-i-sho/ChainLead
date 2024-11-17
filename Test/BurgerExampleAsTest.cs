@@ -204,9 +204,9 @@
             var conditionMath = new ConditionMath();
             var handlerMath = new HandlerMath(conditionMath);
             
-            ConfigureMath
-                .ForHandlers(handlerMath)
-                .AndForConditions(conditionMath);
+            ConfigureChainLeadSyntax
+                .WithHandlerMath(handlerMath)
+                .AndWithConditionMath(conditionMath);
         }
 
         [Test]
