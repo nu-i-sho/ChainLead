@@ -96,3 +96,16 @@ var abcd2 = (a.Then(b)).Than(c.Then(d));
 
 Obviously, circles in the image are handlers, and bars are `Then` calls. 'Then' is directed (it has first and second parameters), and better to draw it as an arrow (but ugly). So, imagine that all vertical bars are arrows from up to down and horizontal - from left to right. Also, we know the order of `Then` calls (black numbers). Based on this, we can easily predict the order of handlers' executions (white numbers). That means `acb1` and `abc2` are logically the same chains (`abcd1` and `abcd2` too). Or, by more mathematical words - `Then` is associative.
 
+### `Join`
+`Join(a, b)` is the same as `a.Then(b)`, but I recommend not calling `Join` directly, and using it only as an object. For example
+``` CSharp
+var abcd = new[] { a, b, c, d }.Aggregate(Join);
+```
+Also, if you aren't sure that the collection of handlers you want to aggregate to chain contains at least one item - use `Handler<T>.Zero` as the starting state of the accumulator.  
+``` CSharp
+IHandler<int> ChainOf(IHandler<int>[] items) =>
+    items.Aggregate(Handler<int>.Zero, Join);
+```
+### `Join(X).To`, `JoinItTo`
+(In Progress)  
+
