@@ -94,5 +94,5 @@ var abcd2 = (a.Then(b)).Than(c.Then(d));
 ```
 ![ab, abc1, abc2, abcd1, abcd2](/readme_img/2.svg)
 
-(In Progress)
+Obviously, circles in the image are handlers, and bars are 'Then' calls. 'Then' is directed (it has first and second parameters), and better to draw it as an arrow (but ugly). So, imagine that all vertical bars are arrows from up to down and horizontal - from left to right. Also, we know the order 'Then' calls (black numbers). Based on this, we can easily predict the order of handlers' executions (white numbers). That means acb1 and abc2 are logically the same chains (abcd1 and abcd2 too). Or, by more mathematical words - 'Then' is associative.
 
