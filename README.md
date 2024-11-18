@@ -36,3 +36,28 @@ public static IHandler<State> Hamburger =>
     .Aggregate(Join);
 ```
 *(You can see fully contexted code [here](https://github.com/nu-i-sho/ChainLead/blob/main/Test/BurgerExampleAsTest.cs).)*
+
+## To use ChainLead
+it is necessary to configure the library (syntax) language by providing the implementations of chain mathematics. But do it once in your solution assembly point (where Dependency Injection is configured). 
+```CSharp
+using ChainLead.Contracts;
+using ChainLead.Implementation;
+using ChainLead.Contracts.Syntax;
+
+...
+    IConditionMath conditionMath = new ConditionMath();
+    IHandlerMath handlerMath = new HandlerMath(conditionMath);
+
+    ChainLeadSyntax.ConfigureChainLeadSyntax
+        .WithHandlerMath(handlerMath)
+        .AndWithConditionMath(conditionMath);
+...
+
+```
+*(Yes, I know that bad practice to have mutable static data. I just chose this evil to provide some library language features (provided by static classes only) without losing the support of DIP (from SOLID). So, just configure it once, and you will have no problems with that.)*
+
+In place of chain implementation use the following.   
+```CSharp
+using ChainLead.Contracts;
+using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
+```
