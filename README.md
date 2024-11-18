@@ -92,6 +92,7 @@ var abc2 = a.Then(b.Then(c));
 var abcd1 = a.Then(b).Then(c).Then(d);
 var abcd2 = (a.Then(b)).Than(c.Then(d));
 ```
+![ab, abc1, abc2, abcd1, abcd2](/readme_img/2.svg)
 
 (In Progress)
 
