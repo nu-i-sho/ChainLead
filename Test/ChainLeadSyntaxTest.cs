@@ -9,19 +9,19 @@
     [TestFixture]
     public class ChainLeadSyntaxTest
     {
+        const int Arg = 7568;
+
         Mock<IHandlerMath> _handlerMath;
         Mock<IConditionMath> _conditionMath;
+
+        string _handlersExecutionResult;
 
         Mock<IHandler<int>> _handler;
         Mock<IHandler<int>> _handlerA;
         Mock<IHandler<int>> _handlerB;
-        Mock<IHandler<int>> _mathFirstThenSecond_AB;
-        Mock<IHandler<int>> _mathJoinFirstWithSecond_AB;
-        Mock<IHandler<int>> _mathMergeFirstWithSecond_AB;
-        Mock<IHandler<int>> _mathPutFirstInSecond_AB;
-        Mock<IHandler<int>> _mathInjectFirstIntoSecond_AB;
-        Mock<IHandler<int>> _mathFirstCoverSecond_AB;
-        Mock<IHandler<int>> _mathFirstWrapSecond_AB;
+        Mock<IHandler<int>> _handlerC;
+        Mock<IHandler<int>> _handlerAB;
+        Mock<IHandler<int>> _handlerABC;
 
         Mock<ICondition<int>> _condition;
         Mock<ICondition<int>> _conditionA;
@@ -33,49 +33,54 @@
             _handlerMath = new Mock<IHandlerMath>();
             _conditionMath = new Mock<IConditionMath>();
 
-            _handler = new Mock<IHandler<int>>();
-            _handlerA = new Mock<IHandler<int>>();
-            _handlerB = new Mock<IHandler<int>>();
-            _mathFirstThenSecond_AB = new Mock<IHandler<int>>();
-            _mathJoinFirstWithSecond_AB = new Mock<IHandler<int>>();
-            _mathMergeFirstWithSecond_AB = new Mock<IHandler<int>>();
-            _mathPutFirstInSecond_AB = new Mock<IHandler<int>>();
-            _mathInjectFirstIntoSecond_AB = new Mock<IHandler<int>>();
-            _mathFirstCoverSecond_AB = new Mock<IHandler<int>>();
-            _mathFirstWrapSecond_AB = new Mock<IHandler<int>>();
+            _handler = new Mock<IHandler<int>>() { Name = nameof(_handler) };
+            _handlerA = new Mock<IHandler<int>>() { Name = nameof(_handlerA) };
+            _handlerB = new Mock<IHandler<int>>() { Name = nameof(_handlerB) };
+            _handlerC = new Mock<IHandler<int>>() { Name = nameof(_handlerC) };
+            _handlerAB = new Mock<IHandler<int>>() { Name = nameof(_handlerAB) };
+            _handlerABC = new Mock<IHandler<int>>() { Name = nameof(_handlerABC) };
 
             _condition = new Mock<ICondition<int>>();
             _conditionA = new Mock<ICondition<int>>();
             _conditionB = new Mock<ICondition<int>>();
 
-            _handlerMath
-                .Setup(o => o.FirstThenSecond(_handlerA.Object, _handlerB.Object))
-                .Returns(_mathFirstThenSecond_AB.Object);
+            _handlersExecutionResult = string.Empty;
 
             _handlerMath
-                .Setup(o => o.JoinFirstWithSecond(_handlerA.Object, _handlerB.Object))
-                .Returns(_mathJoinFirstWithSecond_AB.Object);
+                .Setup(o => o.InjectFirstIntoSecond(It.IsAny<IHandler<int>>(), It.IsAny<IHandler<int>>()))
+                .Callback((IHandler<int> x, IHandler<int> y) =>
+                {
 
-            _handlerMath
-                .Setup(o => o.MergeFirstWithSecond(_handlerA.Object, _handlerB.Object))
-                .Returns(_mathMergeFirstWithSecond_AB.Object);
+                });
 
-            _handlerMath
-                .Setup(o => o.PutFirstInSecond(_handlerA.Object, _handlerB.Object))
-                .Returns(_mathPutFirstInSecond_AB.Object);
+            _handlerA
+                .Setup(o => o.Execute(Arg))
+                .Callback(() => _handlersExecutionResult += "A");
 
-            _handlerMath
-                .Setup(o => o.InjectFirstIntoSecond(_handlerA.Object, _handlerB.Object))
-                .Returns(_mathInjectFirstIntoSecond_AB.Object);
+            _handlerB
+                .Setup(o => o.Execute(Arg))
+                .Callback(() => _handlersExecutionResult += "B");
 
-            _handlerMath
-                .Setup(o => o.FirstCoverSecond(_handlerA.Object, _handlerB.Object))
-                .Returns(_mathFirstCoverSecond_AB.Object);
+            _handlerC
+                .Setup(o => o.Execute(Arg))
+                .Callback(() => _handlersExecutionResult += "C");
 
-            _handlerMath
-                .Setup(o => o.FirstWrapSecond(_handlerA.Object, _handlerB.Object))
-                .Returns(_mathFirstWrapSecond_AB.Object);
-            
+            _handlerAB
+                .Setup(o => o.Execute(Arg))
+                .Callback(() =>
+                {
+                    _handlerA.Object.Execute(Arg);
+                    _handlerB.Object.Execute(Arg);
+                });
+
+            _handlerABC
+                .Setup(o => o.Execute(Arg))
+                .Callback(() =>
+                {
+                    _handlerAB.Object.Execute(Arg);
+                    _handlerC.Object.Execute(Arg);
+                });
+
             ConfigureChainLeadSyntax
                 .WithHandlerMath(_handlerMath.Object)
                 .AndWithConditionMath(_conditionMath.Object);
@@ -96,150 +101,702 @@
         }
 
         [Test]
-        public void A_Then_B_Returns_FirstThenSecond_AB_FromMath()
+        public void A_Then_B_ReturnsEquivalentOf_FirstThenSecond_AB_FromMath()
         {
-            var product = _handlerA.Object.Then(_handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathFirstThenSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.FirstThenSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = _handlerA.Object.Then(_handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult, 
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void FirstThenSecond_AB_Returns_FirstThenSecond_AB_FromMath()
+        public void FirstThenSecond_AB_ReturnsEquivalentOf_FirstThenSecond_AB_FromMath()
         {
-            var product = FirstThenSecond(_handlerA.Object, _handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathFirstThenSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.FirstThenSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = FirstThenSecond(_handlerA.Object, _handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void XThen_B_WhereXIs_A_Returns_FirstThenSecond_AB_FromMath()
+        public void XThen_B_WhereXIs_A_ReturnsEquivalentOf_FirstThenSecond_AB_FromMath()
         {
-            var product = XThen(_handlerB.Object).WhereXIs(_handlerA.Object);
-            Assert.That(product, Is.SameAs(_mathFirstThenSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.FirstThenSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = XThen(_handlerB.Object).WhereXIs(_handlerA.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void JoinFirstWithSecond_AB_Returns_JoinFirstWithSecond_AB_FromMath()
+        public void JoinFirstWithSecond_AB_ReturnsEquivalentOf_JoinFirstWithSecond_AB_FromMath()
         {
-            var product = JoinFirstWithSecond(_handlerA.Object, _handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathJoinFirstWithSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.JoinFirstWithSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = JoinFirstWithSecond(_handlerA.Object, _handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void Join_A_With_B_Returns_JoinFirstWithSecond_AB_FromMath()
+        public void Join_A_With_B_ReturnsEquivalentOf_JoinFirstWithSecond_AB_FromMath()
         {
-            var product = Join(_handlerA.Object).With(_handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathJoinFirstWithSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.JoinFirstWithSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = Join(_handlerA.Object).With(_handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void JoinXWith_B_WhereXIs_A_JoinFirstWithSecond_AB_FromMath()
+        public void JoinXWith_B_WhereXIs_A_ReturnsEquivalentOf_JoinFirstWithSecond_AB_FromMath()
         {
-            var product = JoinXWith(_handlerB.Object).WhereXIs(_handlerA.Object);
-            Assert.That(product, Is.SameAs(_mathJoinFirstWithSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.JoinFirstWithSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = JoinXWith(_handlerB.Object).WhereXIs(_handlerA.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void MergeFirstWithSecond_AB_Returns_MergeFirstWithSecond_AB_FromMath()
+        public void MergeFirstWithSecond_AB_ReturnsEquivalentOf_MergeFirstWithSecond_AB_FromMath()
         {
-            var product = MergeFirstWithSecond(_handlerA.Object, _handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathMergeFirstWithSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.MergeFirstWithSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = MergeFirstWithSecond(_handlerA.Object, _handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void Merge_A_With_B_Returns_MergeFirstWithSecond_AB_FromMath()
+        public void Merge_A_With_B_ReturnsEquivalentOf_MergeFirstWithSecond_AB_FromMath()
         {
-            var product = Merge(_handlerA.Object).With(_handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathMergeFirstWithSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.MergeFirstWithSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = Merge(_handlerA.Object).With(_handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void MergeXWith_B_WhereXIs_A_MergeFirstWithSecond_AB_FromMath()
+        public void MergeXWith_B_WhereXIs_A_ReturnsEquivalentOf_MergeFirstWithSecond_AB_FromMath()
         {
-            var product = JoinXWith(_handlerB.Object).WhereXIs(_handlerA.Object);
-            Assert.That(product, Is.SameAs(_mathMergeFirstWithSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.MergeFirstWithSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = MergeXWith(_handlerB.Object).WhereXIs(_handlerA.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void PutFirstInSecond_AB_Returns_PutFirstInSecond_AB_FromMath()
+        public void PackFirstInSecond_AB_ReturnsEquivalentOf_PackFirstInSecond_AB_FromMath()
         {
-            var product = PutFirstInSecond(_handlerA.Object, _handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathPutFirstInSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.PackFirstInSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = PackFirstInSecond(_handlerA.Object, _handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void Put_A_In_B_Returns_PutFirstInSecond_AB_FromMath()
+        public void Pack_A_In_B_ReturnsEquivalentOf_PackFirstInSecond_AB_FromMath()
         {
-            var product = Put(_handlerA.Object).In(_handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathPutFirstInSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.PackFirstInSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = Pack(_handlerA.Object).In(_handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void PutXIn_B_WhereXIs_A_Returns_PutFirstInSecond_AB_FromMath()
+        public void PackXIn_B_WhereXIs_A_ReturnsEquivalentOf_PackFirstInSecond_AB_FromMath()
         {
-            var product = PutXIn(_handlerB.Object).WhereXIs(_handlerA.Object);
-            Assert.That(product, Is.SameAs(_mathPutFirstInSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.PackFirstInSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = PackXIn(_handlerB.Object).WhereXIs(_handlerA.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void InjectFirstIntoSecond_AB_Returns_InjectFirstIntoSecond_AB_FromMath()
+        public void InjectFirstIntoSecond_AB_ReturnsEquivalentOf_InjectFirstIntoSecond_AB_FromMath()
         {
-            var product = InjectFirstIntoSecond(_handlerA.Object, _handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathInjectFirstIntoSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.InjectFirstIntoSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = InjectFirstIntoSecond(_handlerA.Object, _handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void Inject_A_Into_B_InjectFirstIntoSecond_AB_FromMath()
+        public void Inject_A_Into_B_ReturnsEquivalentOf_InjectFirstIntoSecond_AB_FromMath()
         {
-            var product = Inject(_handlerA.Object).Into(_handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathInjectFirstIntoSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.InjectFirstIntoSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = Inject(_handlerA.Object).Into(_handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void InjectXInto_B_WhereXIs_A_Returns_InjectFirstIntoSecond_AB_FromMath()
+        public void InjectXInto_B_WhereXIs_A_ReturnsEquivalentOf_InjectFirstIntoSecond_AB_FromMath()
         {
-            var product = InjectXInto(_handlerB.Object).WhereXIs(_handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathInjectFirstIntoSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.InjectFirstIntoSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = InjectXInto(_handlerB.Object).WhereXIs(_handlerA.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void FirstCoverSecond_AB_Returns_FirstCoverSecond_AB_FromMath()
+        public void FirstCoverSecond_AB_ReturnsEquivalentOf_FirstCoverSecond_AB_FromMath()
         {
-            var product = FirstCoverSecond(_handlerA.Object, _handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathFirstCoverSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.FirstCoverSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = FirstCoverSecond(_handlerA.Object, _handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void Use_A_ToCover_B_Returns_FirstCoverSecond_AB_FromMath()
+        public void Use_A_ToCover_B_ReturnsEquivalentOf_FirstCoverSecond_AB_FromMath()
         {
-            var product = Use(_handlerA.Object).ToCover(_handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathFirstCoverSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.FirstCoverSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = Use(_handlerA.Object).ToCover(_handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void XWrap_B_WhereCIs_A_Returns_FirstCoverSecond_AB_FromMath()
+        public void XCover_B_WhereXIs_A_ReturnsEquivalentOf_FirstCoverSecond_AB_FromMath()
         {
-            var product = XWrap(_handlerB.Object).WhereXIs(_handlerA.Object);
-            Assert.That(product, Is.SameAs(_mathFirstCoverSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.FirstCoverSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = XCover(_handlerB.Object).WhereXIs(_handlerA.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void FirstWrapSecond_AB_Returns_FirstWrapSecond_AB_FromMath()
+        public void FirstWrapSecond_AB_ReturnsEquivalentOf_FirstWrapSecond_AB_FromMath()
         {
-            var product = FirstWrapSecond(_handlerA.Object, _handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathFirstWrapSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.FirstWrapSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = FirstWrapSecond(_handlerA.Object, _handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void Use_A_ToCWrap_B_Returns_FirstWrapSecond_AB_FromMath()
+        public void Use_A_ToWrap_B_ReturnsEquivalentOf_FirstWrapSecond_AB_FromMath()
         {
-            var product = Use(_handlerA.Object).ToWrap(_handlerB.Object);
-            Assert.That(product, Is.SameAs(_mathFirstWrapSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.FirstWrapSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = Use(_handlerA.Object).ToWrap(_handlerB.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
         }
 
         [Test]
-        public void XWrap_B_WhereCIs_A_Returns_FirstWrapSecond_AB_FromMath()
+        public void XWrap_B_WhereXIs_A_ReturnsEquivalentOf_FirstWrapSecond_AB_FromMath()
         {
-            var product = XWrap(_handlerB.Object).WhereXIs(_handlerA.Object);
-            Assert.That(product, Is.SameAs(_mathFirstWrapSecond_AB.Object));
+            _handlerMath
+                .Setup(o => o.FirstWrapSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            var handler = XWrap(_handlerB.Object).WhereXIs(_handlerA.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("AB"));
+        }
+
+        private void SetupMathFirstThenSecond_ABC()
+        {
+            _handlerMath
+                .Setup(o => o.FirstThenSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            _handlerMath
+                .Setup(o => o.FirstThenSecond(_handlerAB.Object, _handlerC.Object))
+                .Returns(_handlerABC.Object);
+        }
+
+        [Test]
+        public void A_Then_B_Then_C_ReturnsEquivalentOf_FirstThenSecond_ABC_FromMath()
+        {
+            SetupMathFirstThenSecond_ABC();
+
+            var handler = _handlerA.Object
+                .Then(_handlerB.Object)
+                .Then(_handlerC.Object);    
+
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void FirstThenSecond_ABC_ReturnsEquivalentOf_FirstThenSecond_ABC_FromMath()
+        {
+            SetupMathFirstThenSecond_ABC();
+
+            var handler =
+                FirstThenSecond(
+                    FirstThenSecond(
+                        _handlerA.Object,
+                        _handlerB.Object),
+                    _handlerC.Object);
+
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void XThen_B_Then_C_WhereXIs_A_ReturnsEquivalentOf_FirstThenSecond_ABC_FromMath()
+        {
+            SetupMathFirstThenSecond_ABC();
+
+            var handler = XThen(_handlerB.Object)
+                .Then(_handlerC.Object)
+                .WhereXIs(_handlerA.Object);
+            
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        private void SetupMathJoinFirstWithSecond_ABC()
+        {
+            _handlerMath
+                .Setup(o => o.JoinFirstWithSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            _handlerMath
+                .Setup(o => o.JoinFirstWithSecond(_handlerAB.Object, _handlerC.Object))
+                .Returns(_handlerABC.Object);
+        }
+
+        [Test]
+        public void JoinFirstWithSecond_ABC_ReturnsEquivalentOf_JoinFirstWithSecond_ABC_FromMath()
+        {
+            SetupMathJoinFirstWithSecond_ABC();
+
+            var handler = 
+                JoinFirstWithSecond(
+                    JoinFirstWithSecond(
+                        _handlerA.Object, 
+                        _handlerB.Object),
+                    _handlerC.Object);
+            
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void Join_A_With_B_ThenWith_C_ReturnsEquivalentOf_JoinFirstWithSecond_ABC_FromMath()
+        {
+            SetupMathJoinFirstWithSecond_ABC();
+
+            var handler = Join(_handlerA.Object).With(_handlerB.Object)
+                .ThenWith(_handlerC.Object);
+            
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void JoinXWith_B_ThenWith_C_WhereXIs_A_ReturnsEquivalentOf_JoinFirstWithSecond_ABC_FromMath()
+        {
+            SetupMathJoinFirstWithSecond_ABC();
+
+            var handler = JoinXWith(_handlerB.Object)
+                .ThenWith(_handlerC.Object)
+                .WhereXIs(_handlerA.Object);
+            
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        private void SetupMergeFirstWithSecond_ABC()
+        {
+            _handlerMath
+                .Setup(o => o.MergeFirstWithSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            _handlerMath
+                .Setup(o => o.MergeFirstWithSecond(_handlerAB.Object, _handlerC.Object))
+                .Returns(_handlerABC.Object);
+        }
+
+        [Test]
+        public void MergeFirstWithSecond_ABC_ReturnsEquivalentOf_MergeFirstWithSecond_ABC_FromMath()
+        {
+            SetupMergeFirstWithSecond_ABC();
+
+            var handler = 
+                MergeFirstWithSecond(
+                    MergeFirstWithSecond(
+                        _handlerA.Object, 
+                        _handlerB.Object),
+                    _handlerC.Object);
+
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void Merge_A_With_B_ThenWith_C_ReturnsEquivalentOf_MergeFirstWithSecond_ABC_FromMath()
+        {
+            SetupMergeFirstWithSecond_ABC();
+
+            var handler = Merge(_handlerA.Object).With(_handlerB.Object)
+                .ThenWith(_handlerC.Object);
+
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void MergeXWith_B_ThenWith_C_WhereXIs_A_ReturnsEquivalentOf_MergeFirstWithSecond_ABC_FromMath()
+        {
+            SetupMergeFirstWithSecond_ABC();
+
+            var handler = MergeXWith(_handlerB.Object)
+                .ThenWith(_handlerC.Object)
+                .WhereXIs(_handlerA.Object);
+            
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        private void SetupMathPackFirstInSecond_ABC()
+        {
+            _handlerMath
+                .Setup(o => o.PackFirstInSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            _handlerMath
+                .Setup(o => o.PackFirstInSecond(_handlerAB.Object, _handlerC.Object))
+                .Returns(_handlerABC.Object);
+        }
+
+        [Test]
+        public void PackFirstInSecond_ABC_ReturnsEquivalentOf_PackFirstInSecond_ABC_FromMath()
+        {
+            SetupMathPackFirstInSecond_ABC();
+
+            var handler = 
+                PackFirstInSecond(
+                    PackFirstInSecond(
+                        _handlerA.Object,
+                        _handlerB.Object),
+                    _handlerC.Object);
+
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void Pack_A_In_B_ThenIn_C_ReturnsEquivalentOf_PackFirstInSecond_ABC_FromMath()
+        {
+            SetupMathPackFirstInSecond_ABC();
+
+            var handler = Pack(_handlerA.Object).In(_handlerB.Object)
+                .ThenIn(_handlerC.Object);
+
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void PackXIn_B_ThenIn_C_WhereXIs_A_ReturnsEquivalentOf_PackFirstInSecond_ABC_FromMath()
+        {
+            SetupMathPackFirstInSecond_ABC();
+
+            var handler = PackXIn(_handlerB.Object)
+                .ThenIn(_handlerC.Object)
+                .WhereXIs(_handlerA.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        private void SetupMathInjectFirstIntoSecond()
+        {
+            _handlerMath
+                .Setup(o => o.InjectFirstIntoSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            _handlerMath
+                .Setup(o => o.InjectFirstIntoSecond(_handlerAB.Object, _handlerC.Object))
+                .Returns(_handlerABC.Object);
+        }
+
+        [Test]
+        public void InjectFirstIntoSecond_ABC_ReturnsEquivalentOf_InjectFirstIntoSecond_ABC_FromMath()
+        {
+            SetupMathInjectFirstIntoSecond();
+
+            var handler =
+                InjectFirstIntoSecond(
+                    InjectFirstIntoSecond(
+                        _handlerA.Object,
+                        _handlerB.Object),
+                    _handlerC.Object);
+            
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void Inject_A_Into_B_ThenInto_C_ReturnsEquivalentOf_InjectFirstIntoSecond_ABC_FromMath()
+        {
+            SetupMathInjectFirstIntoSecond();
+
+            var handler = Inject(_handlerA.Object).Into(_handlerB.Object)
+                .ThenInto(_handlerC.Object);
+
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void InjectXInto_B_ThenInto_C_WhereXIs_A_ReturnsEquivalentOf_InjectFirstIntoSecond_ABC_FromMath()
+        {
+            SetupMathInjectFirstIntoSecond();
+
+            var handler = InjectXInto(_handlerB.Object)
+                .ThenInto(_handlerC.Object)
+                .WhereXIs(_handlerA.Object);
+
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        private void SetupMathFirstCoverSecond_ABC()
+        {
+            _handlerMath
+                .Setup(o => o.FirstCoverSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            _handlerMath
+                .Setup(o => o.FirstCoverSecond(_handlerAB.Object, _handlerC.Object))
+                .Returns(_handlerABC.Object);
+        }
+
+        [Test]
+        public void FirstCoverSecond_ABC_ReturnsEquivalentOf_FirstCoverSecond_ABC_FromMath()
+        {
+            SetupMathFirstCoverSecond_ABC();
+
+            var handler =
+                FirstCoverSecond(
+                    FirstCoverSecond(
+                        _handlerA.Object,
+                        _handlerB.Object),
+                    _handlerC.Object);
+
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void Use_A_ToCover_B_ThenCover_C_ReturnsEquivalentOf_FirstCoverSecond_ABC_FromMath()
+        {
+            SetupMathFirstCoverSecond_ABC();
+
+            var handler = Use(_handlerA.Object).ToCover(_handlerB.Object)
+                .ThenCover(_handlerC.Object);
+
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void XCover_B_ThenCover_C_WhereXIs_A_ReturnsEquivalentOf_FirstCoverSecond_ABC_FromMath()
+        {
+            SetupMathFirstCoverSecond_ABC();
+
+            var handler = XCover(_handlerB.Object)
+                .ThenCover(_handlerC.Object)
+                .WhereXIs(_handlerA.Object);
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        private void SetupMathFirstWrapSecond_ABC()
+        {
+            _handlerMath
+                .Setup(o => o.FirstWrapSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_handlerAB.Object);
+
+            _handlerMath
+                .Setup(o => o.FirstWrapSecond(_handlerAB.Object, _handlerC.Object))
+                .Returns(_handlerABC.Object);
+        }
+
+        [Test]
+        public void FirstWrapSecond_ABC_ReturnsEquivalentOf_FirstWrapSecond_ABC_FromMath()
+        {
+            SetupMathFirstWrapSecond_ABC();
+
+            var handler = 
+                FirstWrapSecond(
+                    FirstWrapSecond(
+                        _handlerA.Object,
+                        _handlerB.Object),
+                    _handlerC.Object);
+
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void Use_A_ToWrap_B_ThenWrap_C_ReturnsEquivalentOf_FirstWrapSecond_ABC_FromMath()
+        {
+            SetupMathFirstWrapSecond_ABC();
+
+            var handler = Use(_handlerA.Object).ToWrap(_handlerB.Object)
+                .ThenWrap(_handlerC.Object);
+
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
+        }
+
+        [Test]
+        public void XWrap_B_ThenWrap_C_WhereXIs_A_ReturnsEquivalentOf_FirstWrapSecond_ABC_FromMath()
+        {
+            SetupMathFirstWrapSecond_ABC();
+
+            var handler = XWrap(_handlerB.Object)
+                .ThenWrap(_handlerC.Object)
+                .WhereXIs(_handlerA.Object);
+
+            handler.Execute(Arg);
+
+            Assert.That(_handlersExecutionResult,
+                Is.EqualTo("ABC"));
         }
 
         [Test]
