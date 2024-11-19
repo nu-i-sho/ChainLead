@@ -57,7 +57,7 @@
                     .When(Not(OrderExclude(mustard))),
                 Put(topBun)
             }
-            .Select(Inject(Index).Into)
+            .Select(Pack(Index).In(Dot).ThenIn(Space).ThenIn)
             .Select(XCover(NewLine).WhereXIs)
             .Aggregate(FirstThenSecond);
 
@@ -77,7 +77,7 @@
                 Add(tartareSauce),
                 Put(topBun)
             }
-            .Select(Inject(Index).Into)
+            .Select(Pack(Index).In(Dot).ThenIn(Space).ThenIn)
             .Select(XCover(NewLine).WhereXIs)
             .Aggregate(FirstThenSecond);
 
@@ -106,7 +106,7 @@
                 Add(sandwichSauce),
                 Put(topBun)
             })
-            .Select(Inject(Index).Into)
+            .Select(Pack(Index.Then(Dot).Then(Space)).In)
             .Select(XCover(NewLine).WhereXIs)
             .Aggregate(FirstThenSecond);
 
@@ -178,7 +178,13 @@
             MakeHandler<State>(x => x.Recipe.AppendLine());
 
         private static IHandler<State> Index =>
-            MakeHandler<State>(x => x.Recipe.Append($"{x.StepCounter++}. "));
+            MakeHandler<State>(x => x.Recipe.Append($"{x.StepCounter++}"));
+
+        private static IHandler<State> Dot =>
+            MakeHandler<State>(x => x.Recipe.Append($"."));
+
+        private static IHandler<State> Space =>
+            MakeHandler<State>(x => x.Recipe.Append($" "));
 
         private static IHandler<State> RecipePoint(string text) =>
             MakeHandler<State>(x => x.Recipe.Append(text));

@@ -10,7 +10,7 @@
 
         IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b);
 
-        IHandler<T> PutFirstInSecond<T>(IHandler<T> a, IHandler<T> b);
+        IHandler<T> PackFirstInSecond<T>(IHandler<T> a, IHandler<T> b);
 
         IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> a, IHandler<T> b);
 

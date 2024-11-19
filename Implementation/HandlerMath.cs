@@ -16,7 +16,12 @@
 
         public bool IsZero<T>(
             IHandler<T> handler) =>
-                handler is IZero<T>;
+                handler switch
+                {
+                    IZero<T> => true,
+                    IExtendedHandler<T> x => IsZero(x.Origin),
+                    _ => false
+                };
 
         public IHandler<T> MakeHandler<T>(
             Action<T> action) =>
@@ -32,7 +37,7 @@
                    _ => new Sum<T>(a, b)
                };
 
-        public IHandler<T> PutFirstInSecond<T>(
+        public IHandler<T> PackFirstInSecond<T>(
                IHandler<T> a,
                IHandler<T> b)
         {
@@ -124,6 +129,7 @@
             IHandler<T> handler) => 
             handler switch
             {
+                IExtendedHandler<T> x => SplitHandlerAndCondition(x.Origin),
                 Conditional<T> x => (x.Handler, x.Condition),
                 _ => (handler, null)
             };
