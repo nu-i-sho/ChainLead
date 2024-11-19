@@ -3,6 +3,7 @@
     using ChainLead.Contracts;
     using Moq;
 
+    using ChainLead.Contracts.Syntax;
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
 
     [TestFixture]
@@ -14,13 +15,13 @@
         Mock<IHandler<int>> _handler;
         Mock<IHandler<int>> _handlerA;
         Mock<IHandler<int>> _handlerB;
-        Mock<IHandler<int>> _joinedAB;
-        Mock<IHandler<int>> _mergedAB;
-        Mock<IHandler<int>> _deepMergedAB;
-        Mock<IHandler<int>> _injectedAB;
-        Mock<IHandler<int>> _deepInjectedAB;
-        Mock<IHandler<int>> _wrappedAB;
-        Mock<IHandler<int>> _deepWrappedAB;
+        Mock<IHandler<int>> _mathFirstThenSecond_AB;
+        Mock<IHandler<int>> _mathJoinFirstWithSecond_AB;
+        Mock<IHandler<int>> _mathMergeFirstWithSecond_AB;
+        Mock<IHandler<int>> _mathPutFirstInSecond_AB;
+        Mock<IHandler<int>> _mathInjectFirstIntoSecond_AB;
+        Mock<IHandler<int>> _mathFirstCoverSecond_AB;
+        Mock<IHandler<int>> _mathFirstWrapSecond_AB;
 
         Mock<ICondition<int>> _condition;
         Mock<ICondition<int>> _conditionA;
@@ -35,46 +36,46 @@
             _handler = new Mock<IHandler<int>>();
             _handlerA = new Mock<IHandler<int>>();
             _handlerB = new Mock<IHandler<int>>();
-            _joinedAB = new Mock<IHandler<int>>();
-            _mergedAB = new Mock<IHandler<int>>();
-            _deepMergedAB = new Mock<IHandler<int>>();
-            _injectedAB = new Mock<IHandler<int>>();
-            _deepInjectedAB = new Mock<IHandler<int>>();
-            _wrappedAB = new Mock<IHandler<int>>();
-            _deepWrappedAB = new Mock<IHandler<int>>();
+            _mathFirstThenSecond_AB = new Mock<IHandler<int>>();
+            _mathJoinFirstWithSecond_AB = new Mock<IHandler<int>>();
+            _mathMergeFirstWithSecond_AB = new Mock<IHandler<int>>();
+            _mathPutFirstInSecond_AB = new Mock<IHandler<int>>();
+            _mathInjectFirstIntoSecond_AB = new Mock<IHandler<int>>();
+            _mathFirstCoverSecond_AB = new Mock<IHandler<int>>();
+            _mathFirstWrapSecond_AB = new Mock<IHandler<int>>();
 
             _condition = new Mock<ICondition<int>>();
             _conditionA = new Mock<ICondition<int>>();
             _conditionB = new Mock<ICondition<int>>();
 
             _handlerMath
-                .Setup(o => o.Join(_handlerA.Object, _handlerB.Object))
-                .Returns(_joinedAB.Object);
+                .Setup(o => o.FirstThenSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_mathFirstThenSecond_AB.Object);
 
             _handlerMath
-                .Setup(o => o.Merge(_handlerA.Object, _handlerB.Object))
-                .Returns(_mergedAB.Object);
+                .Setup(o => o.JoinFirstWithSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_mathJoinFirstWithSecond_AB.Object);
 
             _handlerMath
-                .Setup(o => o.DeepMerge(_handlerA.Object, _handlerB.Object))
-                .Returns(_deepMergedAB.Object);
+                .Setup(o => o.MergeFirstWithSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_mathMergeFirstWithSecond_AB.Object);
 
             _handlerMath
-                .Setup(o => o.Inject(_handlerA.Object, _handlerB.Object))
-                .Returns(_injectedAB.Object);
+                .Setup(o => o.PutFirstInSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_mathPutFirstInSecond_AB.Object);
 
             _handlerMath
-                .Setup(o => o.DeepInject(_handlerA.Object, _handlerB.Object))
-                .Returns(_deepInjectedAB.Object);
+                .Setup(o => o.InjectFirstIntoSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_mathInjectFirstIntoSecond_AB.Object);
 
             _handlerMath
-                .Setup(o => o.Wrap(_handlerA.Object, _handlerB.Object))
-                .Returns(_wrappedAB.Object);
+                .Setup(o => o.FirstCoverSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_mathFirstCoverSecond_AB.Object);
 
             _handlerMath
-                .Setup(o => o.DeepWrap(_handlerA.Object, _handlerB.Object))
-                .Returns(_deepWrappedAB.Object);
-
+                .Setup(o => o.FirstWrapSecond(_handlerA.Object, _handlerB.Object))
+                .Returns(_mathFirstWrapSecond_AB.Object);
+            
             ConfigureChainLeadSyntax
                 .WithHandlerMath(_handlerMath.Object)
                 .AndWithConditionMath(_conditionMath.Object);
@@ -95,187 +96,150 @@
         }
 
         [Test]
-        public void ThenReturnsMathJoinExecutionResult()
+        public void A_Then_B_Returns_FirstThenSecond_AB_FromMath()
         {
             var product = _handlerA.Object.Then(_handlerB.Object);
-            
-            Assert.That(product, Is.SameAs(_joinedAB.Object));
+            Assert.That(product, Is.SameAs(_mathFirstThenSecond_AB.Object));
         }
 
         [Test]
-        public void JoinReturnsMathJoinExecutionResult()
+        public void FirstThenSecond_AB_Returns_FirstThenSecond_AB_FromMath()
         {
-            var product = Join(_handlerA.Object, _handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_joinedAB.Object));
+            var product = FirstThenSecond(_handlerA.Object, _handlerB.Object);
+            Assert.That(product, Is.SameAs(_mathFirstThenSecond_AB.Object));
         }
 
         [Test]
-        public void JoinXToReturnsMathJoinExecutionResult()
+        public void XThen_B_WhereXIs_A_Returns_FirstThenSecond_AB_FromMath()
         {
-            var product = Join(_handlerA.Object).To(_handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_joinedAB.Object));
+            var product = XThen(_handlerB.Object).WhereXIs(_handlerA.Object);
+            Assert.That(product, Is.SameAs(_mathFirstThenSecond_AB.Object));
         }
 
         [Test]
-        public void JoinItToReturnsMathJoinExecutionResult()
+        public void JoinFirstWithSecond_AB_Returns_JoinFirstWithSecond_AB_FromMath()
         {
-            var joinItToB = JoinItTo(_handlerB.Object);
-            var product = joinItToB(_handlerA.Object);
-
-            Assert.That(product, Is.SameAs(_joinedAB.Object));
+            var product = JoinFirstWithSecond(_handlerA.Object, _handlerB.Object);
+            Assert.That(product, Is.SameAs(_mathJoinFirstWithSecond_AB.Object));
         }
 
         [Test]
-        public void MergeReturnsMathJoinExecutionResult()
+        public void Join_A_With_B_Returns_JoinFirstWithSecond_AB_FromMath()
         {
-            var product = Merge(_handlerA.Object, _handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_mergedAB.Object));
+            var product = Join(_handlerA.Object).With(_handlerB.Object);
+            Assert.That(product, Is.SameAs(_mathJoinFirstWithSecond_AB.Object));
         }
 
         [Test]
-        public void MergeXWithReturnsMathJoinExecutionResult()
+        public void JoinXWith_B_WhereXIs_A_JoinFirstWithSecond_AB_FromMath()
+        {
+            var product = JoinXWith(_handlerB.Object).WhereXIs(_handlerA.Object);
+            Assert.That(product, Is.SameAs(_mathJoinFirstWithSecond_AB.Object));
+        }
+
+        [Test]
+        public void MergeFirstWithSecond_AB_Returns_MergeFirstWithSecond_AB_FromMath()
+        {
+            var product = MergeFirstWithSecond(_handlerA.Object, _handlerB.Object);
+            Assert.That(product, Is.SameAs(_mathMergeFirstWithSecond_AB.Object));
+        }
+
+        [Test]
+        public void Merge_A_With_B_Returns_MergeFirstWithSecond_AB_FromMath()
         {
             var product = Merge(_handlerA.Object).With(_handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_mergedAB.Object));
+            Assert.That(product, Is.SameAs(_mathMergeFirstWithSecond_AB.Object));
         }
 
         [Test]
-        public void MergeItWithReturnsMathJoinExecutionResult()
+        public void MergeXWith_B_WhereXIs_A_MergeFirstWithSecond_AB_FromMath()
         {
-            var mergeItWithB = MergeItWith(_handlerB.Object);
-            var product = mergeItWithB(_handlerA.Object);
-
-            Assert.That(product, Is.SameAs(_mergedAB.Object));
+            var product = JoinXWith(_handlerB.Object).WhereXIs(_handlerA.Object);
+            Assert.That(product, Is.SameAs(_mathMergeFirstWithSecond_AB.Object));
         }
 
         [Test]
-        public void DeepMergeReturnsMathJoinExecutionResult()
+        public void PutFirstInSecond_AB_Returns_PutFirstInSecond_AB_FromMath()
         {
-            var product = DeepMerge(_handlerA.Object, _handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_deepMergedAB.Object));
+            var product = PutFirstInSecond(_handlerA.Object, _handlerB.Object);
+            Assert.That(product, Is.SameAs(_mathPutFirstInSecond_AB.Object));
         }
 
         [Test]
-        public void DeepMergeXWithReturnsMathJoinExecutionResult()
+        public void Put_A_In_B_Returns_PutFirstInSecond_AB_FromMath()
         {
-            var product = DeepMerge(_handlerA.Object).With(_handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_deepMergedAB.Object));
+            var product = Put(_handlerA.Object).In(_handlerB.Object);
+            Assert.That(product, Is.SameAs(_mathPutFirstInSecond_AB.Object));
         }
 
         [Test]
-        public void DeepMergeItWithReturnsMathJoinExecutionResult()
+        public void PutXIn_B_WhereXIs_A_Returns_PutFirstInSecond_AB_FromMath()
         {
-            var deepMergeItWithB = DeepMergeItWith(_handlerB.Object);
-            var product = deepMergeItWithB(_handlerA.Object);
-
-            Assert.That(product, Is.SameAs(_deepMergedAB.Object));
+            var product = PutXIn(_handlerB.Object).WhereXIs(_handlerA.Object);
+            Assert.That(product, Is.SameAs(_mathPutFirstInSecond_AB.Object));
         }
 
         [Test]
-        public void InjectReturnsMathJoinExecutionResult()
+        public void InjectFirstIntoSecond_AB_Returns_InjectFirstIntoSecond_AB_FromMath()
         {
-            var product = Inject(_handlerA.Object, _handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_injectedAB.Object));
+            var product = InjectFirstIntoSecond(_handlerA.Object, _handlerB.Object);
+            Assert.That(product, Is.SameAs(_mathInjectFirstIntoSecond_AB.Object));
         }
 
         [Test]
-        public void InjectXIntoReturnsMathJoinExecutionResult()
+        public void Inject_A_Into_B_InjectFirstIntoSecond_AB_FromMath()
         {
             var product = Inject(_handlerA.Object).Into(_handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_injectedAB.Object));
+            Assert.That(product, Is.SameAs(_mathInjectFirstIntoSecond_AB.Object));
         }
 
         [Test]
-        public void InjectItIntoReturnsMathJoinExecutionResult()
+        public void InjectXInto_B_WhereXIs_A_Returns_InjectFirstIntoSecond_AB_FromMath()
         {
-            var injectItIntoB = InjectItInto(_handlerB.Object);
-            var product = injectItIntoB(_handlerA.Object);
-
-            Assert.That(product, Is.SameAs(_injectedAB.Object));
+            var product = InjectXInto(_handlerB.Object).WhereXIs(_handlerB.Object);
+            Assert.That(product, Is.SameAs(_mathInjectFirstIntoSecond_AB.Object));
         }
 
         [Test]
-        public void DeepInjectReturnsMathJoinExecutionResult()
+        public void FirstCoverSecond_AB_Returns_FirstCoverSecond_AB_FromMath()
         {
-            var product = DeepInject(_handlerA.Object, _handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_deepInjectedAB.Object));
+            var product = FirstCoverSecond(_handlerA.Object, _handlerB.Object);
+            Assert.That(product, Is.SameAs(_mathFirstCoverSecond_AB.Object));
         }
 
         [Test]
-        public void DeepInjectXIntoReturnsMathJoinExecutionResult()
+        public void Use_A_ToCover_B_Returns_FirstCoverSecond_AB_FromMath()
         {
-            var product = DeepInject(_handlerA.Object).Into(_handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_deepInjectedAB.Object));
+            var product = Use(_handlerA.Object).ToCover(_handlerB.Object);
+            Assert.That(product, Is.SameAs(_mathFirstCoverSecond_AB.Object));
         }
 
         [Test]
-        public void DeepInjectItIntoReturnsMathJoinExecutionResult()
+        public void XWrap_B_WhereCIs_A_Returns_FirstCoverSecond_AB_FromMath()
         {
-            var deepInjectItIntoB = DeepInjectItInto(_handlerB.Object);
-            var product = deepInjectItIntoB(_handlerA.Object);
-
-            Assert.That(product, Is.SameAs(_deepInjectedAB.Object));
+            var product = XWrap(_handlerB.Object).WhereXIs(_handlerA.Object);
+            Assert.That(product, Is.SameAs(_mathFirstCoverSecond_AB.Object));
         }
 
         [Test]
-        public void WrapReturnsMathJoinExecutionResult()
+        public void FirstWrapSecond_AB_Returns_FirstWrapSecond_AB_FromMath()
         {
-            var product = Wrap(_handlerA.Object, _handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_wrappedAB.Object));
+            var product = FirstWrapSecond(_handlerA.Object, _handlerB.Object);
+            Assert.That(product, Is.SameAs(_mathFirstWrapSecond_AB.Object));
         }
 
         [Test]
-        public void WrapXUpReturnsMathJoinExecutionResult()
+        public void Use_A_ToCWrap_B_Returns_FirstWrapSecond_AB_FromMath()
         {
-            var product = Wrap(_handlerA.Object).Up(_handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_wrappedAB.Object));
+            var product = Use(_handlerA.Object).ToWrap(_handlerB.Object);
+            Assert.That(product, Is.SameAs(_mathFirstWrapSecond_AB.Object));
         }
 
         [Test]
-        public void WrapItUpReturnsMathJoinExecutionResult()
+        public void XWrap_B_WhereCIs_A_Returns_FirstWrapSecond_AB_FromMath()
         {
-            var wrapItUp = WrapItUp(_handlerB.Object);
-            var product = wrapItUp(_handlerA.Object);
-
-            Assert.That(product, Is.SameAs(_wrappedAB.Object));
-        }
-
-
-        [Test]
-        public void DeepWrapReturnsMathJoinExecutionResult()
-        {
-            var product = DeepWrap(_handlerA.Object, _handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_deepWrappedAB.Object));
-        }
-
-        [Test]
-        public void DeepWrapXUpReturnsMathJoinExecutionResult()
-        {
-            var product = DeepWrap(_handlerA.Object).Up(_handlerB.Object);
-
-            Assert.That(product, Is.SameAs(_deepWrappedAB.Object));
-        }
-
-        [Test]
-        public void DeepWrapItUpReturnsMathJoinExecutionResult()
-        {
-            var deepWrapItUp = DeepWrapItUp(_handlerB.Object);
-            var product = deepWrapItUp(_handlerA.Object);
-
-            Assert.That(product, Is.SameAs(_deepWrappedAB.Object));
+            var product = XWrap(_handlerB.Object).WhereXIs(_handlerA.Object);
+            Assert.That(product, Is.SameAs(_mathFirstWrapSecond_AB.Object));
         }
 
         [Test]
