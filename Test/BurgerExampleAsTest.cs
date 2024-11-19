@@ -23,7 +23,7 @@
                 UncknownBurger
             }
             .Select(WithConditionThat(RecipeIsMissing))
-            .Aggregate(Join)
+            .Aggregate(FirstThenSecond)
             .Execute(state);
 
             return state.Recipe.ToString();
@@ -58,8 +58,8 @@
                 Put(topBun)
             }
             .Select(Inject(Index).Into)
-            .Select(WrapItUp(NewLine))
-            .Aggregate(Join);
+            .Select(XCover(NewLine).WhereXIs)
+            .Aggregate(FirstThenSecond);
 
         public static IHandler<State> Fishburger =>
             new[]
@@ -78,8 +78,8 @@
                 Put(topBun)
             }
             .Select(Inject(Index).Into)
-            .Select(WrapItUp(NewLine))
-            .Aggregate(Join);
+            .Select(XCover(NewLine).WhereXIs)
+            .Aggregate(FirstThenSecond);
 
         public static IHandler<State> Chikenburger =>
             new[]
@@ -95,7 +95,7 @@
                 Bread(chickenPatty),
                 Fry(chickenPatty)
             }
-            .Select(WrapItUp(Again.When(NameStartWith(@double)))))
+            .Select(XCover(Again.When(NameStartWith(@double))).WhereXIs))
             .Concat(new[]
             {
                 Toast(bun),
@@ -107,8 +107,8 @@
                 Put(topBun)
             })
             .Select(Inject(Index).Into)
-            .Select(WrapItUp(NewLine))
-            .Aggregate(Join);
+            .Select(XCover(NewLine).WhereXIs)
+            .Aggregate(FirstThenSecond);
 
         public static IHandler<State> UncknownBurger =>
             MakeHandler<State>(x => x.Recipe.Append(

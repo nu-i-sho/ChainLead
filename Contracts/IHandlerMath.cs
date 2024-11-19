@@ -8,19 +8,19 @@
 
         bool IsZero<T>(IHandler<T> handler);
 
-        IHandler<T> Join<T>(IHandler<T> a, IHandler<T> b);
+        IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b);
 
-        IHandler<T> Merge<T>(IHandler<T> a, IHandler<T> b);
+        IHandler<T> PutFirstInSecond<T>(IHandler<T> a, IHandler<T> b);
 
-        IHandler<T> DeepMerge<T>(IHandler<T> a, IHandler<T> b);
+        IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> a, IHandler<T> b);
 
-        IHandler<T> Inject<T>(IHandler<T> a, IHandler<T> b);
+        IHandler<T> FirstCoverSecond<T>(IHandler<T> a, IHandler<T> b);
 
-        IHandler<T> DeepInject<T>(IHandler<T> a, IHandler<T> b);
+        IHandler<T> FirstWrapSecond<T>(IHandler<T> a, IHandler<T> b);
 
-        IHandler<T> Wrap<T>(IHandler<T> a, IHandler<T> b);
+        IHandler<T> JoinFirstWithSecond<T>(IHandler<T> a, IHandler<T> b);
 
-        IHandler<T> DeepWrap<T>(IHandler<T> a, IHandler<T> b);
+        IHandler<T> MergeFirstWithSecond<T>(IHandler<T> a, IHandler<T> b);
 
         IHandler<T> Conditional<T>(IHandler<T> handler, ICondition<T> condition);
     }

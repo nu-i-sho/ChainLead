@@ -22,23 +22,63 @@
             Action<T> action) =>
                 new Handler<T>(action);
 
-        public IHandler<T> Join<T>(
-            IHandler<T> a,
-            IHandler<T> b) =>
-                0 switch
-                {
-                    _ when IsZero(a) => b,
-                    _ when IsZero(b) => a,
-                    _ => new Joined<T>(a, b)
-                };
+        public IHandler<T> FirstThenSecond<T>(
+               IHandler<T> a,
+               IHandler<T> b) =>
+               0 switch
+               {
+                   _ when IsZero(a) => b,
+                   _ when IsZero(b) => a,
+                   _ => new Sum<T>(a, b)
+               };
 
-        public IHandler<T> Merge<T>(
-            IHandler<T> a,
-            IHandler<T> b)
+        public IHandler<T> PutFirstInSecond<T>(
+               IHandler<T> a,
+               IHandler<T> b)
+        {
+            (b, var condition) = SplitHandlerAndCondition(b);
+            return condition != null
+                 ? Conditional(FirstThenSecond(a, b), condition)
+                 : FirstThenSecond(a, b);
+        }
+
+        public IHandler<T> InjectFirstIntoSecond<T>(
+               IHandler<T> a,
+               IHandler<T> b)
+        {
+            (b, var condition) = SplitHandlerAndCondition(b);
+            return condition != null
+                 ? Conditional(InjectFirstIntoSecond(a, b), condition)
+                 : FirstThenSecond(a, b);
+        }
+
+        public IHandler<T> FirstCoverSecond<T>(
+               IHandler<T> a,
+               IHandler<T> b)
+        {
+            (a, var condition) = SplitHandlerAndCondition(a);
+            return condition != null
+                 ? Conditional(FirstThenSecond(a, b), condition)
+                 : FirstThenSecond(a, b);
+        }
+
+        public IHandler<T> FirstWrapSecond<T>(
+               IHandler<T> a,
+               IHandler<T> b)
+        {
+            (a, var condition) = SplitHandlerAndCondition(a);
+            return condition != null
+                 ? Conditional(FirstWrapSecond(a, b), condition)
+                 : FirstThenSecond(a, b);
+        }
+
+        public IHandler<T> JoinFirstWithSecond<T>(
+               IHandler<T> a,
+               IHandler<T> b)
         {
             var (aHandler, aCondition) = SplitHandlerAndCondition(a);
             var (bHandler, bCondition) = SplitHandlerAndCondition(b);
-            var abHandler = Join(aHandler, bHandler);
+            var abHandler = FirstThenSecond(aHandler, bHandler);
 
             return (aCondition, bCondition) switch
             {
@@ -51,13 +91,13 @@
             };
         }
 
-        public IHandler<T> DeepMerge<T>(
-            IHandler<T> a,
-            IHandler<T> b)
+        public IHandler<T> MergeFirstWithSecond<T>(
+               IHandler<T> a,
+               IHandler<T> b)
         {
             var (aHandler, aCondition) = SplitHandlerAndAllConditions(a);
             var (bHandler, bCondition) = SplitHandlerAndAllConditions(b);
-            var abHandler = Join(aHandler, bHandler);
+            var abHandler = FirstThenSecond(aHandler, bHandler);
 
             return (aCondition, bCondition) switch
             {
@@ -68,46 +108,6 @@
                 _ => Conditional(abHandler,
                         _conditionMath.And(aCondition, bCondition)),
             };
-        }
-
-        public IHandler<T> Inject<T>(
-            IHandler<T> a, 
-            IHandler<T> b)
-        {
-            (b, var condition) = SplitHandlerAndCondition(b);
-            return condition != null
-                 ? Conditional(Join(a, b), condition)
-                 : Join(a, b);
-        }
-
-        public IHandler<T> DeepInject<T>(
-            IHandler<T> a,
-            IHandler<T> b)
-        {
-            (b, var condition) = SplitHandlerAndCondition(b);
-            return condition != null
-                 ? Conditional(DeepInject(a, b), condition)
-                 : Join(a, b);
-        }
-
-        public IHandler<T> Wrap<T>(
-            IHandler<T> a,
-            IHandler<T> b)
-        {
-            (a, var condition) = SplitHandlerAndCondition(a);
-            return condition != null
-                 ? Conditional(Join(a, b), condition)
-                 : Join(a, b);
-        }
-
-        public IHandler<T> DeepWrap<T>(
-            IHandler<T> a,
-            IHandler<T> b)
-        {
-            (a, var condition) = SplitHandlerAndCondition(a);
-            return condition != null
-                 ? Conditional(DeepWrap(a, b), condition)
-                 : Join(a, b);
         }
 
         public IHandler<T> Conditional<T>(
@@ -160,7 +160,7 @@
             imlementation(state);
     }
 
-    file struct Joined<T>(
+    file struct Sum<T>(
         IHandler<T> Prev, 
         IHandler<T> Next) : IHandler<T>
     {

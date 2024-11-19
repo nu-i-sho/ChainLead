@@ -32,30 +32,36 @@ namespace ChainLead.Test
         private Mock<IConditionMath> _conditionMath;
 
         private const string
-            Join = nameof(Join),
-            Merge = nameof(Merge),
-            DeepMerge = nameof(DeepMerge),
-            Inject = nameof(Inject),
-            DeepInject = nameof(DeepInject),
-            Wrap = nameof(Wrap),
-            DeepWrap = nameof(DeepWrap);
+            FirstThenSecond = nameof(IHandlerMath.FirstThenSecond),
+            PutFirstInSecond = nameof(IHandlerMath.PutFirstInSecond),
+            InjectFirstIntoSecond = nameof(IHandlerMath.InjectFirstIntoSecond),
+            FirstCoverSecond = nameof(IHandlerMath.FirstCoverSecond),
+            FirstWrapSecond = nameof(IHandlerMath.FirstWrapSecond),
+            JoinFirstWithSecond = nameof(IHandlerMath.JoinFirstWithSecond),
+            MergeFirstWithSecond = nameof(IHandlerMath.MergeFirstWithSecond);
 
         private static string[] AllAppends =
         {
-            Join, Merge, DeepMerge, Inject, DeepInject, Wrap, DeepWrap
+            FirstThenSecond,
+            PutFirstInSecond,
+            InjectFirstIntoSecond,
+            FirstCoverSecond,
+            FirstWrapSecond,
+            JoinFirstWithSecond,
+            MergeFirstWithSecond
         };
 
         private Func<IHandler<T>, IHandler<T>, IHandler<T>>
             AppendFunc<T>(string by) =>
                 by switch
                 {
-                    Join => _math.Join,
-                    Merge => _math.Merge,
-                    DeepMerge => _math.DeepMerge,
-                    Inject => _math.Inject,
-                    DeepInject => _math.DeepInject,
-                    Wrap => _math.Wrap,
-                    DeepWrap => _math.DeepWrap,
+                    FirstThenSecond => _math.FirstThenSecond,
+                    PutFirstInSecond => _math.PutFirstInSecond,
+                    InjectFirstIntoSecond => _math.InjectFirstIntoSecond,
+                    FirstCoverSecond => _math.FirstCoverSecond,
+                    FirstWrapSecond => _math.FirstWrapSecond,
+                    JoinFirstWithSecond => _math.JoinFirstWithSecond,
+                    MergeFirstWithSecond => _math.MergeFirstWithSecond,
                     _ => throw new ArgumentOutOfRangeException(nameof(by))
                 };
 
@@ -473,7 +479,7 @@ namespace ChainLead.Test
         }
 
         [Test]
-        public void ChecksOrderEqualsWrappingOrder(
+        public void ChecksOrderEqualsConditionsWrappingOrder(
             [Values("123")] string abcMarkers,
             [Values("321")] string expectedLog)
         {
@@ -498,7 +504,7 @@ namespace ChainLead.Test
         [TestCase("01100011")]
         [TestCase("1111100001001010")]
         [TestCase("0101010111100010000111")]
-        public void ConditionalHandlersJoinedToChainExecuteRelevantHandlers(
+        public void ConditionalHandlersAddedToChainExecuteRelevantHandlers(
             string conditionsSetup)
         {
             var chainLength = conditionsSetup.Length;
@@ -525,7 +531,7 @@ namespace ChainLead.Test
                 .Zip(handlers.Select(x => x.Object),
                      conditions.Select(x => x.Object),
                      _math.Conditional)
-                .Aggregate(_math.Join);
+                .Aggregate(_math.FirstThenSecond);
 
             chain.Execute(Arg);
 
@@ -544,7 +550,7 @@ namespace ChainLead.Test
         [TestCase("101", "A1")]
         [TestCase("110", "C0")]
         [TestCase("111", "C1")]
-        public void MergeCreatesNewHandlerWithRelevantPredicate2(
+        public void JoinFirstWithSecondCreatesNewHandlerWithRelevantPredicate(
             string setup,
             string expectation)
         {
@@ -573,7 +579,7 @@ namespace ChainLead.Test
 
             CheckNothingExecuted();
 
-            var ab = _math.Merge(a, b);
+            var ab = _math.JoinFirstWithSecond(a, b);
 
             CheckNothingExecuted();
 
@@ -601,7 +607,7 @@ namespace ChainLead.Test
         [TestCase("0-1--1", "101001", "0-1")]
         [TestCase("1-0--1", "101001", "1-0")]
         [TestCase("1-1--1", "101001", "1-1")]
-        public void MergeConjunctsOnlyTopConditions(
+        public void JoinFirstWithSecondConjunctsOnlyTopConditions(
             string conditionCheckResult,
             string conditionCheckExpected,
             string handlerExecuteExpected)
@@ -637,11 +643,11 @@ namespace ChainLead.Test
 
             CheckNothingExecuted();
 
-            var a_ab_MargedWith_c_cd = _math.Merge(a_ab, c_cd);
+            var a_ab__JoinWith__c_cd = _math.JoinFirstWithSecond(a_ab, c_cd);
 
             CheckNothingExecuted();
 
-            a_ab_MargedWith_c_cd.Execute(Arg);
+            a_ab__JoinWith__c_cd.Execute(Arg);
 
             foreach (var i in new[] { A, B, C, D, E, F })
                 _conditions[i].Verify(o => o.Check(Arg),
@@ -708,7 +714,7 @@ namespace ChainLead.Test
         [TestCase("ACD", "BEF", "H-1,C-0,E-1,B-1", "HCEB", "B")]
         [TestCase("ACD", "BEF", "H-1,C-1,A-0,E-1,B-1", "HCAEB", "B")]
         [TestCase("ACD", "BEF", "H-1,C-1,A-1,E-1,B-1", "HCAEB", "AB")]
-        public void MergeConjunctsOnlyTopConditions(
+        public void JoinFirstWithSecondConjunctsOnlyTopConditions(
             string aHandlerConditions,
             string bHandlerConditions,
             string conditionsChecksSetup,
@@ -749,7 +755,7 @@ namespace ChainLead.Test
 
             CheckNothingExecuted();
 
-            var ab = _math.Merge(a, b);
+            var ab = _math.JoinFirstWithSecond(a, b);
 
             CheckNothingExecuted();
 
@@ -842,7 +848,7 @@ namespace ChainLead.Test
         [TestCase("H", "ABCDEFG", true)]
         [TestCase("HI", "ABCDEFG", true)]
         [TestCase("I", "ABCDEFGH", true)]
-        public void DeepMergeConjunctsAllConditions(
+        public void MergeFirstWithSecondConjunctsAllConditions(
             string aHandlerConditions,
             string bHandlerConditions,
             bool finalConditionResult)
@@ -885,7 +891,7 @@ namespace ChainLead.Test
 
             CheckNothingExecuted();
 
-            var ab = _math.DeepMerge(a, b);
+            var ab = _math.MergeFirstWithSecond(a, b);
 
             CheckNothingExecuted();
 
@@ -915,7 +921,7 @@ namespace ChainLead.Test
         }
 
         [Test]
-        public void DeepMergeWithSingleConditionalHandlerPutConditionOnTopOfResult(
+        public void JoinSomeWithSingleConditionalHandlerPutsConditionOnTopOfResult(
             [Values(false, true)] bool order,
             [Values(false, true)] bool checkResult)
         {
@@ -929,8 +935,8 @@ namespace ChainLead.Test
             CheckNothingExecuted();
 
             var z = order
-                ? _math.DeepMerge(x, y)
-                : _math.DeepMerge(y, x);
+                ? _math.MergeFirstWithSecond(x, y)
+                : _math.MergeFirstWithSecond(y, x);
 
             CheckNothingExecuted();
 
@@ -945,207 +951,207 @@ namespace ChainLead.Test
                 ExecutionExpectedWhen(checkResult));
         }
 
-        [TestCase(DeepInject, "", "", "", "[A][B]")]
-        [TestCase(DeepInject, "C", "", "C-0", "C[B]")]
-        [TestCase(DeepInject, "C", "", "C-1", "C[A][B]")]
-        [TestCase(DeepInject, "", "C", "C-0", "C")]
-        [TestCase(DeepInject, "", "C", "C-1", "C[A][B]")]
-        [TestCase(DeepInject, "CD", "", "D-0", "D[B]")]
-        [TestCase(DeepInject, "CD", "", "D-1,C-0", "DC[B]")]
-        [TestCase(DeepInject, "CD", "", "D-1,C-1", "DC[A][B]")]
-        [TestCase(DeepInject, "", "CD", "D-0", "D")]
-        [TestCase(DeepInject, "", "CD", "D-1,C-0", "DC")]
-        [TestCase(DeepInject, "", "CD", "D-1,C-1", "DC[A][B]")]
-        [TestCase(DeepInject, "CDEF", "", "F-0", "F[B]")]
-        [TestCase(DeepInject, "CDEF", "", "F-1,E-0", "FE[B]")]
-        [TestCase(DeepInject, "CDEF", "", "F-1,E-1,D-0", "FED[B]")]
-        [TestCase(DeepInject, "CDEF", "", "F-1,E-1,D-1,C-0", "FEDC[B]")]
-        [TestCase(DeepInject, "CDEF", "", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
-        [TestCase(DeepInject, "", "CDEF", "F-0", "F")]
-        [TestCase(DeepInject, "", "CDEF", "F-1,E-0", "FE")]
-        [TestCase(DeepInject, "", "CDEF", "F-1,E-1,D-0", "FED")]
-        [TestCase(DeepInject, "", "CDEF", "F-1,E-1,D-1,C-0", "FEDC")]
-        [TestCase(DeepInject, "", "CDEF", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
+        [TestCase(InjectFirstIntoSecond, "", "", "", "[A][B]")]
+        [TestCase(InjectFirstIntoSecond, "C", "", "C-0", "C[B]")]
+        [TestCase(InjectFirstIntoSecond, "C", "", "C-1", "C[A][B]")]
+        [TestCase(InjectFirstIntoSecond, "", "C", "C-0", "C")]
+        [TestCase(InjectFirstIntoSecond, "", "C", "C-1", "C[A][B]")]
+        [TestCase(InjectFirstIntoSecond, "CD", "", "D-0", "D[B]")]
+        [TestCase(InjectFirstIntoSecond, "CD", "", "D-1,C-0", "DC[B]")]
+        [TestCase(InjectFirstIntoSecond, "CD", "", "D-1,C-1", "DC[A][B]")]
+        [TestCase(InjectFirstIntoSecond, "", "CD", "D-0", "D")]
+        [TestCase(InjectFirstIntoSecond, "", "CD", "D-1,C-0", "DC")]
+        [TestCase(InjectFirstIntoSecond, "", "CD", "D-1,C-1", "DC[A][B]")]
+        [TestCase(InjectFirstIntoSecond, "CDEF", "", "F-0", "F[B]")]
+        [TestCase(InjectFirstIntoSecond, "CDEF", "", "F-1,E-0", "FE[B]")]
+        [TestCase(InjectFirstIntoSecond, "CDEF", "", "F-1,E-1,D-0", "FED[B]")]
+        [TestCase(InjectFirstIntoSecond, "CDEF", "", "F-1,E-1,D-1,C-0", "FEDC[B]")]
+        [TestCase(InjectFirstIntoSecond, "CDEF", "", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
+        [TestCase(InjectFirstIntoSecond, "", "CDEF", "F-0", "F")]
+        [TestCase(InjectFirstIntoSecond, "", "CDEF", "F-1,E-0", "FE")]
+        [TestCase(InjectFirstIntoSecond, "", "CDEF", "F-1,E-1,D-0", "FED")]
+        [TestCase(InjectFirstIntoSecond, "", "CDEF", "F-1,E-1,D-1,C-0", "FEDC")]
+        [TestCase(InjectFirstIntoSecond, "", "CDEF", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
 
-        [TestCase(DeepInject, "C", "D", "D-0", "D")]
-        [TestCase(DeepInject, "C", "D", "D-1,C-0", "DC[B]")]
-        [TestCase(DeepInject, "C", "D", "D-1,C-1", "DC[A][B]")]
-        [TestCase(DeepInject, "CD", "E", "E-0", "E")]
-        [TestCase(DeepInject, "CD", "E", "E-1,D-0", "ED[B]")]
-        [TestCase(DeepInject, "CD", "E", "E-1,D-1,C-0", "EDC[B]")]
-        [TestCase(DeepInject, "CD", "E", "E-1,D-1,C-1", "EDC[A][B]")]
-        [TestCase(DeepInject, "C", "DE", "E-0", "E")]
-        [TestCase(DeepInject, "C", "DE", "E-1,D-0", "ED")]
-        [TestCase(DeepInject, "C", "DE", "E-1,D-1,C-0", "EDC[B]")]
-        [TestCase(DeepInject, "C", "DE", "E-1,D-1,C-1", "EDC[A][B]")]
-        [TestCase(DeepInject, "CD", "EF", "F-0", "F")]
-        [TestCase(DeepInject, "CD", "EF", "F-1,E-0", "FE")]
-        [TestCase(DeepInject, "CD", "EF", "F-1,E-1,D-0", "FED[B]")]
-        [TestCase(DeepInject, "CD", "EF", "F-1,E-1,D-1,C-0", "FEDC[B]")]
-        [TestCase(DeepInject, "CD", "EF", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
-        [TestCase(DeepInject, "CDE", "FGH", "H-0", "H")]
-        [TestCase(DeepInject, "CDE", "FGH", "H-1,G-0", "HG")]
-        [TestCase(DeepInject, "CDE", "FGH", "H-1,G-1,F-0", "HGF")]
-        [TestCase(DeepInject, "CDE", "FGH", "H-1,G-1,F-1,E-0", "HGFE[B]")]
-        [TestCase(DeepInject, "CDE", "FGH", "H-1,G-1,F-1,E-1,D-0", "HGFED[B]")]
-        [TestCase(DeepInject, "CDE", "FGH", "H-1,G-1,F-1,E-1,D-1,C-0", "HGFEDC[B]")]
-        [TestCase(DeepInject, "CDE", "FGH", "H-1,G-1,F-1,E-1,D-1,C-1", "HGFEDC[A][B]")]
+        [TestCase(InjectFirstIntoSecond, "C", "D", "D-0", "D")]
+        [TestCase(InjectFirstIntoSecond, "C", "D", "D-1,C-0", "DC[B]")]
+        [TestCase(InjectFirstIntoSecond, "C", "D", "D-1,C-1", "DC[A][B]")]
+        [TestCase(InjectFirstIntoSecond, "CD", "E", "E-0", "E")]
+        [TestCase(InjectFirstIntoSecond, "CD", "E", "E-1,D-0", "ED[B]")]
+        [TestCase(InjectFirstIntoSecond, "CD", "E", "E-1,D-1,C-0", "EDC[B]")]
+        [TestCase(InjectFirstIntoSecond, "CD", "E", "E-1,D-1,C-1", "EDC[A][B]")]
+        [TestCase(InjectFirstIntoSecond, "C", "DE", "E-0", "E")]
+        [TestCase(InjectFirstIntoSecond, "C", "DE", "E-1,D-0", "ED")]
+        [TestCase(InjectFirstIntoSecond, "C", "DE", "E-1,D-1,C-0", "EDC[B]")]
+        [TestCase(InjectFirstIntoSecond, "C", "DE", "E-1,D-1,C-1", "EDC[A][B]")]
+        [TestCase(InjectFirstIntoSecond, "CD", "EF", "F-0", "F")]
+        [TestCase(InjectFirstIntoSecond, "CD", "EF", "F-1,E-0", "FE")]
+        [TestCase(InjectFirstIntoSecond, "CD", "EF", "F-1,E-1,D-0", "FED[B]")]
+        [TestCase(InjectFirstIntoSecond, "CD", "EF", "F-1,E-1,D-1,C-0", "FEDC[B]")]
+        [TestCase(InjectFirstIntoSecond, "CD", "EF", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
+        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-0", "H")]
+        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-1,G-0", "HG")]
+        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-1,G-1,F-0", "HGF")]
+        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-1,G-1,F-1,E-0", "HGFE[B]")]
+        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-1,G-1,F-1,E-1,D-0", "HGFED[B]")]
+        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-1,G-1,F-1,E-1,D-1,C-0", "HGFEDC[B]")]
+        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-1,G-1,F-1,E-1,D-1,C-1", "HGFEDC[A][B]")]
 
-        [TestCase(DeepWrap, "", "", "", "[A][B]")]
-        [TestCase(DeepWrap, "C", "", "C-0", "C")]
-        [TestCase(DeepWrap, "C", "", "C-1", "C[A][B]")]
-        [TestCase(DeepWrap, "", "C", "C-0", "[A]C")]
-        [TestCase(DeepWrap, "", "C", "C-1", "[A]C[B]")]
-        [TestCase(DeepWrap, "CD", "", "D-0", "D")]
-        [TestCase(DeepWrap, "CD", "", "D-1,C-0", "DC")]
-        [TestCase(DeepWrap, "CD", "", "D-1,C-1", "DC[A][B]")]
-        [TestCase(DeepWrap, "", "CD", "D-0", "[A]D")]
-        [TestCase(DeepWrap, "", "CD", "D-1,C-0", "[A]DC")]
-        [TestCase(DeepWrap, "", "CD", "D-1,C-1", "[A]DC[B]")]
-        [TestCase(DeepWrap, "CDEF", "", "F-0", "F")]
-        [TestCase(DeepWrap, "CDEF", "", "F-1,E-0", "FE")]
-        [TestCase(DeepWrap, "CDEF", "", "F-1,E-1,D-0", "FED")]
-        [TestCase(DeepWrap, "CDEF", "", "F-1,E-1,D-1,C-0", "FEDC")]
-        [TestCase(DeepWrap, "CDEF", "", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
-        [TestCase(DeepWrap, "", "CDEF", "F-0", "[A]F")]
-        [TestCase(DeepWrap, "", "CDEF", "F-1,E-0", "[A]FE")]
-        [TestCase(DeepWrap, "", "CDEF", "F-1,E-1,D-0", "[A]FED")]
-        [TestCase(DeepWrap, "", "CDEF", "F-1,E-1,D-1,C-0", "[A]FEDC")]
-        [TestCase(DeepWrap, "", "CDEF", "F-1,E-1,D-1,C-1", "[A]FEDC[B]")]
+        [TestCase(FirstWrapSecond, "", "", "", "[A][B]")]
+        [TestCase(FirstWrapSecond, "C", "", "C-0", "C")]
+        [TestCase(FirstWrapSecond, "C", "", "C-1", "C[A][B]")]
+        [TestCase(FirstWrapSecond, "", "C", "C-0", "[A]C")]
+        [TestCase(FirstWrapSecond, "", "C", "C-1", "[A]C[B]")]
+        [TestCase(FirstWrapSecond, "CD", "", "D-0", "D")]
+        [TestCase(FirstWrapSecond, "CD", "", "D-1,C-0", "DC")]
+        [TestCase(FirstWrapSecond, "CD", "", "D-1,C-1", "DC[A][B]")]
+        [TestCase(FirstWrapSecond, "", "CD", "D-0", "[A]D")]
+        [TestCase(FirstWrapSecond, "", "CD", "D-1,C-0", "[A]DC")]
+        [TestCase(FirstWrapSecond, "", "CD", "D-1,C-1", "[A]DC[B]")]
+        [TestCase(FirstWrapSecond, "CDEF", "", "F-0", "F")]
+        [TestCase(FirstWrapSecond, "CDEF", "", "F-1,E-0", "FE")]
+        [TestCase(FirstWrapSecond, "CDEF", "", "F-1,E-1,D-0", "FED")]
+        [TestCase(FirstWrapSecond, "CDEF", "", "F-1,E-1,D-1,C-0", "FEDC")]
+        [TestCase(FirstWrapSecond, "CDEF", "", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
+        [TestCase(FirstWrapSecond, "", "CDEF", "F-0", "[A]F")]
+        [TestCase(FirstWrapSecond, "", "CDEF", "F-1,E-0", "[A]FE")]
+        [TestCase(FirstWrapSecond, "", "CDEF", "F-1,E-1,D-0", "[A]FED")]
+        [TestCase(FirstWrapSecond, "", "CDEF", "F-1,E-1,D-1,C-0", "[A]FEDC")]
+        [TestCase(FirstWrapSecond, "", "CDEF", "F-1,E-1,D-1,C-1", "[A]FEDC[B]")]
 
-        [TestCase(DeepWrap, "C", "D", "C-0", "C")]
-        [TestCase(DeepWrap, "C", "D", "C-1,D-0", "C[A]D")]
-        [TestCase(DeepWrap, "C", "D", "C-1,D-1", "C[A]D[B]")]
-        [TestCase(DeepWrap, "CD", "E", "D-0", "D")]
-        [TestCase(DeepWrap, "CD", "E", "D-1,C-0", "DC")]
-        [TestCase(DeepWrap, "CD", "E", "D-1,C-1,E-0", "DC[A]E")]
-        [TestCase(DeepWrap, "CD", "E", "D-1,C-1,E-1", "DC[A]E[B]")]
-        [TestCase(DeepWrap, "C", "DE", "C-0", "C")]
-        [TestCase(DeepWrap, "C", "DE", "C-1,E-0", "C[A]E")]
-        [TestCase(DeepWrap, "C", "DE", "C-1,E-1,D-0", "C[A]ED")]
-        [TestCase(DeepWrap, "C", "DE", "C-1,E-1,D-1", "C[A]ED[B]")]
-        [TestCase(DeepWrap, "CD", "EF", "D-0", "D")]
-        [TestCase(DeepWrap, "CD", "EF", "D-1,C-0", "DC")]
-        [TestCase(DeepWrap, "CD", "EF", "D-1,C-1,F-0", "DC[A]F")]
-        [TestCase(DeepWrap, "CD", "EF", "D-1,C-1,F-1,E-0", "DC[A]FE")]
-        [TestCase(DeepWrap, "CD", "EF", "D-1,C-1,F-1,E-1", "DC[A]FE[B]")]
-        [TestCase(DeepWrap, "CDE", "FGH", "E-0", "E")]
-        [TestCase(DeepWrap, "CDE", "FGH", "E-1,D-0", "ED")]
-        [TestCase(DeepWrap, "CDE", "FGH", "E-1,D-1,C-0", "EDC")]
-        [TestCase(DeepWrap, "CDE", "FGH", "E-1,D-1,C-1,H-0", "EDC[A]H")]
-        [TestCase(DeepWrap, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-0", "EDC[A]HG")]
-        [TestCase(DeepWrap, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-1,F-0", "EDC[A]HGF")]
-        [TestCase(DeepWrap, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-1,F-1", "EDC[A]HGF[B]")]
+        [TestCase(FirstWrapSecond, "C", "D", "C-0", "C")]
+        [TestCase(FirstWrapSecond, "C", "D", "C-1,D-0", "C[A]D")]
+        [TestCase(FirstWrapSecond, "C", "D", "C-1,D-1", "C[A]D[B]")]
+        [TestCase(FirstWrapSecond, "CD", "E", "D-0", "D")]
+        [TestCase(FirstWrapSecond, "CD", "E", "D-1,C-0", "DC")]
+        [TestCase(FirstWrapSecond, "CD", "E", "D-1,C-1,E-0", "DC[A]E")]
+        [TestCase(FirstWrapSecond, "CD", "E", "D-1,C-1,E-1", "DC[A]E[B]")]
+        [TestCase(FirstWrapSecond, "C", "DE", "C-0", "C")]
+        [TestCase(FirstWrapSecond, "C", "DE", "C-1,E-0", "C[A]E")]
+        [TestCase(FirstWrapSecond, "C", "DE", "C-1,E-1,D-0", "C[A]ED")]
+        [TestCase(FirstWrapSecond, "C", "DE", "C-1,E-1,D-1", "C[A]ED[B]")]
+        [TestCase(FirstWrapSecond, "CD", "EF", "D-0", "D")]
+        [TestCase(FirstWrapSecond, "CD", "EF", "D-1,C-0", "DC")]
+        [TestCase(FirstWrapSecond, "CD", "EF", "D-1,C-1,F-0", "DC[A]F")]
+        [TestCase(FirstWrapSecond, "CD", "EF", "D-1,C-1,F-1,E-0", "DC[A]FE")]
+        [TestCase(FirstWrapSecond, "CD", "EF", "D-1,C-1,F-1,E-1", "DC[A]FE[B]")]
+        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-0", "E")]
+        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-1,D-0", "ED")]
+        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-1,D-1,C-0", "EDC")]
+        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-1,D-1,C-1,H-0", "EDC[A]H")]
+        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-0", "EDC[A]HG")]
+        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-1,F-0", "EDC[A]HGF")]
+        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-1,F-1", "EDC[A]HGF[B]")]
 
-        [TestCase(Inject, "", "", "", "[A][B]")]
-        [TestCase(Inject, "C", "", "C-0", "C[B]")]
-        [TestCase(Inject, "C", "", "C-1", "C[A][B]")]
-        [TestCase(Inject, "", "C", "C-0", "C")]
-        [TestCase(Inject, "", "C", "C-1", "C[A][B]")]
-        [TestCase(Inject, "CD", "", "D-0", "D[B]")]
-        [TestCase(Inject, "CD", "", "D-1,C-0", "DC[B]")]
-        [TestCase(Inject, "CD", "", "D-1,C-1", "DC[A][B]")]
-        [TestCase(Inject, "", "CD", "D-0", "D")]
-        [TestCase(Inject, "", "CD", "D-1,C-0", "D[A]C")]
-        [TestCase(Inject, "", "CD", "D-1,C-1", "D[A]C[B]")]
-        [TestCase(Inject, "CDEF", "", "F-0", "F[B]")]
-        [TestCase(Inject, "CDEF", "", "F-1,E-0", "FE[B]")]
-        [TestCase(Inject, "CDEF", "", "F-1,E-1,D-0", "FED[B]")]
-        [TestCase(Inject, "CDEF", "", "F-1,E-1,D-1,C-0", "FEDC[B]")]
-        [TestCase(Inject, "CDEF", "", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
-        [TestCase(Inject, "", "CDEF", "F-0", "F")]
-        [TestCase(Inject, "", "CDEF", "F-1,E-0", "F[A]E")]
-        [TestCase(Inject, "", "CDEF", "F-1,E-1,D-0", "F[A]ED")]
-        [TestCase(Inject, "", "CDEF", "F-1,E-1,D-1,C-0", "F[A]EDC")]
-        [TestCase(Inject, "", "CDEF", "F-1,E-1,D-1,C-1", "F[A]EDC[B]")]
+        [TestCase(PutFirstInSecond, "", "", "", "[A][B]")]
+        [TestCase(PutFirstInSecond, "C", "", "C-0", "C[B]")]
+        [TestCase(PutFirstInSecond, "C", "", "C-1", "C[A][B]")]
+        [TestCase(PutFirstInSecond, "", "C", "C-0", "C")]
+        [TestCase(PutFirstInSecond, "", "C", "C-1", "C[A][B]")]
+        [TestCase(PutFirstInSecond, "CD", "", "D-0", "D[B]")]
+        [TestCase(PutFirstInSecond, "CD", "", "D-1,C-0", "DC[B]")]
+        [TestCase(PutFirstInSecond, "CD", "", "D-1,C-1", "DC[A][B]")]
+        [TestCase(PutFirstInSecond, "", "CD", "D-0", "D")]
+        [TestCase(PutFirstInSecond, "", "CD", "D-1,C-0", "D[A]C")]
+        [TestCase(PutFirstInSecond, "", "CD", "D-1,C-1", "D[A]C[B]")]
+        [TestCase(PutFirstInSecond, "CDEF", "", "F-0", "F[B]")]
+        [TestCase(PutFirstInSecond, "CDEF", "", "F-1,E-0", "FE[B]")]
+        [TestCase(PutFirstInSecond, "CDEF", "", "F-1,E-1,D-0", "FED[B]")]
+        [TestCase(PutFirstInSecond, "CDEF", "", "F-1,E-1,D-1,C-0", "FEDC[B]")]
+        [TestCase(PutFirstInSecond, "CDEF", "", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
+        [TestCase(PutFirstInSecond, "", "CDEF", "F-0", "F")]
+        [TestCase(PutFirstInSecond, "", "CDEF", "F-1,E-0", "F[A]E")]
+        [TestCase(PutFirstInSecond, "", "CDEF", "F-1,E-1,D-0", "F[A]ED")]
+        [TestCase(PutFirstInSecond, "", "CDEF", "F-1,E-1,D-1,C-0", "F[A]EDC")]
+        [TestCase(PutFirstInSecond, "", "CDEF", "F-1,E-1,D-1,C-1", "F[A]EDC[B]")]
 
-        [TestCase(Inject, "C", "D", "D-0", "D")]
-        [TestCase(Inject, "C", "D", "D-1,C-0", "DC[B]")]
-        [TestCase(Inject, "C", "D", "D-1,C-1", "DC[A][B]")]
-        [TestCase(Inject, "CD", "E", "E-0", "E")]
-        [TestCase(Inject, "CD", "E", "E-1,D-0", "ED[B]")]
-        [TestCase(Inject, "CD", "E", "E-1,D-1,C-0", "EDC[B]")]
-        [TestCase(Inject, "CD", "E", "E-1,D-1,C-1", "EDC[A][B]")]
-        [TestCase(Inject, "C", "DE", "E-0", "E")]
-        [TestCase(Inject, "C", "DE", "E-1,C-0,D-0", "ECD")]
-        [TestCase(Inject, "C", "DE", "E-1,C-1,D-0", "EC[A]D")]
-        [TestCase(Inject, "C", "DE", "E-1,C-1,D-1", "EC[A]D[B]")]
-        [TestCase(Inject, "CD", "EF", "F-0", "F")]
-        [TestCase(Inject, "CD", "EF", "F-1,D-0,E-0", "FDE")]
-        [TestCase(Inject, "CD", "EF", "F-1,D-0,E-1", "FDE[B]")]
-        [TestCase(Inject, "CD", "EF", "F-1,D-1,C-0,E-0", "FDCE")]
-        [TestCase(Inject, "CD", "EF", "F-1,D-1,C-0,E-1", "FDCE[B]")]
-        [TestCase(Inject, "CD", "EF", "F-1,D-1,C-1,E-0", "FDC[A]E")]
-        [TestCase(Inject, "CD", "EF", "F-1,D-1,C-1,E-1", "FDC[A]E[B]")]
-        [TestCase(Inject, "CDE", "FGH", "H-0", "H")]
-        [TestCase(Inject, "CDE", "FGH", "H-1,E-0,G-0", "HEG")]
-        [TestCase(Inject, "CDE", "FGH", "H-1,E-1,D-0,G-0", "HEDG")]
-        [TestCase(Inject, "CDE", "FGH", "H-1,E-1,D-1,C-0,G-0", "HEDCG")]
-        [TestCase(Inject, "CDE", "FGH", "H-1,E-1,D-1,C-1,G-0", "HEDC[A]G")]
-        [TestCase(Inject, "CDE", "FGH", "H-1,E-0,G-0", "HEG")]
-        [TestCase(Inject, "CDE", "FGH", "H-1,E-0,G-1,F-0", "HEGF")]
-        [TestCase(Inject, "CDE", "FGH", "H-1,E-0,G-1,F-1", "HEGF[B]")]
-        [TestCase(Inject, "CDE", "FGH", "H-1,E-1,D-0,G-1,F-0", "HEDGF")]
-        [TestCase(Inject, "CDE", "FGH", "H-1,E-1,D-1,C-0,G-1,F-0", "HEDCGF")]
-        [TestCase(Inject, "CDE", "FGH", "H-1,E-1,D-1,C-1,G-1,F-0", "HEDC[A]GF")]
-        [TestCase(Inject, "CDE", "FGH", "H-1,E-1,D-1,C-0,G-1,F-1", "HEDCGF[B]")]
-        [TestCase(Inject, "CDE", "FGH", "H-1,E-1,D-1,C-1,G-1,F-1", "HEDC[A]GF[B]")]
+        [TestCase(PutFirstInSecond, "C", "D", "D-0", "D")]
+        [TestCase(PutFirstInSecond, "C", "D", "D-1,C-0", "DC[B]")]
+        [TestCase(PutFirstInSecond, "C", "D", "D-1,C-1", "DC[A][B]")]
+        [TestCase(PutFirstInSecond, "CD", "E", "E-0", "E")]
+        [TestCase(PutFirstInSecond, "CD", "E", "E-1,D-0", "ED[B]")]
+        [TestCase(PutFirstInSecond, "CD", "E", "E-1,D-1,C-0", "EDC[B]")]
+        [TestCase(PutFirstInSecond, "CD", "E", "E-1,D-1,C-1", "EDC[A][B]")]
+        [TestCase(PutFirstInSecond, "C", "DE", "E-0", "E")]
+        [TestCase(PutFirstInSecond, "C", "DE", "E-1,C-0,D-0", "ECD")]
+        [TestCase(PutFirstInSecond, "C", "DE", "E-1,C-1,D-0", "EC[A]D")]
+        [TestCase(PutFirstInSecond, "C", "DE", "E-1,C-1,D-1", "EC[A]D[B]")]
+        [TestCase(PutFirstInSecond, "CD", "EF", "F-0", "F")]
+        [TestCase(PutFirstInSecond, "CD", "EF", "F-1,D-0,E-0", "FDE")]
+        [TestCase(PutFirstInSecond, "CD", "EF", "F-1,D-0,E-1", "FDE[B]")]
+        [TestCase(PutFirstInSecond, "CD", "EF", "F-1,D-1,C-0,E-0", "FDCE")]
+        [TestCase(PutFirstInSecond, "CD", "EF", "F-1,D-1,C-0,E-1", "FDCE[B]")]
+        [TestCase(PutFirstInSecond, "CD", "EF", "F-1,D-1,C-1,E-0", "FDC[A]E")]
+        [TestCase(PutFirstInSecond, "CD", "EF", "F-1,D-1,C-1,E-1", "FDC[A]E[B]")]
+        [TestCase(PutFirstInSecond, "CDE", "FGH", "H-0", "H")]
+        [TestCase(PutFirstInSecond, "CDE", "FGH", "H-1,E-0,G-0", "HEG")]
+        [TestCase(PutFirstInSecond, "CDE", "FGH", "H-1,E-1,D-0,G-0", "HEDG")]
+        [TestCase(PutFirstInSecond, "CDE", "FGH", "H-1,E-1,D-1,C-0,G-0", "HEDCG")]
+        [TestCase(PutFirstInSecond, "CDE", "FGH", "H-1,E-1,D-1,C-1,G-0", "HEDC[A]G")]
+        [TestCase(PutFirstInSecond, "CDE", "FGH", "H-1,E-0,G-0", "HEG")]
+        [TestCase(PutFirstInSecond, "CDE", "FGH", "H-1,E-0,G-1,F-0", "HEGF")]
+        [TestCase(PutFirstInSecond, "CDE", "FGH", "H-1,E-0,G-1,F-1", "HEGF[B]")]
+        [TestCase(PutFirstInSecond, "CDE", "FGH", "H-1,E-1,D-0,G-1,F-0", "HEDGF")]
+        [TestCase(PutFirstInSecond, "CDE", "FGH", "H-1,E-1,D-1,C-0,G-1,F-0", "HEDCGF")]
+        [TestCase(PutFirstInSecond, "CDE", "FGH", "H-1,E-1,D-1,C-1,G-1,F-0", "HEDC[A]GF")]
+        [TestCase(PutFirstInSecond, "CDE", "FGH", "H-1,E-1,D-1,C-0,G-1,F-1", "HEDCGF[B]")]
+        [TestCase(PutFirstInSecond, "CDE", "FGH", "H-1,E-1,D-1,C-1,G-1,F-1", "HEDC[A]GF[B]")]
 
-        [TestCase(Wrap, "", "", "", "[A][B]")]
-        [TestCase(Wrap, "C", "", "C-0", "C")]
-        [TestCase(Wrap, "C", "", "C-1", "C[A][B]")]
-        [TestCase(Wrap, "", "C", "C-0", "[A]C")]
-        [TestCase(Wrap, "", "C", "C-1", "[A]C[B]")]
-        [TestCase(Wrap, "CD", "", "D-0", "D")]
-        [TestCase(Wrap, "CD", "", "D-1,C-0", "DC[B]")]
-        [TestCase(Wrap, "CD", "", "D-1,C-1", "DC[A][B]")]
-        [TestCase(Wrap, "", "CD", "D-0", "[A]D")]
-        [TestCase(Wrap, "", "CD", "D-1,C-0", "[A]DC")]
-        [TestCase(Wrap, "", "CD", "D-1,C-1", "[A]DC[B]")]
-        [TestCase(Wrap, "CDEF", "", "F-0", "F")]
-        [TestCase(Wrap, "CDEF", "", "F-1,E-0", "FE[B]")]
-        [TestCase(Wrap, "CDEF", "", "F-1,E-1,D-0", "FED[B]")]
-        [TestCase(Wrap, "CDEF", "", "F-1,E-1,D-1,C-0", "FEDC[B]")]
-        [TestCase(Wrap, "CDEF", "", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
-        [TestCase(Wrap, "", "CDEF", "F-0", "[A]F")]
-        [TestCase(Wrap, "", "CDEF", "F-1,E-0", "[A]FE")]
-        [TestCase(Wrap, "", "CDEF", "F-1,E-1,D-0", "[A]FED")]
-        [TestCase(Wrap, "", "CDEF", "F-1,E-1,D-1,C-0", "[A]FEDC")]
-        [TestCase(Wrap, "", "CDEF", "F-1,E-1,D-1,C-1", "[A]FEDC[B]")]
+        [TestCase(FirstCoverSecond, "", "", "", "[A][B]")]
+        [TestCase(FirstCoverSecond, "C", "", "C-0", "C")]
+        [TestCase(FirstCoverSecond, "C", "", "C-1", "C[A][B]")]
+        [TestCase(FirstCoverSecond, "", "C", "C-0", "[A]C")]
+        [TestCase(FirstCoverSecond, "", "C", "C-1", "[A]C[B]")]
+        [TestCase(FirstCoverSecond, "CD", "", "D-0", "D")]
+        [TestCase(FirstCoverSecond, "CD", "", "D-1,C-0", "DC[B]")]
+        [TestCase(FirstCoverSecond, "CD", "", "D-1,C-1", "DC[A][B]")]
+        [TestCase(FirstCoverSecond, "", "CD", "D-0", "[A]D")]
+        [TestCase(FirstCoverSecond, "", "CD", "D-1,C-0", "[A]DC")]
+        [TestCase(FirstCoverSecond, "", "CD", "D-1,C-1", "[A]DC[B]")]
+        [TestCase(FirstCoverSecond, "CDEF", "", "F-0", "F")]
+        [TestCase(FirstCoverSecond, "CDEF", "", "F-1,E-0", "FE[B]")]
+        [TestCase(FirstCoverSecond, "CDEF", "", "F-1,E-1,D-0", "FED[B]")]
+        [TestCase(FirstCoverSecond, "CDEF", "", "F-1,E-1,D-1,C-0", "FEDC[B]")]
+        [TestCase(FirstCoverSecond, "CDEF", "", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
+        [TestCase(FirstCoverSecond, "", "CDEF", "F-0", "[A]F")]
+        [TestCase(FirstCoverSecond, "", "CDEF", "F-1,E-0", "[A]FE")]
+        [TestCase(FirstCoverSecond, "", "CDEF", "F-1,E-1,D-0", "[A]FED")]
+        [TestCase(FirstCoverSecond, "", "CDEF", "F-1,E-1,D-1,C-0", "[A]FEDC")]
+        [TestCase(FirstCoverSecond, "", "CDEF", "F-1,E-1,D-1,C-1", "[A]FEDC[B]")]
 
-        [TestCase(Wrap, "C", "D", "C-0", "C")]
-        [TestCase(Wrap, "C", "D", "C-1,D-0", "C[A]D")]
-        [TestCase(Wrap, "C", "D", "C-1,D-1", "C[A]D[B]")]
-        [TestCase(Wrap, "CD", "E", "D-0", "D")]
-        [TestCase(Wrap, "CD", "E", "D-1,C-0,E-0", "DCE")]
-        [TestCase(Wrap, "CD", "E", "D-1,C-1,E-0", "DC[A]E")]
-        [TestCase(Wrap, "CD", "E", "D-1,C-0,E-1", "DCE[B]")]
-        [TestCase(Wrap, "CD", "E", "E-1,D-1,C-1", "DC[A]E[B]")]
-        [TestCase(Wrap, "C", "DE", "C-0", "C")]
-        [TestCase(Wrap, "C", "DE", "C-1,E-0", "C[A]E")]
-        [TestCase(Wrap, "C", "DE", "C-1,E-1,D-0", "C[A]ED")]
-        [TestCase(Wrap, "C", "DE", "C-1,E-1,D-1", "C[A]ED[B]")]
-        [TestCase(Wrap, "CD", "EF", "D-0", "D")]
-        [TestCase(Wrap, "CD", "EF", "D-1,C-0,F-0", "DCF")]
-        [TestCase(Wrap, "CD", "EF", "D-1,C-1,F-0", "DC[A]F")]
-        [TestCase(Wrap, "CD", "EF", "D-1,C-1,F-1,E-0", "DC[A]FE")]
-        [TestCase(Wrap, "CD", "EF", "D-1,C-0,F-1,E-0", "DCFE")]
-        [TestCase(Wrap, "CD", "EF", "D-1,C-1,F-1,E-0", "DC[A]FE")]
-        [TestCase(Wrap, "CD", "EF", "D-1,C-0,F-1,E-1", "DCFE[B]")]
-        [TestCase(Wrap, "CD", "EF", "D-1,C-1,F-1,E-1", "DC[A]FE[B]")]
-        [TestCase(Wrap, "CDE", "FGH", "E-0", "E")]
-        [TestCase(Wrap, "CDE", "FGH", "E-1,D-0,H-0", "EDH")]
-        [TestCase(Wrap, "CDE", "FGH", "E-1,D-1,C-0,H-0", "EDCH")]
-        [TestCase(Wrap, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-0", "EDC[A]HG")]
-        [TestCase(Wrap, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-1,F-0", "EDC[A]HGF")]
-        [TestCase(Wrap, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-1,F-1", "EDC[A]HGF[B]")]
-        [TestCase(Wrap, "CDE", "FGH", "E-1,D-0,H-1,G-0", "EDHG")]
-        [TestCase(Wrap, "CDE", "FGH", "E-1,D-0,H-1,G-1,F-0", "EDHGF")]
-        [TestCase(Wrap, "CDE", "FGH", "E-1,D-0,H-1,G-1,F-1", "EDHGF[B]")]
-        [TestCase(Wrap, "CDE", "FGH", "E-1,D-1,C-0,H-1,G-0", "EDCHG")]
-        [TestCase(Wrap, "CDE", "FGH", "E-1,D-1,C-0,H-1,G-1,F-0", "EDCHGF")]
-        [TestCase(Wrap, "CDE", "FGH", "E-1,D-1,C-0,H-1,G-1,F-1", "EDCHGF[B]")]
-        public void InjectAndWrapCreatesCorrectConditions—ascade(
+        [TestCase(FirstCoverSecond, "C", "D", "C-0", "C")]
+        [TestCase(FirstCoverSecond, "C", "D", "C-1,D-0", "C[A]D")]
+        [TestCase(FirstCoverSecond, "C", "D", "C-1,D-1", "C[A]D[B]")]
+        [TestCase(FirstCoverSecond, "CD", "E", "D-0", "D")]
+        [TestCase(FirstCoverSecond, "CD", "E", "D-1,C-0,E-0", "DCE")]
+        [TestCase(FirstCoverSecond, "CD", "E", "D-1,C-1,E-0", "DC[A]E")]
+        [TestCase(FirstCoverSecond, "CD", "E", "D-1,C-0,E-1", "DCE[B]")]
+        [TestCase(FirstCoverSecond, "CD", "E", "E-1,D-1,C-1", "DC[A]E[B]")]
+        [TestCase(FirstCoverSecond, "C", "DE", "C-0", "C")]
+        [TestCase(FirstCoverSecond, "C", "DE", "C-1,E-0", "C[A]E")]
+        [TestCase(FirstCoverSecond, "C", "DE", "C-1,E-1,D-0", "C[A]ED")]
+        [TestCase(FirstCoverSecond, "C", "DE", "C-1,E-1,D-1", "C[A]ED[B]")]
+        [TestCase(FirstCoverSecond, "CD", "EF", "D-0", "D")]
+        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-0,F-0", "DCF")]
+        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-1,F-0", "DC[A]F")]
+        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-1,F-1,E-0", "DC[A]FE")]
+        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-0,F-1,E-0", "DCFE")]
+        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-1,F-1,E-0", "DC[A]FE")]
+        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-0,F-1,E-1", "DCFE[B]")]
+        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-1,F-1,E-1", "DC[A]FE[B]")]
+        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-0", "E")]
+        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-0,H-0", "EDH")]
+        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-0,H-0", "EDCH")]
+        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-0", "EDC[A]HG")]
+        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-1,F-0", "EDC[A]HGF")]
+        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-1,F-1", "EDC[A]HGF[B]")]
+        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-0,H-1,G-0", "EDHG")]
+        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-0,H-1,G-1,F-0", "EDHGF")]
+        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-0,H-1,G-1,F-1", "EDHGF[B]")]
+        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-0,H-1,G-0", "EDCHG")]
+        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-0,H-1,G-1,F-0", "EDCHGF")]
+        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-0,H-1,G-1,F-1", "EDCHGF[B]")]
+        public void PutIn_Inject_Cover_Wrap_CreateCorrectConditions—ascade(
             string appendType,
             string aHandlerConditions,
             string bHandlerConditions,
