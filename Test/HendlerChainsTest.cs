@@ -34,7 +34,7 @@
             _conditionMath = new Mock<IConditionMath>();
             _math = mathFactory.Create(_conditionMath.Object);
 
-            _callsLog = new List<string>();
+            _callsLog = [];
         }
 
         [Test]
@@ -89,7 +89,16 @@
             [ValueSource(nameof(Ids))]
                 string ids)
         {
-            var chain = SetupChain(_math.CoverChain, ids);
+            var chain = SetupChain(
+                chainCallName switch
+                {
+                    nameof(IHandlerChainingCallsProvider.CoverChain) => _math.CoverChain,
+                    nameof(IHandlerChainingCallsProvider.WrapChain) => _math.WrapChain,
+                    nameof(IHandlerChainingCallsProvider.ThenChain) => _math.ThenChain,
+                    _ => throw new ArgumentException(chainCallName)
+                }, 
+                ids);
+
             chain.Execute(Arg);
 
             var expectedCallsLog =

@@ -10,7 +10,7 @@
     [TestFixture]
     public class BurgerExampleAsTest
     {
-        public static string GetRecipeFor(Order order)
+        static string GetRecipeFor(Order order)
         {
             var state = new State(order);
 
@@ -96,8 +96,8 @@
                 Fry(chickenPatty)
             }
             .Select(XCover(Again.When(NameStartWith(@double))).WhereXIs))
-            .Concat(new[]
-            {
+            .Concat(
+            [
                 Toast(bun),
                 Put(bottomBun),
                 Put(chickenPatty)
@@ -105,7 +105,7 @@
                 Add(lettuce),
                 Add(sandwichSauce),
                 Put(topBun)
-            })
+            ])
             .Select(Pack(Index.Then(Dot).Then(Space)).In)
             .Select(XCover(NewLine).WhereXIs)
             .Aggregate(FirstThenSecond);
@@ -181,10 +181,10 @@
             MakeHandler<State>(x => x.Recipe.Append($"{x.StepCounter++}"));
 
         static IHandler<State> Dot =>
-            MakeHandler<State>(x => x.Recipe.Append($"."));
+            MakeHandler<State>(x => x.Recipe.Append('.'));
 
         static IHandler<State> Space =>
-            MakeHandler<State>(x => x.Recipe.Append($" "));
+            MakeHandler<State>(x => x.Recipe.Append(' '));
 
         static IHandler<State> RecipePoint(string text) =>
             MakeHandler<State>(x => x.Recipe.Append(text));
