@@ -114,11 +114,11 @@
             MakeHandler<State>(x => x.Recipe.Append(
                 $"There is no recipe for {x.Order.Name}"));
 
-        private const string @double = "Double";
-        private const string hamburger = "Hamburger";
-        private const string fishburger = "Fishburger";
-        private const string chikenburger = "Chikenburger";
-        private const string doubleChikenburger = $"{@double} {@chikenburger}";
+        const string @double = "Double";
+        const string hamburger = "Hamburger";
+        const string fishburger = "Fishburger";
+        const string chikenburger = "Chikenburger";
+        const string doubleChikenburger = $"{@double} {@chikenburger}";
 
         public record Order(string Name, params string[] Options) { }
 
@@ -131,77 +131,77 @@
             public int StepCounter { get; set; } = 1;
         }
 
-        private const string bun = "bun";
-        private const string topBun = $"top {bun}";
-        private const string bottomBun = $"bottom {bun}";
-        private const string pickle = "pickle";
-        private const string pickleSlices = $"{pickle} slices";
-        private const string onion = "onion";
-        private const string pepper = "pepper";
-        private const string mustard = "mustard";
-        private const string bacon = "bacon";
-        private const string beefPatty = "beef patty";
-        private const string tomatoKetchup = "tomato ketchup";
-        private const string fishFillet = "fish fillet";
-        private const string fishFilletPortion = $"{fishFillet} portion";
-        private const string cheese = "cheese";
-        private const string cheeseSlice = $"{cheese} slice";
-        private const string tartareSauce = "tartare sauce";
-        private const string chickenPatty = "chicken patty";
-        private const string lettuce = "lettuce";
-        private const string sandwichSauce = "sandwich sauce";
+        const string bun = "bun";
+        const string topBun = $"top {bun}";
+        const string bottomBun = $"bottom {bun}";
+        const string pickle = "pickle";
+        const string pickleSlices = $"{pickle} slices";
+        const string onion = "onion";
+        const string pepper = "pepper";
+        const string mustard = "mustard";
+        const string bacon = "bacon";
+        const string beefPatty = "beef patty";
+        const string tomatoKetchup = "tomato ketchup";
+        const string fishFillet = "fish fillet";
+        const string fishFilletPortion = $"{fishFillet} portion";
+        const string cheese = "cheese";
+        const string cheeseSlice = $"{cheese} slice";
+        const string tartareSauce = "tartare sauce";
+        const string chickenPatty = "chicken patty";
+        const string lettuce = "lettuce";
+        const string sandwichSauce = "sandwich sauce";
 
-        public static IHandler<State> Cut(string x) => RecipePoint($"Cut {x}");
+        static IHandler<State> Cut(string x) => RecipePoint($"Cut {x}");
 
-        public static IHandler<State> Slice(string x) => RecipePoint($"Slice {x}");
+        static IHandler<State> Slice(string x) => RecipePoint($"Slice {x}");
 
-        public static IHandler<State> Dice(string x) => RecipePoint($"Dice {x}");
+        static IHandler<State> Dice(string x) => RecipePoint($"Dice {x}");
 
-        public static IHandler<State> Salt(string x) => RecipePoint($"Salt {x}");
+        static IHandler<State> Salt(string x) => RecipePoint($"Salt {x}");
 
-        public static IHandler<State> Pepper(string x) => RecipePoint($"Pepper {x}");
+        static IHandler<State> Pepper(string x) => RecipePoint($"Pepper {x}");
 
-        public static IHandler<State> Add(string x) => RecipePoint($"Add {x}");
+        static IHandler<State> Add(string x) => RecipePoint($"Add {x}");
 
-        public static IHandler<State> Put(string x) => RecipePoint($"Put {x}");
+        static IHandler<State> Put(string x) => RecipePoint($"Put {x}");
 
-        public static IHandler<State> Fry(string x) => RecipePoint($"Fry {x}");
+        static IHandler<State> Fry(string x) => RecipePoint($"Fry {x}");
 
-        public static IHandler<State> Toast(string x) => RecipePoint($"Toast {x}");
+        static IHandler<State> Toast(string x) => RecipePoint($"Toast {x}");
 
-        public static IHandler<State> Bread(string x) => RecipePoint($"Bread {x}");
+        static IHandler<State> Bread(string x) => RecipePoint($"Bread {x}");
 
-        public static IHandler<State> Again =>
+        static IHandler<State> Again =>
             MakeHandler<State>(x => x.Recipe.Append(" x2"));
 
-        public static IHandler<State> NewLine =>
+        static IHandler<State> NewLine =>
             MakeHandler<State>(x => x.Recipe.AppendLine());
 
-        private static IHandler<State> Index =>
+        static IHandler<State> Index =>
             MakeHandler<State>(x => x.Recipe.Append($"{x.StepCounter++}"));
 
-        private static IHandler<State> Dot =>
+        static IHandler<State> Dot =>
             MakeHandler<State>(x => x.Recipe.Append($"."));
 
-        private static IHandler<State> Space =>
+        static IHandler<State> Space =>
             MakeHandler<State>(x => x.Recipe.Append($" "));
 
-        private static IHandler<State> RecipePoint(string text) =>
+        static IHandler<State> RecipePoint(string text) =>
             MakeHandler<State>(x => x.Recipe.Append(text));
 
-        public static ICondition<State> RecipeIsMissing =>
+        static ICondition<State> RecipeIsMissing =>
             MakeCondition<State>(x => x.Recipe.Length == 0);
 
-        public static ICondition<State> OrderExclude(string ingredient) =>
+        static ICondition<State> OrderExclude(string ingredient) =>
             MakeCondition<State>(x => x.Order.Options.Contains($"- {ingredient}"));
 
-        public static ICondition<State> OrderIncludeAdditional(string ingredient) =>
+        static ICondition<State> OrderIncludeAdditional(string ingredient) =>
             MakeCondition<State>(x => x.Order.Options.Contains($"+ {ingredient}"));
 
-        public static ICondition<State> NameStartWith(string str) =>
+        static ICondition<State> NameStartWith(string str) =>
             MakeCondition<State>(x => x.Order.Name.StartsWith(str));
 
-        public static ICondition<State> NameIs(string str) =>
+        static ICondition<State> NameIs(string str) =>
             MakeCondition<State>(x => x.Order.Name == str);
 
         [SetUp]
@@ -417,7 +417,7 @@
                 Is.EqualTo("There is no recipe for Veganburger"));
         }
 
-        private static string Text(params string[] lines) =>
+        static string Text(params string[] lines) =>
             lines.SelectMany(x => new[] { x, Environment.NewLine })
                  .Aggregate(string.Concat);
     }

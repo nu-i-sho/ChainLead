@@ -1,7 +1,7 @@
 namespace ChainLead.Test
 {
     using ChainLead.Contracts;
-    using ChainLead.Test.HandlersMathTestData;
+    using ChainLead.Test.HandlersTestData;
     using Moq;
     using NUnit.Framework.Internal;
     using System;
@@ -15,35 +15,35 @@ namespace ChainLead.Test
         {
             get
             {
-                yield return new OriginalHandlerMathCallsProvider();
-                yield return new ChainLeadSytaxCallsProvider();
-                yield return new ChainLeadSyntaxSeparatedCallsProvider();
-                yield return new ChainLeadSytaxReverseCallsProvider();
+                yield return new OriginalHandlerMathCallsProviderFactory();
+                yield return new ChainLeadSyntaxCallsProviderFactory();
+                yield return new ChainLeadSyntaxSeparatedCallsProviderFactory();
+                yield return new ChainLeadSytaxReverseCallsProviderFactory();
             }
         }
 
         public class Base { }
         public class Derived : Base { }
 
-        private IHandlerMath _math;
+        IHandlerMath _math;
 
-        private IHandler<int> _zeroInt;
-        private IHandler<Base> _zeroBase;
-        private IHandler<Derived> _zeroDerived;
+        IHandler<int> _zeroInt;
+        IHandler<Base> _zeroBase;
+        IHandler<Derived> _zeroDerived;
 
-        private Mock<IHandler<int>> _handler;
-        private Mock<ICondition<int>> _condition;
+        Mock<IHandler<int>> _handler;
+        Mock<ICondition<int>> _condition;
 
-        private const int 
+        const int 
             A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8,
             First = A, Last = I, Missing = -1;
 
-        private Mock<IHandler<int>>[] _handlers;
-        private Mock<ICondition<int>>[] _conditions;
+        Mock<IHandler<int>>[] _handlers;
+        Mock<ICondition<int>>[] _conditions;
 
-        private Mock<IConditionMath> _conditionMath;
+        Mock<IConditionMath> _conditionMath;
 
-        private const string
+        const string
             FirstThenSecond = nameof(IHandlerMath.FirstThenSecond),
             PackFirstInSecond = nameof(IHandlerMath.PackFirstInSecond),
             InjectFirstIntoSecond = nameof(IHandlerMath.InjectFirstIntoSecond),
@@ -52,7 +52,7 @@ namespace ChainLead.Test
             JoinFirstWithSecond = nameof(IHandlerMath.JoinFirstWithSecond),
             MergeFirstWithSecond = nameof(IHandlerMath.MergeFirstWithSecond);
 
-        private static readonly string[] AllAppends =
+        static readonly string[] AllAppends =
         [
             FirstThenSecond,
             PackFirstInSecond,
@@ -63,7 +63,7 @@ namespace ChainLead.Test
             MergeFirstWithSecond
         ];
 
-        private Func<IHandler<T>, IHandler<T>, IHandler<T>>
+        Func<IHandler<T>, IHandler<T>, IHandler<T>>
             AppendFunc<T>(string by) =>
                 by switch
                 {
@@ -77,7 +77,7 @@ namespace ChainLead.Test
                     _ => throw new ArgumentOutOfRangeException(nameof(by))
                 };
 
-        private const int Arg = 7643;
+        const int Arg = 7643;
 
         [SetUp]
         public void Setup()
@@ -107,7 +107,7 @@ namespace ChainLead.Test
                 .ToArray();
         }
 
-        private Mock<IConditionMath> MockPredicateMath()
+        Mock<IConditionMath> MockPredicateMath()
         {
             var math = new Mock<IConditionMath>();
 
@@ -1220,14 +1220,14 @@ namespace ChainLead.Test
                             _math.Conditional);
         }
 
-        private static IEnumerable<(int i, bool value)> ParseChecksSetup(
+        static IEnumerable<(int i, bool value)> ParseChecksSetup(
             string conditionChecksSetup) =>
                 conditionChecksSetup
                     .Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => x.Split('-'))
                     .Select(x => (i: ParseIndex(x[0][0]), value: ParseBool(x[1][0])));
 
-        private void CheckNothingExecuted()
+        void CheckNothingExecuted()
         {
             foreach (var mock in _conditions)
                 mock.Verify(o => o.Check(Arg), Times.Never);
@@ -1236,19 +1236,19 @@ namespace ChainLead.Test
                 mock.Verify(o => o.Execute(Arg), Times.Never);
         }
 
-        private static Func<Times> ExecutionExpectedWhen(bool value) =>
+        static Func<Times> ExecutionExpectedWhen(bool value) =>
             value ? Times.Once : Times.Never;
 
-        private static bool ParseBool(char mask) => mask == '1';
+        static bool ParseBool(char mask) => mask == '1';
 
-        private static int ParseIndex(char mask) =>
+        static int ParseIndex(char mask) =>
             mask switch
             {
                 'X' => Missing,
                 _ => mask - 'A'
             };
 
-        private static string IndexToString(int i) =>
+        static string IndexToString(int i) =>
             (i switch
             {
                 Missing => 'X',

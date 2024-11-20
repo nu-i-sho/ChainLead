@@ -236,10 +236,10 @@
 
     file readonly struct Acc<T>
     {
-        private readonly Func<IHandler<T>, IHandler<T>, IHandler<T>> _append;
-        private readonly Func<IHandler<T>, IHandler<T>> _call;
+        readonly Func<IHandler<T>, IHandler<T>, IHandler<T>> _append;
+        readonly Func<IHandler<T>, IHandler<T>> _call;
 
-        private Acc(
+        Acc(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             Func<IHandler<T>, IHandler<T>> call)
         {

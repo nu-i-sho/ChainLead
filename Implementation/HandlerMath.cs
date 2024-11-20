@@ -121,7 +121,7 @@
                     _ => new Conditional<T>(handler, condition)
                 };
 
-        private (IHandler<T>, ICondition<T>?) SplitHandlerAndCondition<T>(
+        (IHandler<T>, ICondition<T>?) SplitHandlerAndCondition<T>(
             IHandler<T> handler) => 
             handler switch
             {
@@ -130,7 +130,7 @@
                 _ => (handler, null)
             };
 
-        private (IHandler<T>, ICondition<T>?) SplitHandlerAndAllConditions<T>(
+        (IHandler<T>, ICondition<T>?) SplitHandlerAndAllConditions<T>(
             IHandler<T> handler)
         {
             ICondition<T>? accCondition = null;
