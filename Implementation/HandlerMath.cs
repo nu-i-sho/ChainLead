@@ -4,13 +4,9 @@
     using ChainLead.Contracts;
     using System;
 
-    public class HandlerMath : IHandlerMath
+    public class HandlerMath(IConditionMath conditionMath)
+        : IHandlerMath
     {
-        private readonly IConditionMath _conditionMath;
-
-        public HandlerMath(IConditionMath conditionMath) =>
-            _conditionMath = conditionMath;
-
         public IHandler<T> Zero<T>() => 
                 new Zero<T>();
 
@@ -92,7 +88,7 @@
                 (_, null) => Conditional(abHandler, aCondition),
                 
                 _ => Conditional(abHandler, 
-                        _conditionMath.And(aCondition, bCondition)),
+                        conditionMath.And(aCondition, bCondition)),
             };
         }
 
@@ -111,7 +107,7 @@
                 (_, null) => Conditional(abHandler, aCondition),
 
                 _ => Conditional(abHandler,
-                        _conditionMath.And(aCondition, bCondition)),
+                        conditionMath.And(aCondition, bCondition)),
             };
         }
 
@@ -121,7 +117,7 @@
                 0 switch
                 {
                     _ when IsZero(handler) => handler,
-                    _ when _conditionMath.IsPredictableTrue(condition) => handler,
+                    _ when conditionMath.IsPredictableTrue(condition) => handler,
                     _ => new Conditional<T>(handler, condition)
                 };
 
@@ -143,7 +139,7 @@
             while (xCondition != null)
             {
                 accCondition = accCondition == null ? xCondition
-                    : _conditionMath.And(accCondition, xCondition);
+                    : conditionMath.And(accCondition, xCondition);
 
                 (handler, xCondition) = SplitHandlerAndAllConditions(handler);
             }
@@ -156,13 +152,13 @@
 
     file struct Zero<T> : IZero<T>
     {
-        public void Execute(T state) { }
+        public readonly void Execute(T state) { }
     }
 
     file struct Handler<T>(
         Action<T> imlementation) : IHandler<T>
     {
-        public void Execute(T state) => 
+        public readonly void Execute(T state) => 
             imlementation(state);
     }
 
@@ -170,7 +166,7 @@
         IHandler<T> Prev, 
         IHandler<T> Next) : IHandler<T>
     {
-        public void Execute(T state)
+        public readonly void Execute(T state)
         {
             Prev.Execute(state);
             Next.Execute(state);
@@ -181,7 +177,7 @@
         IHandler<T> Handler,
         ICondition<T> Condition) : IHandler<T>
     {
-        public void Execute(T state)
+        public readonly void Execute(T state)
         {
             if (Condition.Check(state))
                 Handler.Execute(state);

@@ -66,27 +66,27 @@
 
     file struct True<T> : ITrue<T>
     {
-        public bool Check(T _) => true;
+        public readonly bool Check(T _) => true;
     }
 
     file interface IFalse<in T> : ICondition<T> { }
 
     file struct False<T> : IFalse<T>
     {
-        public bool Check(T _) => false;
+        public readonly bool Check(T _) => false;
     }
 
     file struct Condition<T>(
         Func<T, bool> check) : ICondition<T>
     {
-        public bool Check(T x) => check(x);
+        public readonly bool Check(T x) => check(x);
     }
 
     file struct And<T>(
         ICondition<T> a,
         ICondition<T> b) : ICondition<T>
     {
-        public bool Check(T x) =>
+        public readonly bool Check(T x) =>
             a.Check(x) && b.Check(x);
     }
 
@@ -94,14 +94,14 @@
         ICondition<T> a,
         ICondition<T> b) : ICondition<T>
     {
-        public bool Check(T x) =>
+        public readonly bool Check(T x) =>
             a.Check(x) || b.Check(x);
     }
 
     file struct Not<T>(
         ICondition<T> condition) : ICondition<T>
     {
-        public bool Check(T x) =>
+        public readonly bool Check(T x) =>
             !condition.Check(x);
     }
 }

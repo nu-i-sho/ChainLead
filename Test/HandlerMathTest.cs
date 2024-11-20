@@ -52,8 +52,8 @@ namespace ChainLead.Test
             JoinFirstWithSecond = nameof(IHandlerMath.JoinFirstWithSecond),
             MergeFirstWithSecond = nameof(IHandlerMath.MergeFirstWithSecond);
 
-        private static string[] AllAppends =
-        {
+        private static readonly string[] AllAppends =
+        [
             FirstThenSecond,
             PackFirstInSecond,
             InjectFirstIntoSecond,
@@ -61,7 +61,7 @@ namespace ChainLead.Test
             FirstWrapSecond,
             JoinFirstWithSecond,
             MergeFirstWithSecond
-        };
+        ];
 
         private Func<IHandler<T>, IHandler<T>, IHandler<T>>
             AppendFunc<T>(string by) =>
@@ -161,14 +161,14 @@ namespace ChainLead.Test
         public void ZeroIsZero()
         {
             var isZero = _math.IsZero(_zeroInt);
-            Assert.IsTrue(isZero);
+            Assert.That(isZero, Is.True);
         }
 
         [Test]
         public void ZeroForBaseClassIsZeroForDerivedClass()
         {
             var isZero = _math.IsZero<Derived>(_zeroBase);
-            Assert.IsTrue(isZero);
+            Assert.That(isZero, Is.True);
         }
 
         [Test]
@@ -180,7 +180,7 @@ namespace ChainLead.Test
             var zeroZero = append(_zeroInt, zeroInt);
             var isZero = _math.IsZero(zeroZero);
 
-            Assert.IsTrue(isZero);
+            Assert.That(isZero, Is.True);
         }
 
         [Test]
@@ -191,7 +191,7 @@ namespace ChainLead.Test
             var chain = append(_zeroBase, _zeroDerived);
             var isZero = _math.IsZero(chain);
 
-            Assert.IsTrue(isZero);
+            Assert.That(isZero, Is.True);
         }
 
         [Test]
@@ -202,7 +202,7 @@ namespace ChainLead.Test
             var chain = append(_zeroDerived, _zeroBase);
             var isZero = _math.IsZero(chain);
 
-            Assert.IsTrue(isZero);
+            Assert.That(isZero, Is.True);
         }
 
         [Test]
@@ -312,12 +312,12 @@ namespace ChainLead.Test
                 Is.EqualTo(a_bcExecutionResult));
         }
 
-        public static string[] OneByOneCases =
-        {
+        public static string[] OneByOneCases =>
+        [
             "ab", "abc", "abcd",
             "abcdueiruoewiroiewepwo",
             "aaaaaaaaaaaaaaaaaaaaaaa"
-        };
+        ];
 
         [Test]
         public void ChainExecutesHandlersOneByOne(
@@ -347,8 +347,8 @@ namespace ChainLead.Test
                 Is.EqualTo(handlersSource));
         }
 
-        public static (string, string)[] OneByOneWithoutZerosCases =
-        {
+        public static (string, string)[] OneByOneWithoutZerosCases =>
+        [
             ("0a", "a"),
             ("a0", "a"),
             ("0a0", "a"),
@@ -357,7 +357,7 @@ namespace ChainLead.Test
              "abcdueiruoewiroiewepwo"),
             ("a0a0a0a0a0a0a0a0a0aaaa0000aaa0a0aaaaaaa000aaaaaa0aaa0aa00aaaa000",
              "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-        };
+        ];
 
         [Test]
         public void ChainExecutesHandlersOneByOneAndIgnoresZeros(
@@ -398,7 +398,7 @@ namespace ChainLead.Test
         public void ConditionalZeroIsZero()
         {
             var conditionalZero = _math.Conditional(_zeroInt, _condition.Object);
-            Assert.IsTrue(_math.IsZero(conditionalZero));
+            Assert.That(_math.IsZero(conditionalZero), Is.True);
         }
 
         [Test]
@@ -602,7 +602,7 @@ namespace ChainLead.Test
                     .Verify(o => o.Check(Arg), Times.Once);
 
             foreach (var i in new[] { A, B, C }
-                      .Except(new[] { expectedCondition }))
+                      .Except([ expectedCondition ]))
                 _conditions[i].Verify(o => o.Check(Arg), Times.Never);
 
             foreach (var i in new[] { A, B })
@@ -736,10 +736,10 @@ namespace ChainLead.Test
             var @checked = expectedToCheck.Select(ParseIndex).ToArray();
             var executed = expectedToExecute.Select(ParseIndex).ToArray();
 
-            foreach (var x in ParseChecksSetup(conditionsChecksSetup))
-                _conditions[x.i]
+            foreach (var (i, value) in ParseChecksSetup(conditionsChecksSetup))
+                _conditions[i]
                     .Setup(o => o.Check(Arg))
-                    .Returns(x.value);
+                    .Returns(value);
 
             _conditionMath
                 .Setup(x => x.And(
@@ -747,8 +747,8 @@ namespace ChainLead.Test
                     It.IsAny<ICondition<int>>()))
                 .Returns(_conditions[I].Object);
 
-            if (aHandlerConditions.Any() &&
-                bHandlerConditions.Any())
+            if (aHandlerConditions.Length != 0 &&
+                bHandlerConditions.Length != 0)
                     _conditionMath
                         .Setup(x => x.And(
                             _conditions[ParseIndex(aHandlerConditions.Last())].Object,
@@ -932,7 +932,7 @@ namespace ChainLead.Test
                 ExecutionExpectedWhen(finalConditionResult));
         }
 
-        [Ignore("")]
+        [Test]
         public void JoinSomeWithSingleConditionalHandlerPutsConditionOnTopOfResult(
             [Values(false, true)] bool order,
             [Values(false, true)] bool checkResult)
@@ -1206,9 +1206,8 @@ namespace ChainLead.Test
                             var i = ParseIndex(x);
                             var p = _conditions[i];
 
-                            if (checksResult.ContainsKey(i))
-                                p.Setup(o => o.Check(Arg))
-                                 .Returns(checksResult[i])
+                            if (checksResult.TryGetValue(i, out bool result))
+                                p.Setup(o => o.Check(Arg)).Returns(result)
                                  .Callback(() => callsOrder += x);
                             else
                                 p.Setup(o => o.Check(Arg))
