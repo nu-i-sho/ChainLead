@@ -394,7 +394,7 @@
                 Is.EqualTo("AB"));
         }
 
-        private void SetupMathFirstThenSecond_ABC()
+        void SetupMathFirstThenSecond_ABC()
         {
             _handlerMath
                 .Setup(o => o.FirstThenSecond(_handlerA.Object, _handlerB.Object))
@@ -453,7 +453,7 @@
                 Is.EqualTo("ABC"));
         }
 
-        private void SetupMathJoinFirstWithSecond_ABC()
+        void SetupMathJoinFirstWithSecond_ABC()
         {
             _handlerMath
                 .Setup(o => o.JoinFirstWithSecond(_handlerA.Object, _handlerB.Object))
@@ -511,7 +511,7 @@
                 Is.EqualTo("ABC"));
         }
 
-        private void SetupMergeFirstWithSecond_ABC()
+        void SetupMergeFirstWithSecond_ABC()
         {
             _handlerMath
                 .Setup(o => o.MergeFirstWithSecond(_handlerA.Object, _handlerB.Object))
@@ -569,7 +569,7 @@
                 Is.EqualTo("ABC"));
         }
 
-        private void SetupMathPackFirstInSecond_ABC()
+        void SetupMathPackFirstInSecond_ABC()
         {
             _handlerMath
                 .Setup(o => o.PackFirstInSecond(_handlerA.Object, _handlerB.Object))
@@ -626,7 +626,7 @@
                 Is.EqualTo("ABC"));
         }
 
-        private void SetupMathInjectFirstIntoSecond()
+        void SetupMathInjectFirstIntoSecond()
         {
             _handlerMath
                 .Setup(o => o.InjectFirstIntoSecond(_handlerA.Object, _handlerB.Object))
@@ -684,7 +684,7 @@
                 Is.EqualTo("ABC"));
         }
 
-        private void SetupMathFirstCoverSecond_ABC()
+        void SetupMathFirstCoverSecond_ABC()
         {
             _handlerMath
                 .Setup(o => o.FirstCoverSecond(_handlerA.Object, _handlerB.Object))
@@ -741,7 +741,7 @@
                 Is.EqualTo("ABC"));
         }
 
-        private void SetupMathFirstWrapSecond_ABC()
+        void SetupMathFirstWrapSecond_ABC()
         {
             _handlerMath
                 .Setup(o => o.FirstWrapSecond(_handlerA.Object, _handlerB.Object))

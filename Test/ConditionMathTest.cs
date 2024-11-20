@@ -52,87 +52,87 @@
         public void TrueCheckReturnsTrue()
         {
             var result = _conditions.ForInt[True].Check(678);
-            Assert.IsTrue(result);
+            Assert.That(result, Is.True);
         }
 
         [Test]
         public void FalseCheckReturnsTrue()
         {
             var result = _conditions.ForInt[False].Check(903);   
-            Assert.IsFalse(result);
+            Assert.That(result, Is.False);
         }
 
         [Test]
         public void TrueIsPredictableTrue()
         {
-            var isPredictableTrue = 
+            var predictableTrue = 
                 _math.IsPredictableTrue(_conditions.ForInt[True]);   
             
-            Assert.IsTrue(isPredictableTrue);
+            Assert.That(predictableTrue, Is.True);
         }
 
         [Test]
         public void TrueIsNotPredictableFalse()
         {
-            var isPredictableFalse =
+            var predictableFalse =
                 _math.IsPredictableFalse(_conditions.ForInt[True]);
             
-            Assert.IsFalse(isPredictableFalse);
+            Assert.That(predictableFalse, Is.False);
         }
 
         [Test]
         public void FalseIsPredictableFalse()
         {
-            var isPredictableFalse = 
+            var predictableFalse = 
                 _math.IsPredictableFalse(_conditions.ForInt[False]);
 
-            Assert.IsTrue(isPredictableFalse);
+            Assert.That(predictableFalse, Is.True);
         }
 
         [Test]
         public void FalseIsNotPredictableTrue()
         {
-            var isPredictableTrue = 
+            var predictableTrue = 
                 _math.IsPredictableTrue(_conditions.ForInt[False]);
 
-            Assert.IsFalse(isPredictableTrue);
+            Assert.That(predictableTrue, Is.False);
         }
 
 
         [Test]
         public void BaseTrueIsPredictableTrueAsDerived()
         {
-            var isPredictableTrue =
+            var predictableTrue =
                 _math.IsPredictableTrue<Derived>(_conditions.ForBase[True]);
 
-            Assert.IsTrue(isPredictableTrue);
+            Assert.That(predictableTrue, Is.True);
         }
 
         [Test]
         public void BaseTrueIsNotPredictableFalseAsDerived()
         {
-            var isPredictableFalse =
+            var predictableFalse =
                 _math.IsPredictableFalse<Derived>(_conditions.ForBase[True]);
 
-            Assert.IsFalse(isPredictableFalse);
+            Assert.That(predictableFalse, Is.False);
         }
 
         [Test]
         public void BaseFalseIsNotPredictableTrueAsDerived()
         {
-            var isPredictableTrue =
+            var predictableTrue =
                 _math.IsPredictableTrue<Derived>(_conditions.ForBase[False]);
 
-            Assert.IsFalse(isPredictableTrue);
+            Assert.That(predictableTrue, Is.False);
         }
 
         [Test]
         public void BaseFalseIsPredictableFalseAsDerived()
         {
-            var isPredictableFalse =
+            var predictableFalse =
                 _math.IsPredictableFalse<Derived>(_conditions.ForBase[False]);
 
-            Assert.IsTrue(isPredictableFalse);
+            Assert.That(predictableFalse, Is.True);
         }
 
         [Test]
@@ -143,9 +143,9 @@
                 _math.False<int>(),
                 _conditions.ForInt[something]);
 
-            var isPredictableFalse = _math.IsPredictableFalse(falseAndSomething);
+            var predictableFalse = _math.IsPredictableFalse(falseAndSomething);
 
-            Assert.IsTrue(isPredictableFalse);
+            Assert.That(predictableFalse, Is.True);
         }
 
         [Test]
@@ -156,9 +156,9 @@
                 _conditions.ForBase[False],
                 _conditions.ForDerived[something]);
 
-            var isPredictableFalse = _math.IsPredictableFalse(falseAndSomething);
+            var predictableFalse = _math.IsPredictableFalse(falseAndSomething);
 
-            Assert.IsTrue(isPredictableFalse);
+            Assert.That(predictableFalse, Is.True);
         }
 
         [Test]
@@ -169,9 +169,9 @@
                 _math.False<int>(),
                 _conditions.ForInt[something]);
 
-            var isPredictableTrue = _math.IsPredictableTrue(falseAndSomething);
+            var predictableTrue = _math.IsPredictableTrue(falseAndSomething);
 
-            Assert.IsFalse(isPredictableTrue);
+            Assert.That(predictableTrue, Is.False);
         }
 
         [Test]
@@ -182,9 +182,9 @@
                 _conditions.ForBase[False],
                 _conditions.ForDerived[something]);
 
-            var isPredictableTrue = _math.IsPredictableTrue(falseAndSomething);
+            var predictableTrue = _math.IsPredictableTrue(falseAndSomething);
 
-            Assert.IsFalse(isPredictableTrue);
+            Assert.That(predictableTrue, Is.False);
         }
 
         [Test]
@@ -197,7 +197,7 @@
 
             var result = falseAndSomething.Check(5346);
 
-            Assert.IsFalse(result);
+            Assert.That(result, Is.False);
         }
 
         [Test]
@@ -210,7 +210,7 @@
 
             var result = falseAndSomething.Check(new Derived());
 
-            Assert.IsFalse(result);
+            Assert.That(result, Is.False);
         }
 
         [Test]
@@ -221,9 +221,9 @@
                 _conditions.ForInt[something],
                 _math.False<int>());
 
-            var isPredictableFalse = _math.IsPredictableFalse(somethingAndFalse);
+            var predictableFalse = _math.IsPredictableFalse(somethingAndFalse);
 
-            Assert.IsTrue(isPredictableFalse);
+            Assert.That(predictableFalse, Is.True);
         }
 
         [Test]
@@ -234,9 +234,9 @@
                 _conditions.ForDerived[something],
                 _conditions.ForBase[False]);
 
-            var isPredictableFalse = _math.IsPredictableFalse(somethingAndFalse);
+            var predictableFalse = _math.IsPredictableFalse(somethingAndFalse);
 
-            Assert.IsTrue(isPredictableFalse);
+            Assert.That(predictableFalse, Is.True);
         }
 
         [Test]
@@ -249,7 +249,7 @@
 
             var isPredictableTrue = _math.IsPredictableTrue(somethingAndFalse);
 
-            Assert.IsFalse(isPredictableTrue);
+            Assert.That(isPredictableTrue, Is.False);
         }
 
         [Test]
@@ -260,9 +260,9 @@
                 _conditions.ForDerived[something],
                 _conditions.ForBase[False]);
 
-            var isPredictableTrue = _math.IsPredictableTrue(somethingAndFalse);
+            var predictableTrue = _math.IsPredictableTrue(somethingAndFalse);
 
-            Assert.IsFalse(isPredictableTrue);
+            Assert.That(predictableTrue, Is.False);
         }
 
         [Test]
@@ -275,7 +275,7 @@
 
             var result = somethingAndFalse.Check(628);
 
-            Assert.IsFalse(result);
+            Assert.That(result, Is.False);
         }
 
         [Test]
@@ -288,7 +288,7 @@
 
             var result = somethingAndFalse.Check(new Derived());
 
-            Assert.IsFalse(result);
+            Assert.That(result, Is.False);
         }
 
         [Test]
@@ -385,9 +385,9 @@
                 _math.True<int>(),
                 _conditions.ForInt[something]);
 
-            var isPredictableTrue = _math.IsPredictableTrue(trueOrSomething);
+            var predictableTrue = _math.IsPredictableTrue(trueOrSomething);
 
-            Assert.IsTrue(isPredictableTrue);
+            Assert.That(predictableTrue, Is.True);
         }
 
         [Test]
@@ -398,9 +398,9 @@
                 _conditions.ForBase[True],
                 _conditions.ForDerived[something]);
 
-            var isPredictableTrue = _math.IsPredictableTrue(trueOrSomething);
+            var predictableTrue = _math.IsPredictableTrue(trueOrSomething);
 
-            Assert.IsTrue(isPredictableTrue);
+            Assert.That(predictableTrue, Is.True);
         }
 
         [Test]
@@ -411,9 +411,9 @@
                 _math.True<int>(),
                 _conditions.ForInt[something]);
 
-            var isPredictableFalse = _math.IsPredictableFalse(trueOrSomething);
+            var predictableFalse = _math.IsPredictableFalse(trueOrSomething);
 
-            Assert.IsFalse(isPredictableFalse);
+            Assert.That(predictableFalse, Is.False);
         }
 
         [Test]
@@ -424,9 +424,9 @@
                 _conditions.ForBase[True],
                 _conditions.ForDerived[something]);
 
-            var isPredictableFalse = _math.IsPredictableFalse(trueOrSomething);
+            var predictableFalse = _math.IsPredictableFalse(trueOrSomething);
 
-            Assert.IsFalse(isPredictableFalse);
+            Assert.That(predictableFalse, Is.False);
         }
 
         [Test]
@@ -439,7 +439,7 @@
 
             var result = trueOrSomething.Check(325);
 
-            Assert.IsTrue(result);
+            Assert.That(result, Is.True);
         }
 
         [Test]
@@ -452,7 +452,7 @@
 
             var result = trueOrSomething.Check(new Derived());
 
-            Assert.IsTrue(result);
+            Assert.That(result, Is.True);
         }
 
         [Test]
@@ -463,9 +463,9 @@
                 _conditions.ForInt[something],
                 _math.True<int>());
 
-            var isPredictableTrue = _math.IsPredictableTrue(somethingOrTrue);
+            var predictableTrue = _math.IsPredictableTrue(somethingOrTrue);
 
-            Assert.IsTrue(isPredictableTrue);
+            Assert.That(predictableTrue, Is.True);
         }
 
         [Test]
@@ -476,9 +476,9 @@
                 _conditions.ForDerived[something],
                 _conditions.ForBase[True]);
 
-            var isPredictableTrue = _math.IsPredictableTrue(somethingOrTrue);
+            var predictableTrue = _math.IsPredictableTrue(somethingOrTrue);
 
-            Assert.IsTrue(isPredictableTrue);
+            Assert.That(predictableTrue, Is.True);
         }
 
         [Test]
@@ -489,9 +489,9 @@
                 _conditions.ForInt[something],
                 _math.True<int>());
 
-            var isPredictableFalse = _math.IsPredictableFalse(somethingOrTrue);
+            var predictableFalse = _math.IsPredictableFalse(somethingOrTrue);
 
-            Assert.IsFalse(isPredictableFalse);
+            Assert.That(predictableFalse, Is.False);
         }
 
         [Test]
@@ -502,9 +502,9 @@
                 _conditions.ForDerived[something],
                 _conditions.ForBase[True]);
 
-            var isPredictableFalse = _math.IsPredictableFalse(somethingOrTrue);
+            var predictableFalse = _math.IsPredictableFalse(somethingOrTrue);
 
-            Assert.IsFalse(isPredictableFalse);
+            Assert.That(predictableFalse, Is.False);
         }
 
         [Test]
@@ -517,7 +517,7 @@
 
             var result = somethingOrTrue.Check(325);
 
-            Assert.IsTrue(result);
+            Assert.That(result, Is.True);
         }
 
         [Test]
@@ -530,7 +530,7 @@
 
             var result = somethingOrTrue.Check(new Derived());
 
-            Assert.IsTrue(result);
+            Assert.That(result, Is.True);
         }
 
         [Test]
@@ -581,108 +581,108 @@
         public void NotTrueIsPredictableFalse()
         {
             var notTrue = _math.Not(_conditions.ForInt[True]);
-            var isPredictableFalse = _math.IsPredictableFalse(notTrue);
+            var predictableFalse = _math.IsPredictableFalse(notTrue);
 
-            Assert.IsTrue(isPredictableFalse);
+            Assert.That(predictableFalse, Is.True);
         }
 
         [Test]
         public void NotOfBaseTrueIsPredictableFalseByDerivedCheck()
         {
             var notTrue = _math.Not(_conditions.ForBase[True]);
-            var isPredictableFalse = _math.IsPredictableFalse<Derived>(notTrue);
+            var predictableFalse = _math.IsPredictableFalse<Derived>(notTrue);
 
-            Assert.IsTrue(isPredictableFalse);
+            Assert.That(predictableFalse, Is.True);
         }
 
         [Test]
         public void DerivedNotOfBaseTrueIsPredictableFalse()
         {
             var notTrue = _math.Not<Derived>(_conditions.ForBase[True]);
-            var isPredictableFalse = _math.IsPredictableFalse(notTrue);
+            var predictableFalse = _math.IsPredictableFalse(notTrue);
 
-            Assert.IsTrue(isPredictableFalse);
+            Assert.That(predictableFalse, Is.True);
         }
 
         [Test]
         public void NotTrueIsNotPredictableTrue()
         {
             var notTrue = _math.Not(_conditions.ForInt[True]);
-            var isPredictableTrue = _math.IsPredictableTrue(notTrue);
+            var predictableTrue = _math.IsPredictableTrue(notTrue);
 
-            Assert.IsFalse(isPredictableTrue);
+            Assert.That(predictableTrue, Is.False);
         }
 
         [Test]
         public void NotOfBaseTrueIsNotPredictableTrueByDerivedCheck()
         {
             var notTrue = _math.Not(_conditions.ForBase[True]);
-            var isPredictableTrue = _math.IsPredictableTrue<Derived>(notTrue);
+            var predictableTrue = _math.IsPredictableTrue<Derived>(notTrue);
 
-            Assert.IsFalse(isPredictableTrue);
+            Assert.That(predictableTrue, Is.False);
         }
 
         [Test]
         public void DerivedNotOfBaseTrueIsNotPredictableTrue()
         {
             var notTrue = _math.Not<Derived>(_conditions.ForBase[True]);
-            var isPredictableTrue = _math.IsPredictableTrue(notTrue);
+            var predictableTrue = _math.IsPredictableTrue(notTrue);
 
-            Assert.IsFalse(isPredictableTrue);
+            Assert.That(predictableTrue, Is.False);
         }
 
         [Test]
         public void NotFalseIsPredictableTrue()
         {
             var notFalse = _math.Not(_conditions.ForInt[False]);
-            var isPredictableTrue = _math.IsPredictableTrue(notFalse);
+            var predictableTrue = _math.IsPredictableTrue(notFalse);
 
-            Assert.IsTrue(isPredictableTrue);
+            Assert.That(predictableTrue, Is.True);
         }
 
         [Test]
         public void DerivedNotOfBaseFalseIsPredictableTrue()
         {
             var notFalse = _math.Not<Derived>(_conditions.ForBase[False]);
-            var isPredictableTrue = _math.IsPredictableTrue(notFalse);
+            var predictableTrue = _math.IsPredictableTrue(notFalse);
 
-            Assert.IsTrue(isPredictableTrue);
+            Assert.That(predictableTrue, Is.True);
         }
 
         [Test]
         public void NotOfBaseFalseIsPredictableTrueByDerivedCheck()
         {
             var notFalse = _math.Not(_conditions.ForBase[False]);
-            var isPredictableTrue = _math.IsPredictableTrue<Derived>(notFalse);
+            var predictableTrue = _math.IsPredictableTrue<Derived>(notFalse);
 
-            Assert.IsTrue(isPredictableTrue);
+            Assert.That(predictableTrue, Is.True);
         }
 
         [Test]
         public void NotFalseIsNotPredictableFalse()
         {
             var notFalse = _math.Not(_conditions.ForInt[False]);
-            var isPredictableFalse = _math.IsPredictableFalse(notFalse);
+            var predictableFalse = _math.IsPredictableFalse(notFalse);
 
-            Assert.IsFalse(isPredictableFalse);
+            Assert.That(predictableFalse, Is.False);
         }
 
         [Test]
         public void NotOfBaseFalseIsNotPredictableFalseByDerivedCheck()
         {
             var notFalse = _math.Not(_conditions.ForBase[False]);
-            var isPredictableFalse = _math.IsPredictableFalse<Derived>(notFalse);
+            var predictableFalse = _math.IsPredictableFalse<Derived>(notFalse);
 
-            Assert.IsFalse(isPredictableFalse);
+            Assert.That(predictableFalse, Is.False);
         }
 
         [Test]
         public void DerivedNotOfBaseFalseIsNotPredictableFalse()
         {
             var notFalse = _math.Not<Derived>(_conditions.ForBase[False]);
-            var isPredictableFalse = _math.IsPredictableFalse(notFalse);
+            var predictableFalse = _math.IsPredictableFalse(notFalse);
 
-            Assert.IsFalse(isPredictableFalse);
+            Assert.That(predictableFalse, Is.False);
         }
 
         [Test]
@@ -691,7 +691,7 @@
             var notTrue = _math.Not(_conditions.ForInt[True]);
             var result = notTrue.Check(567);
 
-            Assert.IsFalse(result);
+            Assert.That(result, Is.False);
         }
 
         [Test]
@@ -700,7 +700,7 @@
             var notFalse = _math.Not(_conditions.ForInt[False]);
             var result = notFalse.Check(567);
 
-            Assert.IsTrue(result);
+            Assert.That(result, Is.True);
         }
     }
 }

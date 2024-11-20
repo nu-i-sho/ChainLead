@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Test.HandlersMathTestData
+﻿namespace ChainLead.Test.HandlersTestData
 {
     using ChainLead.Contracts;
 

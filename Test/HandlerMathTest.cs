@@ -1,7 +1,7 @@
 namespace ChainLead.Test
 {
     using ChainLead.Contracts;
-    using ChainLead.Test.HandlersMathTestData;
+    using ChainLead.Test.HandlersTestData;
     using Moq;
     using NUnit.Framework.Internal;
     using System;
@@ -15,35 +15,35 @@ namespace ChainLead.Test
         {
             get
             {
-                yield return new OriginalHandlerMathCallsProvider();
-                yield return new ChainLeadSytaxCallsProvider();
-                yield return new ChainLeadSyntaxSeparatedCallsProvider();
-                yield return new ChainLeadSytaxReverseCallsProvider();
+                yield return new OriginalHandlerMathCallsProviderFactory();
+                yield return new ChainLeadSyntaxCallsProviderFactory();
+                yield return new ChainLeadSyntaxSeparatedCallsProviderFactory();
+                yield return new ChainLeadSytaxReverseCallsProviderFactory();
             }
         }
 
         public class Base { }
         public class Derived : Base { }
 
-        private IHandlerMath _math;
+        IHandlerMath _math;
 
-        private IHandler<int> _zeroInt;
-        private IHandler<Base> _zeroBase;
-        private IHandler<Derived> _zeroDerived;
+        IHandler<int> _zeroInt;
+        IHandler<Base> _zeroBase;
+        IHandler<Derived> _zeroDerived;
 
-        private Mock<IHandler<int>> _handler;
-        private Mock<ICondition<int>> _condition;
+        Mock<IHandler<int>> _handler;
+        Mock<ICondition<int>> _condition;
 
-        private const int 
+        const int 
             A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8,
             First = A, Last = I, Missing = -1;
 
-        private Mock<IHandler<int>>[] _handlers;
-        private Mock<ICondition<int>>[] _conditions;
+        Mock<IHandler<int>>[] _handlers;
+        Mock<ICondition<int>>[] _conditions;
 
-        private Mock<IConditionMath> _conditionMath;
+        Mock<IConditionMath> _conditionMath;
 
-        private const string
+        const string
             FirstThenSecond = nameof(IHandlerMath.FirstThenSecond),
             PackFirstInSecond = nameof(IHandlerMath.PackFirstInSecond),
             InjectFirstIntoSecond = nameof(IHandlerMath.InjectFirstIntoSecond),
@@ -52,8 +52,8 @@ namespace ChainLead.Test
             JoinFirstWithSecond = nameof(IHandlerMath.JoinFirstWithSecond),
             MergeFirstWithSecond = nameof(IHandlerMath.MergeFirstWithSecond);
 
-        private static string[] AllAppends =
-        {
+        static readonly string[] AllAppends =
+        [
             FirstThenSecond,
             PackFirstInSecond,
             InjectFirstIntoSecond,
@@ -61,9 +61,9 @@ namespace ChainLead.Test
             FirstWrapSecond,
             JoinFirstWithSecond,
             MergeFirstWithSecond
-        };
+        ];
 
-        private Func<IHandler<T>, IHandler<T>, IHandler<T>>
+        Func<IHandler<T>, IHandler<T>, IHandler<T>>
             AppendFunc<T>(string by) =>
                 by switch
                 {
@@ -77,7 +77,7 @@ namespace ChainLead.Test
                     _ => throw new ArgumentOutOfRangeException(nameof(by))
                 };
 
-        private const int Arg = 7643;
+        const int Arg = 7643;
 
         [SetUp]
         public void Setup()
@@ -107,7 +107,7 @@ namespace ChainLead.Test
                 .ToArray();
         }
 
-        private Mock<IConditionMath> MockPredicateMath()
+        Mock<IConditionMath> MockPredicateMath()
         {
             var math = new Mock<IConditionMath>();
 
@@ -161,14 +161,14 @@ namespace ChainLead.Test
         public void ZeroIsZero()
         {
             var isZero = _math.IsZero(_zeroInt);
-            Assert.IsTrue(isZero);
+            Assert.That(isZero, Is.True);
         }
 
         [Test]
         public void ZeroForBaseClassIsZeroForDerivedClass()
         {
             var isZero = _math.IsZero<Derived>(_zeroBase);
-            Assert.IsTrue(isZero);
+            Assert.That(isZero, Is.True);
         }
 
         [Test]
@@ -180,7 +180,7 @@ namespace ChainLead.Test
             var zeroZero = append(_zeroInt, zeroInt);
             var isZero = _math.IsZero(zeroZero);
 
-            Assert.IsTrue(isZero);
+            Assert.That(isZero, Is.True);
         }
 
         [Test]
@@ -191,7 +191,7 @@ namespace ChainLead.Test
             var chain = append(_zeroBase, _zeroDerived);
             var isZero = _math.IsZero(chain);
 
-            Assert.IsTrue(isZero);
+            Assert.That(isZero, Is.True);
         }
 
         [Test]
@@ -202,7 +202,7 @@ namespace ChainLead.Test
             var chain = append(_zeroDerived, _zeroBase);
             var isZero = _math.IsZero(chain);
 
-            Assert.IsTrue(isZero);
+            Assert.That(isZero, Is.True);
         }
 
         [Test]
@@ -312,12 +312,12 @@ namespace ChainLead.Test
                 Is.EqualTo(a_bcExecutionResult));
         }
 
-        public static string[] OneByOneCases =
-        {
+        public static string[] OneByOneCases =>
+        [
             "ab", "abc", "abcd",
             "abcdueiruoewiroiewepwo",
             "aaaaaaaaaaaaaaaaaaaaaaa"
-        };
+        ];
 
         [Test]
         public void ChainExecutesHandlersOneByOne(
@@ -347,8 +347,8 @@ namespace ChainLead.Test
                 Is.EqualTo(handlersSource));
         }
 
-        public static (string, string)[] OneByOneWithoutZerosCases =
-        {
+        public static (string, string)[] OneByOneWithoutZerosCases =>
+        [
             ("0a", "a"),
             ("a0", "a"),
             ("0a0", "a"),
@@ -357,7 +357,7 @@ namespace ChainLead.Test
              "abcdueiruoewiroiewepwo"),
             ("a0a0a0a0a0a0a0a0a0aaaa0000aaa0a0aaaaaaa000aaaaaa0aaa0aa00aaaa000",
              "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-        };
+        ];
 
         [Test]
         public void ChainExecutesHandlersOneByOneAndIgnoresZeros(
@@ -398,7 +398,7 @@ namespace ChainLead.Test
         public void ConditionalZeroIsZero()
         {
             var conditionalZero = _math.Conditional(_zeroInt, _condition.Object);
-            Assert.IsTrue(_math.IsZero(conditionalZero));
+            Assert.That(_math.IsZero(conditionalZero), Is.True);
         }
 
         [Test]
@@ -602,7 +602,7 @@ namespace ChainLead.Test
                     .Verify(o => o.Check(Arg), Times.Once);
 
             foreach (var i in new[] { A, B, C }
-                      .Except(new[] { expectedCondition }))
+                      .Except([ expectedCondition ]))
                 _conditions[i].Verify(o => o.Check(Arg), Times.Never);
 
             foreach (var i in new[] { A, B })
@@ -736,10 +736,10 @@ namespace ChainLead.Test
             var @checked = expectedToCheck.Select(ParseIndex).ToArray();
             var executed = expectedToExecute.Select(ParseIndex).ToArray();
 
-            foreach (var x in ParseChecksSetup(conditionsChecksSetup))
-                _conditions[x.i]
+            foreach (var (i, value) in ParseChecksSetup(conditionsChecksSetup))
+                _conditions[i]
                     .Setup(o => o.Check(Arg))
-                    .Returns(x.value);
+                    .Returns(value);
 
             _conditionMath
                 .Setup(x => x.And(
@@ -747,8 +747,8 @@ namespace ChainLead.Test
                     It.IsAny<ICondition<int>>()))
                 .Returns(_conditions[I].Object);
 
-            if (aHandlerConditions.Any() &&
-                bHandlerConditions.Any())
+            if (aHandlerConditions.Length != 0 &&
+                bHandlerConditions.Length != 0)
                     _conditionMath
                         .Setup(x => x.And(
                             _conditions[ParseIndex(aHandlerConditions.Last())].Object,
@@ -932,7 +932,7 @@ namespace ChainLead.Test
                 ExecutionExpectedWhen(finalConditionResult));
         }
 
-        [Ignore("")]
+        [Test]
         public void JoinSomeWithSingleConditionalHandlerPutsConditionOnTopOfResult(
             [Values(false, true)] bool order,
             [Values(false, true)] bool checkResult)
@@ -1206,9 +1206,8 @@ namespace ChainLead.Test
                             var i = ParseIndex(x);
                             var p = _conditions[i];
 
-                            if (checksResult.ContainsKey(i))
-                                p.Setup(o => o.Check(Arg))
-                                 .Returns(checksResult[i])
+                            if (checksResult.TryGetValue(i, out bool result))
+                                p.Setup(o => o.Check(Arg)).Returns(result)
                                  .Callback(() => callsOrder += x);
                             else
                                 p.Setup(o => o.Check(Arg))
@@ -1221,14 +1220,14 @@ namespace ChainLead.Test
                             _math.Conditional);
         }
 
-        private static IEnumerable<(int i, bool value)> ParseChecksSetup(
+        static IEnumerable<(int i, bool value)> ParseChecksSetup(
             string conditionChecksSetup) =>
                 conditionChecksSetup
                     .Split(',', StringSplitOptions.RemoveEmptyEntries)
                     .Select(x => x.Split('-'))
                     .Select(x => (i: ParseIndex(x[0][0]), value: ParseBool(x[1][0])));
 
-        private void CheckNothingExecuted()
+        void CheckNothingExecuted()
         {
             foreach (var mock in _conditions)
                 mock.Verify(o => o.Check(Arg), Times.Never);
@@ -1237,19 +1236,19 @@ namespace ChainLead.Test
                 mock.Verify(o => o.Execute(Arg), Times.Never);
         }
 
-        private static Func<Times> ExecutionExpectedWhen(bool value) =>
+        static Func<Times> ExecutionExpectedWhen(bool value) =>
             value ? Times.Once : Times.Never;
 
-        private static bool ParseBool(char mask) => mask == '1';
+        static bool ParseBool(char mask) => mask == '1';
 
-        private static int ParseIndex(char mask) =>
+        static int ParseIndex(char mask) =>
             mask switch
             {
                 'X' => Missing,
                 _ => mask - 'A'
             };
 
-        private static string IndexToString(int i) =>
+        static string IndexToString(int i) =>
             (i switch
             {
                 Missing => 'X',

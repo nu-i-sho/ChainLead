@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Test.HandlersMathTestData
+﻿namespace ChainLead.Test.HandlersTestData
 {
     using ChainLead.Contracts;
     using ChainLead.Implementation;
@@ -6,22 +6,22 @@
 
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
 
-    public class ChainLeadSytaxReverseCallsProvider
+    public class ChainLeadSytaxReverseCallsProviderFactory
         : IHandlerMathCallsProviderFactory
     {
-        public IHandlerMath Create(IConditionMath conditionalMath)
+        public IHandlerMath Create(IConditionMath conditionMath)
         {
-            IHandlerMath math = new HandlerMath(conditionalMath);
+            IHandlerMath math = new HandlerMath(conditionMath);
             ConfigureChainLeadSyntax
                 .WithHandlerMath(math)
-                .AndWithConditionMath(conditionalMath);
+                .AndWithConditionMath(conditionMath);
 
             return new Calls();
         }
 
         public override string ToString() => "like XThen(b).WhereXIs(a)";
 
-        private class Calls : IHandlerMath
+        class Calls : IHandlerMath
         {
             public IHandler<T> Zero<T>() =>
                 Handler<T>.Zero;

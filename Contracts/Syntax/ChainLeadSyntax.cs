@@ -11,8 +11,7 @@
 
     public static class ChainLeadSyntax
     {
-        public static FirstConfigurationStep ConfigureChainLeadSyntax =>
-            new FirstConfigurationStep();
+        public static FirstConfigurationStep ConfigureChainLeadSyntax => new();
 
         public class FirstConfigurationStep
         {
@@ -235,17 +234,17 @@
                 f(b, a);
     }
 
-    file struct Acc<T>
+    file readonly struct Acc<T>
     {
-        private readonly Func<IHandler<T>, IHandler<T>, IHandler<T>> _append;
-        private readonly Func<IHandler<T>, IHandler<T>> _call;
+        readonly Func<IHandler<T>, IHandler<T>, IHandler<T>> _append;
+        readonly Func<IHandler<T>, IHandler<T>> _call;
 
-        private Acc(
+        Acc(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             Func<IHandler<T>, IHandler<T>> call)
         {
-            _append = append;
-            _call = call;
+           _append = append;
+           _call = call;
         }
 
         public Acc(
@@ -257,34 +256,34 @@
 
         public Acc<T> Add(IHandler<T> next)
         {
-            var (a, c) = (_append, _call);
-            return new Acc<T>(_append, head => a(c(head), next));
+           var (a, c) = (_append, _call);
+           return new Acc<T>(_append, head => a(c(head), next));
         }
 
         public IHandler<T> Close(IHandler<T> head) =>
-            _call(head);
+           _call(head);
     }
 
-    file struct ThenReverseCallMorphem<T>(Acc<T> acc)
+    file readonly struct ThenReverseCallMorphem<T>(Acc<T> acc)
         : Morphem.IThenReverseCall<T>
     {
         public Morphem.IThenReverseCall<T> Then(IHandler<T> next) => 
-            new ThenReverseCallMorphem<T>(acc.Add(next));
+           new ThenReverseCallMorphem<T>(acc.Add(next));
 
         public IHandler<T> WhereXIs(IHandler<T> head) =>
-            acc.Close(head);
+           acc.Close(head);
     }
 
-    file struct InMorphem<T>(
+    file readonly struct InMorphem<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morphem.IIn<T>
     {
         public Morphem.IThenIn<T> In(IHandler<T> next) =>
-            new ThenInMorphem<T>(append, append(prev, next));
+           new ThenInMorphem<T>(append, append(prev, next));
     }
 
-    file struct ThenInMorphem<T>(
+    file readonly struct ThenInMorphem<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morphem.IThenIn<T>
@@ -292,29 +291,29 @@
         IHandler<T> IExtendedHandler<T>.Origin => prev;
 
         public Morphem.IThenIn<T> ThenIn(IHandler<T> next) =>
-            new ThenInMorphem<T>(append, append(prev, next));
+           new ThenInMorphem<T>(append, append(prev, next));
     }
 
-    file struct ThenInReverseCallMorphem<T>(Acc<T> acc) 
+    file readonly struct ThenInReverseCallMorphem<T>(Acc<T> acc) 
         : Morphem.IThenInReverseCall<T>
     {
         public Morphem.IThenInReverseCall<T> ThenIn(IHandler<T> next) =>
-            new ThenInReverseCallMorphem<T>(acc.Add(next));
+           new ThenInReverseCallMorphem<T>(acc.Add(next));
 
         public IHandler<T> WhereXIs(IHandler<T> head) =>
-            acc.Close(head);
+           acc.Close(head);
     }
 
-    file struct IntoMorphem<T>(
+    file readonly struct IntoMorphem<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morphem.IInto<T>
     {
         public Morphem.IThenInto<T> Into(IHandler<T> next) =>
-            new ThenIntoMorphem<T>(append, append(prev, next));
+           new ThenIntoMorphem<T>(append, append(prev, next));
     }
 
-    file struct ThenIntoMorphem<T>(
+    file readonly struct ThenIntoMorphem<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morphem.IThenInto<T>
@@ -322,33 +321,33 @@
         IHandler<T> IExtendedHandler<T>.Origin => prev;
 
         public Morphem.IThenInto<T> ThenInto(IHandler<T> next) =>
-            new ThenIntoMorphem<T>(append, append(prev, next));
+           new ThenIntoMorphem<T>(append, append(prev, next));
     }
 
-    file struct ThenIntoReverseCallMorphem<T>(Acc<T> acc) 
+    file readonly struct ThenIntoReverseCallMorphem<T>(Acc<T> acc) 
         : Morphem.IThenIntoReverseCall<T>
     {
         public Morphem.IThenIntoReverseCall<T> ThenInto(IHandler<T> next) =>
-            new ThenIntoReverseCallMorphem<T>(acc.Add(next));
+           new ThenIntoReverseCallMorphem<T>(acc.Add(next));
 
         public IHandler<T> WhereXIs(IHandler<T> head) =>
-            acc.Close(head);
+           acc.Close(head);
     }
 
-    file struct ToCoverOrWrapMorphem<T>(
+    file readonly struct ToCoverOrWrapMorphem<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> cover,
             Func<IHandler<T>, IHandler<T>, IHandler<T>> wrap,
             IHandler<T> prev) 
         : Morphem.IToCoverOrWrap<T>
     {
         public Morphem.IThenCover<T> ToCover(IHandler<T> next) =>
-            new ThenCoverMorphem<T>(cover, cover(prev, next));
+           new ThenCoverMorphem<T>(cover, cover(prev, next));
 
         public Morphem.IThenWrap<T> ToWrap(IHandler<T> next) =>
-            new ThenWrapMorphem<T>(wrap, wrap(prev, next));
+           new ThenWrapMorphem<T>(wrap, wrap(prev, next));
     }
 
-    file struct ThenCoverMorphem<T>(
+    file readonly struct ThenCoverMorphem<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morphem.IThenCover<T>
@@ -356,10 +355,10 @@
         IHandler<T> IExtendedHandler<T>.Origin => prev;
 
         public Morphem.IThenCover<T> ThenCover(IHandler<T> next) =>
-            new ThenCoverMorphem<T>(append, append(prev, next));
+           new ThenCoverMorphem<T>(append, append(prev, next));
     }
 
-    file struct ThenWrapMorphem<T>(
+    file readonly struct ThenWrapMorphem<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morphem.IThenWrap<T>
@@ -367,39 +366,39 @@
         IHandler<T> IExtendedHandler<T>.Origin => prev;
 
         public Morphem.IThenWrap<T> ThenWrap(IHandler<T> next) =>
-            new ThenWrapMorphem<T>(append, append(prev, next));
+           new ThenWrapMorphem<T>(append, append(prev, next));
     }
 
-    file struct ThenCoverReverseCallMorphem<T>(Acc<T> acc) : 
+    file readonly struct ThenCoverReverseCallMorphem<T>(Acc<T> acc) : 
         Morphem.IThenCoverReverseCall<T>
     {
         public Morphem.IThenCoverReverseCall<T> ThenCover(IHandler<T> next) =>
-            new ThenCoverReverseCallMorphem<T>(acc.Add(next));
+           new ThenCoverReverseCallMorphem<T>(acc.Add(next));
 
         public IHandler<T> WhereXIs(IHandler<T> head) =>
-            acc.Close(head);
+           acc.Close(head);
     }
 
-    file struct ThenWrapReverseCallMorphem<T>(Acc<T> acc) 
+    file readonly struct ThenWrapReverseCallMorphem<T>(Acc<T> acc) 
         : Morphem.IThenWrapReverseCall<T>
     {
         public Morphem.IThenWrapReverseCall<T> ThenWrap(IHandler<T> next) =>
-            new ThenWrapReverseCallMorphem<T>(acc.Add(next));
+           new ThenWrapReverseCallMorphem<T>(acc.Add(next));
 
         public IHandler<T> WhereXIs(IHandler<T> head) =>
-            acc.Close(head);
+           acc.Close(head);
     }
 
-    file struct WithMorphem<T>(
+    file readonly struct WithMorphem<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morphem.IWith<T>
     {
         public Morphem.IThenWith<T> With(IHandler<T> next) =>
-            new ThenWithMorphem<T>(append, append(prev, next));
+           new ThenWithMorphem<T>(append, append(prev, next));
     }
 
-    file struct ThenWithMorphem<T>(
+    file readonly struct ThenWithMorphem<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morphem.IThenWith<T>
@@ -407,16 +406,16 @@
         IHandler<T> IExtendedHandler<T>.Origin => prev;
 
         public Morphem.IThenWith<T> ThenWith(IHandler<T> next) =>
-            new ThenWithMorphem<T>(append, append(prev, next));
+           new ThenWithMorphem<T>(append, append(prev, next));
     }
 
-    file struct ThenWithReverseCallMorphem<T>(Acc<T> acc) 
+    file readonly struct ThenWithReverseCallMorphem<T>(Acc<T> acc) 
         : Morphem.IThenWithReverseCall<T>
     {
         public Morphem.IThenWithReverseCall<T> ThenWith(IHandler<T> next) =>
-            new ThenWithReverseCallMorphem<T>(acc.Add(next));
+           new ThenWithReverseCallMorphem<T>(acc.Add(next));
 
         public IHandler<T> WhereXIs(IHandler<T> head) =>
-            acc.Close(head);
+           acc.Close(head);
     }
 }
