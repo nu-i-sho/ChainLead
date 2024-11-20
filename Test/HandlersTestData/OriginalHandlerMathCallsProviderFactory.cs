@@ -9,6 +9,6 @@
         public IHandlerMath Create(IConditionMath conditionMath) =>
             new HandlerMath(conditionMath);
 
-        public override string ToString() => $"original";
+        public override string ToString() => $"\"original\"";
     }
 }

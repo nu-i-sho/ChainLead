@@ -19,7 +19,7 @@
             return new Calls();
         }
 
-        public override string ToString() => "like XThen(b).WhereXIs(a)";
+        public override string ToString() => "\"like XThen(b).WhereXIs(a)\"";
 
         class Calls : IHandlerMath
         {

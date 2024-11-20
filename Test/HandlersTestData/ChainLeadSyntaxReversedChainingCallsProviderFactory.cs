@@ -18,7 +18,7 @@
             return new Calls();
         }
 
-        public override string ToString() => "like MergeXWith(b).ThenWith(c).WhereXIs(c)";
+        public override string ToString() => "\"like MergeXWith(b).ThenWith(c).WhereXIs(c)\"";
 
         class Calls : IHandlerChainingCallsProvider
         {
