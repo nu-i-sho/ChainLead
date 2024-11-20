@@ -1164,7 +1164,7 @@ namespace ChainLead.Test
         [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-0,H-1,G-0", "EDCHG")]
         [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-0,H-1,G-1,F-0", "EDCHGF")]
         [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-0,H-1,G-1,F-1", "EDCHGF[B]")]
-        public void Pack_Inject_Cover_Wrap_CreateCorrectConditions—ascade(
+        public void Pack_Inject_Cover_Wrap_CreateCorrectConditionsCascade(
             string appendType,
             string aHandlerConditions,
             string bHandlerConditions,
