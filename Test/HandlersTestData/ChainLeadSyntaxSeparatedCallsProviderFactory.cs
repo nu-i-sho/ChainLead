@@ -19,7 +19,7 @@
             return new Calls();
         }
 
-        public override string ToString() => "like a.Then(b)";
+        public override string ToString() => "\"like a.Then(b)\"";
 
         class Calls : IHandlerMath
         {

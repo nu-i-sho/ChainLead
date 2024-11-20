@@ -17,7 +17,7 @@
             return new Calls();
         }
 
-        public override string ToString() => "direct ChainLeadSyntax";
+        public override string ToString() => "\"direct ChainLeadSyntax\"";
 
         class Calls : IHandlerMath
         {

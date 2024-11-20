@@ -18,7 +18,7 @@
             return new Calls();
         }
 
-        public override string ToString() => "like Use(a).ToMerge(b).ThenMerge(c)";
+        public override string ToString() => "\"like Use(a).ToMerge(b).ThenMerge(c)\"";
 
         class Calls : IHandlerChainingCallsProvider
         {
