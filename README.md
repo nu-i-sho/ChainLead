@@ -135,13 +135,36 @@ danielDoesSomething = danielDoesSomething.When(itIsNiceTimeToWork);
 ```
 `Or` and `Not` don't need an explanation. Instead, let's look at them in the context of use.
 ```CSharp
- var passIsProhibited = foundDrugs.Or(foundWeapon).And(Not(isFbiAgent));
+var passIsProhibited = foundDrugs.Or(foundWeapon).And(Not(isFbiAgent));
 
 var securePass = pass.When(Not(passIsProhibited));
 ```
+#### `WithConditionThat`, `FirstThenSecond`
+Also, we can make a collection of handlers conditional by `Select(WithConditionThat)` and aggregate it to a single handler by `Aggregate(FirstThenSecond)`.
+```CSharp
+IHandler<State> workers = new[]
+    {
+         jackDoesSomething,
+         bobDoesSomething,
+         danielDoesSomething
+    }
+    .Select(WithConditionThat(itIsNiceTimeToWork))
+    .Aggregate(FirstThenSecond);
+```
+Of course, we can do the same aggregation with `Aggregate(Then)`, but it is better to prefer `FirstThenSecond` for consistency with the methods described below.
 
+## Chain is lazy
+Currently, we have a described minimum enough functionality to call our library useful. I was not directly pointed, but everybody understood that chains built with ChainLead are lazy, and no one handler or condition will be called without 'Execute' or 'Check' calls. The following images help us memorize what a chain is. The left image demonstrates the chain as an object, and the right shows it during execution. This image is bound with the following code snipped.
+```CSharp
+IHandler<state> handler =
+    new[] { a, b.When(f), c, d.When(g), e }
+    .Select(WithConditionThat(h))
+    .Aggregate(FirstThenSecond);
 
-
+State s = ...
+handler.Execute(s);
+```
+![lazy chain](/readme_img/3.svg)
 
 
 (In Progress)  
