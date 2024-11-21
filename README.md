@@ -103,7 +103,7 @@ The second atom (basic block) of the ChainLead library is a condition object `IC
 var isEmpty = MakeCondition<StringBuilder>(acc => acc.Length == 0);
 
 Func<StringBuilder, bool> checkIsToBig = acc => acc.Length > 10000;
-ICondition<StringBuilder> second = checkIsToBig.AsCondition();
+ICondition<StringBuilder> isToBig = checkIsToBig.AsCondition();
 
 ICondition<StringBuilder> @true = Condition<StringBuilder>.True;
 ICondition<StringBuilder> @false = Condition<StringBuilder>.False;
@@ -121,4 +121,27 @@ doSomething = doSomething
     .When(weatherIsSunny)
     .When(haveGoodMood);
 ```
+
+## Condition expressions
+#### `And`, `Or`, `Not`
+Also, we can combine predicates from predicates. For example, a double `When` in the previous code snippet can be replaced with an `And` expression.
+```CSharp
+ICondition<State> itIsNiceTimeToWork = weatherIsSunny.And(haveGoodMood);
+
+doSomething = doSomething.When(itIsNiceTimeToWork);
+jackDoesSomething = jackDoesSomething.When(itIsNiceTimeToWork);
+bobDoesSomething = bobDoesSomething.When(itIsNiceTimeToWork);
+danielDoesSomething = danielDoesSomething.When(itIsNiceTimeToWork);
+```
+`Or` and `Not` don't need an explanation. Instead, let's look at them in the context of use.
+```CSharp
+ var passIsProhibited = foundDrugs.Or(foundWeapon).And(Not(isFbiAgent));
+
+var securePass = pass.When(Not(passIsProhibited));
+```
+
+
+
+
+
 (In Progress)  
