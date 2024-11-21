@@ -31,9 +31,9 @@ public static IHandler<State> Hamburger =>
             .When(Not(OrderExclude(mustard))),
         Put(topBun)
     }
-    .Select(Inject(Index).Into)
-    .Select(WrapItUp(NewLine))
-    .Aggregate(Join);
+    .Select(Pack(Index).In(Dot).ThenIn(Space).ThenIn)
+    .Select(XCover(NewLine).WhereXIs)
+    .Aggregate(FirstThenSecond);
 ```
 *(You can see fully contexted code [here](https://github.com/nu-i-sho/ChainLead/blob/main/Test/BurgerExampleAsTest.cs).)*
 
@@ -54,7 +54,7 @@ using ChainLead.Contracts.Syntax;
 ...
 
 ```
-*(Yes, I know that bad practice to have mutable static data. I just chose this evil to provide some library language features (provided by static classes only) without losing the support of DIP (from SOLID). So, just configure it once, and you will have no problems with that.)*
+*(Yes, I know that it is bad practice to have mutable static data. I just chose this evil to provide some library language features (provided by static classes only) without losing the support of DIP (from SOLID). So, just configure it once, and you will have no problems with that.)*
 
 In place of chain implementation use the following.   
 ```CSharp
@@ -63,14 +63,14 @@ using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
 ```
 ## Handler creation
 #### `MakeHandler`, `AsHandler`, `Zero`
-One of two basic blocks of ChainLead is `IHandler<T>`. It is a simple interface with a single method `Execute(T state)`. We can implement it directly or create it in one of the following ways.
+One of two basic blocks of ChainLead is `IHandler<T>`. It is a simple interface with a single method `void Execute(T state)`. We can implement it directly or create it in one of the following ways.
 ```CSharp
-IHandler<StringBuilder> first = MakeHandler(acc => acc.Append(1));
+var addOne = MakeHandler<StringBuilder>(acc => acc.Append(1));
 
-Action<StringBuilder> action = acc => acc.Append(2); 
-IHandler<StringBuilder> second = action.AsHandler();
+Action<StringBuilder> action = acc => acc.Append(2);
+IHandler<StringBuilder> addTwo = action.AsHandler();
 
-IHandler<StringBuilder> zero = Handler<StringBuilder>.Zero; 
+IHandler<StringBuilder> zero = Handler<StringBuilder>.Zero;
 ```
 The last one does nothing, but it is not the same as a custom-implemented handler that does nothing. (The difference is below.)
 ## Handlers chain building
@@ -94,18 +94,31 @@ var abcd2 = (a.Then(b)).Than(c.Then(d));
 ```
 ![ab, abc1, abc2, abcd1, abcd2](/readme_img/2.svg)
 
-Obviously, circles in the image are handlers, and bars are `Then` calls. 'Then' is directed (it has first and second parameters), and better to draw it as an arrow (but ugly). So, imagine that all vertical bars are arrows from up to down and horizontal - from left to right. Also, we know the order of `Then` calls (black numbers). Based on this, we can easily predict the order of handlers' executions (white numbers). That means `acb1` and `abc2` are logically the same chains (`abcd1` and `abcd2` too). Or, by more mathematical words - `Then` is associative.
+Obviously, circles in the image are handlers, and bars are `Then` calls. 'Then' is directed (it has first and second parameters)/ All vertical bars join the first up handler with the second down and horizontal - the first left with the second right. Also, we know the order of `Then` calls (black numbers). Based on this, we can easily predict the order of handlers' executions (white numbers). That means `acb1` and `abc2` are logically the same chains (`abcd1` and `abcd2` too). Or, by more mathematical words - `Then` is associative.
 
-### `Join`
-`Join(a, b)` is the same as `a.Then(b)`, but I recommend not calling `Join` directly, and using it only as an object. For example
-``` CSharp
-var abcd = new[] { a, b, c, d }.Aggregate(Join);
+## Conditions creation
+#### `MakeHandler`, `AsHandler`, `Zero`
+The second atom (basic block) of the ChainLead library is a condition object `ICondition<T>. It contains a single method `bool Check(T state)` and its object can be created in one of the following ways (in addition to custom interface implementation).
+```CSharp
+var isEmpty = MakeCondition<StringBuilder>(acc => acc.Length == 0);
+
+Func<StringBuilder, bool> checkIsToBig = acc => acc.Length > 10000;
+ICondition<StringBuilder> second = checkIsToBig.AsCondition();
+
+ICondition<StringBuilder> @true = Condition<StringBuilder>.True;
+ICondition<StringBuilder> @false = Condition<StringBuilder>.False;
 ```
-Also, if you aren't sure that the collection of handlers you want to aggregate to chain contains at least one item - use `Handler<T>.Zero` as the starting state of the accumulator.  
-``` CSharp
-IHandler<int> ChainOf(IHandler<int>[] items) =>
-    items.Aggregate(Handler<int>.Zero, Join);
+
+`Condition<T>.True` and `Condition<T>.False` checks return `true` and `false` accordingly regardless of the input arguments.  
+
+## Conditional handlers
+#### `When`
+We can use the extension method `When` on the handler and make it conditional. The conditional handler has the same type/interface as the original. It will be executed only in the case when all its (attached) conditions return true.
+```CSharp
+IHandler<State> goHomeWhenWeatherIsRainy = goHome.When(weatherIsRainy);
+
+doSomething = doSomething
+    .When(weatherIsSunny)
+    .When(haveGoodMood);
 ```
-### `Join(X).To`, `JoinItTo`
 (In Progress)  
-
