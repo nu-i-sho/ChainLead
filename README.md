@@ -164,7 +164,6 @@ IHandler<state> handler =
 State s = ...
 handler.Execute(s);
 ```
-![lazy chain](/readme_img/3.svg)
 
 
 (In Progress)  
