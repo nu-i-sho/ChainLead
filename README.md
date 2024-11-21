@@ -164,6 +164,6 @@ IHandler<state> handler =
 State s = ...
 handler.Execute(s);
 ```
-
+![chain execution](/readme_img/3.svg)
 
 (In Progress)  
