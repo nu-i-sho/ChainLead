@@ -35,7 +35,7 @@ public static IHandler<State> Hamburger =>
     .Select(XCover(NewLine).WhereXIs)
     .Aggregate(FirstThenSecond);
 ```
-*(You can see fully contexted code [here](https://github.com/nu-i-sho/ChainLead/blob/main/Test/BurgerExampleAsTest.cs).)*
+*(You can see this code in context and more [here](https://github.com/nu-i-sho/ChainLead/blob/main/Test/BurgerExampleAsTest.cs).)*
 
 ## To use ChainLead
 it is necessary to configure the library (syntax) language by providing the implementations of chain mathematics. But do it once in your solution assembly point (where Dependency Injection is configured). 
@@ -54,9 +54,9 @@ using ChainLead.Contracts.Syntax;
 ...
 
 ```
-*(Yes, I know that it is bad practice to have mutable static data. I just chose this evil to provide some library language features (provided by static classes only) without losing the support of DIP (from SOLID). So, just configure it once, and you will have no problems with that.)*
+*(Yes, I know that it is bad practice to have mutable static data. I compromised with that to provide some library language features (provided by static classes only) without losing the support of DIP (from SOLID). So, just configure it once, and you will have no problems with that.)*
 
-In place of chain implementation use the following.   
+Use the following 'usings' in source files where you build the chains to make the library syntax available.   
 ```CSharp
 using ChainLead.Contracts;
 using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
@@ -82,7 +82,7 @@ var addB = MakeHandler<StringBuilder>(acc => acc.Append("B"));
 
 var addAB = printA.Then(printB);
 ```
-So, we can create the chain with any number of handlers. By the fact, it will be a tree. We imagine the chain as a collection, but it doesn't matter because all executions of items in our tree have a determined and predictable order. The following code and image show how it works.
+So, we can create the chain with any number of handlers. By the fact, it is a tree. We imagine the chain as a collection, but it doesn't matter because all executions of items in our tree have a determined and predictable order. The following code and image show how it works.
 ```CSharp
 var ab = a.Then(b);
 
@@ -94,10 +94,10 @@ var abcd2 = (a.Then(b)).Than(c.Then(d));
 ```
 ![ab, abc1, abc2, abcd1, abcd2](/readme_img/2.svg)
 
-Obviously, circles in the image are handlers, and bars are `Then` calls. 'Then' is directed (it has first and second parameters)/ All vertical bars join the first up handler with the second down and horizontal - the first left with the second right. Also, we know the order of `Then` calls (black numbers). Based on this, we can easily predict the order of handlers' executions (white numbers). That means `acb1` and `abc2` are logically the same chains (`abcd1` and `abcd2` too). Or, by more mathematical words - `Then` is associative.
+Obviously, circles in the image are handlers, and bars are `Then` calls. 'Then' is directed (it has the first and the second parameters). All vertical bars join the first up handler with the second down and horizontal, and the first left with the second right. Also, we know the order of `Then` calls (black numbers). Based on this, we can easily predict the order of handlers' executions (white numbers). That means `abc1` and `abc2` are logically the same chains (`abcd1` and `abcd2` too). Or, in mathematical terms - `Then` is associative.
 
 ## Conditions creation
-#### `MakeHandler`, `AsHandler`, `Zero`
+#### `MakeCondition`, `AsCondition`, `True`,  `False`
 The second atom (basic block) of the ChainLead library is a condition object `ICondition<T>. It contains a single method `bool Check(T state)` and its object can be created in one of the following ways (in addition to custom interface implementation).
 ```CSharp
 var isEmpty = MakeCondition<StringBuilder>(acc => acc.Length == 0);
