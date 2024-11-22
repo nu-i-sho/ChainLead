@@ -80,6 +80,14 @@
                 Math.ForHandler
                     .IsZero(handler);
 
+        public static bool IsPredictableTrue<T>(
+            this ICondition<T> condition) => 
+                Math.ForCondition.IsPredictableTrue(condition);
+
+        public static bool IsPredictableFalse<T>(
+            this ICondition<T> condition) =>
+                Math.ForCondition.IsPredictableFalse(condition);
+
         public static IHandler<T> FirstThenSecond<T>(
             IHandler<T> prev,
             IHandler<T> next) =>

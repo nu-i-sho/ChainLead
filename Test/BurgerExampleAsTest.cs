@@ -29,7 +29,7 @@
             return state.Recipe.ToString();
         }  
 
-        public static IHandler<State> Hamburger =>
+        static IHandler<State> Hamburger =>
             new[]
             {
                 Cut(bun),
@@ -61,7 +61,7 @@
             .Select(XCover(NewLine).WhereXIs)
             .Aggregate(FirstThenSecond);
 
-        public static IHandler<State> Fishburger =>
+        static IHandler<State> Fishburger =>
             new[]
             {
                 Cut(bun),
@@ -81,7 +81,7 @@
             .Select(XCover(NewLine).WhereXIs)
             .Aggregate(FirstThenSecond);
 
-        public static IHandler<State> Chikenburger =>
+        static IHandler<State> Chikenburger =>
             new[]
             {
                 Cut(bun),
@@ -110,7 +110,7 @@
             .Select(XCover(NewLine).WhereXIs)
             .Aggregate(FirstThenSecond);
 
-        public static IHandler<State> UncknownBurger =>
+        static IHandler<State> UncknownBurger =>
             MakeHandler<State>(x => x.Recipe.Append(
                 $"There is no recipe for {x.Order.Name}"));
 
@@ -120,9 +120,9 @@
         const string chikenburger = "Chikenburger";
         const string doubleChikenburger = $"{@double} {@chikenburger}";
 
-        public record Order(string Name, params string[] Options) { }
+        record Order(string Name, params string[] Options) { }
 
-        public class State(Order order)
+        class State(Order order)
         {
             public Order Order => order;
 
