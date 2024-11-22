@@ -234,6 +234,6 @@ var handler = Handler<State>.Zero.When(something);
 Assert.IsTrue(handler.IsZero());
 ```
 
-*(Possibly ChainLead will be extended with additional optimizations boolean algebra has the potential to do that. It is one more why relying on side effects in conditions anyway is a bad idea. )* 
+*(Possibly, ChainLead will be extended with additional optimizations. Boolean algebra has the potential to do that. It is one more why relying on side effects in conditions anyway is a bad idea. )* 
 
 (In Progress)  
