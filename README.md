@@ -98,7 +98,7 @@ Obviously, circles in the image are handlers, and bars are `Then` calls. 'Then' 
 
 ## Conditions creation
 #### `MakeCondition`, `AsCondition`, `True`,  `False`
-The second atom (basic block) of the ChainLead library is a condition object `ICondition<T>. It contains a single method `bool Check(T state)` and its object can be created in one of the following ways (in addition to custom interface implementation).
+The second atom (basic block) of the ChainLead library is a condition - `ICondition<T>`. It contains a single method `bool Check(T state)` and its object can be created in one of the following ways (in addition to the custom interface implementation).
 ```CSharp
 var isEmpty = MakeCondition<StringBuilder>(acc => acc.Length == 0);
 
@@ -109,7 +109,7 @@ ICondition<StringBuilder> @true = Condition<StringBuilder>.True;
 ICondition<StringBuilder> @false = Condition<StringBuilder>.False;
 ```
 
-`Condition<T>.True` and `Condition<T>.False` checks return `true` and `false` accordingly regardless of the input arguments.  
+`Condition<T>.True` and `Condition<T>.False` checks return `true` and `false` accordingly, regardless of the input arguments.  
 
 ## Conditional handlers
 #### `When`
@@ -122,9 +122,9 @@ doSomething = doSomething
     .When(haveGoodMood);
 ```
 
-## Condition expressions
+## Conditions combinations 
 #### `And`, `Or`, `Not`
-Also, we can combine predicates from predicates. For example, a double `When` in the previous code snippet can be replaced with an `And` expression.
+Also, we can combine conditions with each other. For example, a double `When` in the previous code snippet can be replaced with an `And` expression.
 ```CSharp
 ICondition<State> itIsNiceTimeToWork = weatherIsSunny.And(haveGoodMood);
 
@@ -140,7 +140,7 @@ var passIsProhibited = foundDrugs.Or(foundWeapon).And(Not(isFbiAgent));
 var securePass = pass.When(Not(passIsProhibited));
 ```
 #### `WithConditionThat`, `FirstThenSecond`
-Also, we can make a collection of handlers conditional by `Select(WithConditionThat)` and aggregate it to a single handler by `Aggregate(FirstThenSecond)`.
+Also, we can make a collection of handlers conditional by `Select(WithConditionThat)` and aggregate it into a single handler by `Aggregate(FirstThenSecond)`.
 ```CSharp
 IHandler<State> workers = new[]
     {
@@ -151,10 +151,10 @@ IHandler<State> workers = new[]
     .Select(WithConditionThat(itIsNiceTimeToWork))
     .Aggregate(FirstThenSecond);
 ```
-Of course, we can do the same aggregation with `Aggregate(Then)`, but it is better to prefer `FirstThenSecond` for consistency with the methods described below.
+Of course, we can do the same aggregation with `Aggregate(Then)`, but it is preferable to use `FirstThenSecond` for consistency with the methods described below.
 
 ## Chain is lazy
-Currently, we have a described minimum enough functionality to call our library useful. I was not directly pointed, but everybody understood that chains built with ChainLead are lazy, and no one handler or condition will be called without 'Execute' or 'Check' calls. The following images help us memorize what a chain is. The left image demonstrates the chain as an object, and the right shows it during execution. This image is bound with the following code snipped.
+Currently, we have enough functionality described to call our library useful. I was not directly pointed, but everybody understands that chains built with ChainLead are lazy, and no handler or condition will be called without 'Execute' or 'Check' calls. The following images help us to memorize what a chain is. The left image demonstrates the chain as an object, and the right shows it during execution. This image is bound with the following code snipped.
 ```CSharp
 IHandler<state> handler =
     new[] { a, b.When(f), c, d.When(g), e }
@@ -169,7 +169,7 @@ handler.Execute(s);
 We can imagine chain execution as a trip of the state through the handlers that mutate it under the control of the conditions. 
 
 ## Correct responsibility
-It is bad practice to change the state in predicates because it is an erosion of responsibility. You can protect your code from this erosion by separating access to the state by two inherited interfaces. And use the read-only interfaced state for the conditions and the full-access interfaced state for the handlers. ChainLead provides (co/contra)variance to make it possible. Like the following
+It is bad practice to change the state in conditions because it is an erosion of responsibility. You can protect your code from this erosion by separating access to the state by two inherited interfaces. And use the read-only interfaced state for the conditions and the full-access interfaced state for the handlers. ChainLead provides (co/contra)variance to make it possible. Like the following
 ```CSharp
 interface IReadOnlyState
 {
@@ -209,7 +209,7 @@ var handler = new[]
 handler.Execute(new State());
 ...
 ```
-The responsibility of the condition is to check the state to comply with the capsulated *condition* and nothing more. If you added some side effect to the condition, be aware that it is not guaranteed to be called. ChainLead relies on the correct implementation of the `ICondition<T>` and doesn't care about side effects. For example, the following conditions do not call `a` because it doesn't make sense as ChainLead predicts the result without calling.  
+The responsibility of the condition is to check the state to comply with the capsulated *condition* and nothing more. If you add some side effect to the condition, be aware that it is not guaranteed to be called. ChainLead relies on the correct implementation of the `ICondition<T>` and doesn't care about side effects. For example, the following conditions do not call `a` because it doesn't make sense as ChainLead predicts the result without calling.  
 ```CSharp
 var falseAndA = Condition<State>.False.And(a); // anything and false = false
 var aAndFalse = a.And(Condition<State>.False); // false and anything = false
@@ -234,6 +234,6 @@ var handler = Handler<State>.Zero.When(something);
 Assert.IsTrue(handler.IsZero());
 ```
 
-*(Possibly, ChainLead will be extended with additional optimizations. Boolean algebra has the potential to do that. It is one more why relying on side effects in conditions anyway is a bad idea. )* 
+*(Possibly, ChainLead will be extended with additional optimizations. Boolean algebra has the potential to do that. It is one more why relying on side effects in conditions is a bad idea. )* 
 
 (In Progress)  
