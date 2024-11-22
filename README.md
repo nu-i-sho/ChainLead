@@ -209,12 +209,31 @@ var handler = new[]
 handler.Execute(new State());
 ...
 ```
-The responsibility of the condition is to check the state to comply with the capsulated *condition* and nothing more. If you added some side effect to the condition, be aware that it is not guaranteed to be called. ChainLead relies on the correct implementation of the `ICondition<T>` and doesn't care about side effects. For example, the following conditions do not call `a`.  
+The responsibility of the condition is to check the state to comply with the capsulated *condition* and nothing more. If you added some side effect to the condition, be aware that it is not guaranteed to be called. ChainLead relies on the correct implementation of the `ICondition<T>` and doesn't care about side effects. For example, the following conditions do not call `a` because it doesn't make sense as ChainLead predicts the result without calling.  
 ```CSharp
 var falseAndA = Condition<State>.False.And(a); // anything and false = false
 var aAndFalse = a.And(Condition<State>.False); // false and anything = false
 
 var trueOrA = Condition<State>.True.Or(a) // true or anything = true
-var aOrTrue = a.Or(Condition<State>.True) // true or anything = true
+var aOrTrue = a.Or(Condition<State>.True) // anything or true = true
 ```
+#### `IsPredictableTrue`, `IsPredictableFalse`
+We can check whether the condition is a `True` or `False` object by the following extension methods.
+```CSharp
+Assert.IsTrue(falseAndA.IsPredictableFalse());
+Assert.IsTrue(aAndFalse.IsPredictableFalse());
+
+Assert.IsTrue(trueOrA.IsPredictableTrue());
+Assert.IsTrue(aOrTrue.IsPredictableTrue());
+```
+#### `IsZero` 
+Also, we can check whether the handler is a `Zero` object. There is one more case of an uncalled condition when it is attached to a zero handler because there is no reason to check something to do nothing.
+
+```CSharp
+var handler = Handler<State>.Zero.When(something);
+Assert.IsTrue(handler.IsZero());
+```
+
+*(Possibly ChainLead will be extended with additional optimizations boolean algebra has the potential to do that. It is one more why relying on side effects in conditions anyway is a bad idea. )* 
+
 (In Progress)  
