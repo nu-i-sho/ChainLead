@@ -166,4 +166,55 @@ handler.Execute(s);
 ```
 ![chain execution](/readme_img/3.svg)
 
+We can imagine chain execution as a trip of the state through the handlers that mutate it under the control of the conditions. 
+
+## Correct responsibility
+It is bad practice to change the state in predicates because it is an erosion of responsibility. You can protect your code from this erosion by separating access to the state by two inherited interfaces. And use the read-only interfaced state for the conditions and the full-access interfaced state for the handlers. ChainLead provides (co/contra)variance to make it possible. Like the following
+```CSharp
+interface IReadOnlyState
+{
+    int A { get; }
+    int B { get; }
+    int C { get; }
+}
+
+abstract class IState : IReadOnlyState
+{
+    public virtual int A { get; set; }
+    public virtual int B { get; set; }
+    public virtual int C { get; set; }
+}
+
+class State : IState { }
+
+...
+var setA1 = MakeHandler<IState>(s => s.A = 1);
+var setB5 = MakeHandler<IState>(s => s.B = 5);
+var setC3 = MakeHandler<IState>(s => s.C = 3);
+var setA5 = MakeHandler<IState>(s => s.C = 5);
+
+var aEquals1 = MakeCondition<IReadOnlyState>(s => s.A == 1);
+var bEquals5 = MakeCondition<IReadOnlyState>(s => s.B == 5);
+var cEquals3 = MakeCondition<IReadOnlyState>(s => s.C == 3);
+
+var handler = new[]
+{
+    setA1,
+    setB5.When(aEquals1),
+    setC3.When(bEquals5),
+    setA5.When(cEquals3)
+}
+.Aggregate(FirstThenSecond);
+
+handler.Execute(new State());
+...
+```
+The responsibility of the condition is to check the state to comply with the capsulated *condition* and nothing more. If you added some side effect to the condition, be aware that it is not guaranteed to be called. ChainLead relies on the correct implementation of the `ICondition<T>` and doesn't care about side effects. For example, the following conditions do not call `a`.  
+```CSharp
+var falseAndA = Condition<State>.False.And(a); // anything and false = false
+var aAndFalse = a.And(Condition<State>.False); // false and anything = false
+
+var trueOrA = Condition<State>.True.Or(a) // true or anything = true
+var aOrTrue = a.Or(Condition<State>.True) // true or anything = true
+```
 (In Progress)  
