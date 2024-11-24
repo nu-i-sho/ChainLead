@@ -292,6 +292,7 @@ var handler = new[]
 ```
 #### `XCover(o).WhereXIs`
 If you like lambda expressions free code like me, you can use `XCover(closseTransactin).WhereXIs` instead of `x => Use(x).ToCover(closseTransactin)`.
+```CSharp
 var handler = new[] { /* db operations handlers list*/ }
     .Select(Pack(openTransaction).In)
     .Select(XCover(closseTransactin).WhereXIs)
