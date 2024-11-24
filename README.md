@@ -92,7 +92,7 @@ var abc2 = a.Then(b.Then(c));
 var abcd1 = a.Then(b).Then(c).Then(d);
 var abcd2 = (a.Then(b)).Than(c.Then(d));
 ```
-![ab, abc1, abc2, abcd1, abcd2](/readme_img/2.svg)
+![ab, abc1, abc2, abcd1, abcd2](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/2.svg)
 
 Obviously, circles in the image are handlers, and bars are `Then` calls. 'Then' is directed (it has the first and the second parameters). All vertical bars join the first up handler with the second down and horizontal, and the first left with the second right. Also, we know the order of `Then` calls (black numbers). Based on this, we can easily predict the order of handlers' executions (white numbers). That means `abc1` and `abc2` are logically the same chains (`abcd1` and `abcd2` too). Or, in mathematical terms - `Then` is associative.
 
@@ -164,7 +164,7 @@ IHandler<state> handler =
 State s = ...
 handler.Execute(s);
 ```
-![chain execution](/readme_img/3.svg)
+![chain execution](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/3.svg)
 
 We can imagine chain execution as a trip of the state through the handlers that mutate it under the control of the conditions. 
 
@@ -306,5 +306,5 @@ Of course, analogical syntax construction for reversed arguments order calls of 
 
 
 The following image summarizes how the 'Pack' and 'Cover' functions work.
-![Pack and Cover](/readme_img/4.svg)
+![Pack and Cover](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/4.svg)
 (In Progress)  
