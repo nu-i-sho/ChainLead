@@ -233,7 +233,71 @@ Also, we can check whether the handler is a `Zero` object. There is one more cas
 var handler = Handler<State>.Zero.When(something);
 Assert.IsTrue(handler.IsZero());
 ```
-
 *(Possibly, ChainLead will be extended with additional optimizations. Boolean algebra has the potential to do that. It is one more why relying on side effects in conditions is a bad idea. )* 
+
+## Advanced chain building
+#### `Pack(o).In`
+Imagine that we have a good readable chain where some items are conditional 
+```CSharp
+var handler = new[]
+    {
+        addNewEmployee,
+        addEmployeeManager.When(employeeHasManager),
+        addDepartment.When(Not(employeeIsFreeContractor)),
+        informOnboardingSystem,
+        notifyEmployeesAboutFirstWorkingDay.When(Not(employeeStartedWork)),
+    }
+    .Aggregete(FirstThenSecond);
+```
+and want to add state logging before and after each handler execution. At first look, it is not a problem and we can update the building expression like the following
+```CSharp
+var handler = new[] { /* steps list */ }
+    .Select(logState.Then)
+    .Aggregete(FirstThenSecond)
+    .Then(logState);
+```
+Everything looks great to me. But it has one problem. When conditions attached to handlers during execution return false, relevant handlers will not be executed but we will have redundant calls of `logState`. So, we need to couple our logging handler with each handler in our list and mix domain logic with copy-pasted technical details.
+```CSharp
+var handler = new[]
+    {
+        logState.Then(addNewEmployee),
+        logState.Then(addEmployeeManager).When(employeeHasManager),
+        logState.Then(addDepartment).When(Not(employeeIsFreeContractor)),
+        logState.Then(informOnboardingSystem),
+        logState.Then(notifyEmployeesAboutFirstWorkingDay).When(Not(employeeStartedWork)),
+    }
+    .Aggregete(FirstThenSecond)
+    .Then(logState);
+```
+To avoid it we need some function that can couple two handlers but use the condition attached to the second one as the condition attached to the coupling result instead. ChainLead provides this function `Pack(first).In(Second)`, which can be used as in the code snipped below.
+```CSharp
+var handler = new[] { /* steps list */ }
+    .Select(Pack(logState).In)
+    .Aggregete(FirstThenSecond)
+    .Then(logState);
+```    
+And our chain will have no extra logging handler calls as we want.
+#### `Use(o).ToCover` 
+The same problem exists when we want to add the handler to each handler in the main list to the end but under conditions attached to them. So, ChainLead has a function for this situation too. The following example shows the situation when we want to open a transaction before each handler call and close after.
+```CSharp
+var handler = new[]
+    {
+        addNewEmployee,
+        addEmployeeManager.When(employeeHasManager),
+        addDepartment.When(Not(employeeIsFreeContractor))
+    }
+    .Select(Pack(openTransaction).In)
+    .Select(x => Use(x).ToCover(closseTransactin))
+    .Aggregete(FirstThenSecond);
+```
+#### `XCover(o).WhereXIs`
+If you like lambda expressions free code like me, you can use `XCover(closseTransactin).WhereXIs` instead of `x => Use(x).ToCover(closseTransactin)`.
+var handler = new[] { /* db operations handlers list*/ }
+    .Select(Pack(openTransaction).In)
+    .Select(XCover(closseTransactin).WhereXIs)
+    .Aggregete(FirstThenSecond);
+```
+#### `PackXInto(o).WhereXIs`
+Of course, analogical syntax construction for reversed arguments order calls of `Pack(o).In` exists too. It is `PackXIn(o).WhereXIs`. 
 
 (In Progress)  
