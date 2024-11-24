@@ -301,4 +301,10 @@ var handler = new[] { /* db operations handlers list*/ }
 #### `PackXInto(o).WhereXIs`
 Of course, analogical syntax construction for reversed arguments order calls of `Pack(o).In` exists too. It is `PackXIn(o).WhereXIs`. 
 
+#### `PackFirstInSecond`, `FirstCoverSecond`
+'Pack' and 'Cover' have useful forms for aggregation, they are not carried `PackFirstInSecond` and `FirstCoverSecond`. It is not easy to find a good example where `Aggaragete(PackFirstInSecond)` or `Aggaragete(FirstCoverSecond)` is apt. But as you remember we are talking about "Advanced chain building" and using it in each real-life situation is not expected. 
+
+
+The following image summarizes how the 'Pack' and 'Cover' functions work.
+![Pack and Cover](/readme_img/4.svg)
 (In Progress)  
