@@ -310,8 +310,11 @@ The following image summarizes how the 'Pack' and 'Cover' functions work.
 
 #### `Inject(o).Into`, `InjectZInto(o).WhereXIs`, `InjectFirstIntoSecond`,
 #### `Use(o).ToWrap`, `XWrap(o).WhereXIs`, `FirstWrapSecond`
-The 'Pack' and 'Cover' functions put coupled handlers in the top attached condition only. If we want to put handlers in all conditions we can use functions from the 'Inject' and 'Wrap' family. The following table represents analogs for the 'Pack' and 'Cover' functions from the 'Inject' and 'Wrap' functions set.
+The 'Pack' and 'Cover' functions put coupled handlers in the top attached condition only. If we want to put handlers in all conditions we can use functions from the 'Inject' and 'Wrap' family. And the following image show how they work. 
 
+![Inject and Wrap](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/5.svg)
+
+And the following table represents analogs for the 'Pack' and 'Cover' functions from the 'Inject' and 'Wrap' functions set.
 | **'Pack' & 'Cover'**    | **'Inject' & 'Wrap'**     |
 | ----------------------- | ------------------------- |
 | `Pack(o).In`            | `Inject(o).Into`          |
@@ -321,4 +324,3 @@ The 'Pack' and 'Cover' functions put coupled handlers in the top attached condit
 | `XCover(o).WhereXIs`    | `XWrap(o).WhereXIs`       |
 | `FirstCoverSecond`      | `FirstWrapSecond`         |
 
-(In Progress)  
