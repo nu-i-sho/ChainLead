@@ -314,7 +314,7 @@ The 'Pack' and 'Cover' functions put coupled handlers in the top attached condit
 
 ![Inject and Wrap](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/5.svg)
 
-And the following table represents analogs for the 'Pack' and 'Cover' functions from the 'Inject' and 'Wrap' functions set.
+The following table represents analogs for the 'Pack' and 'Cover' functions from the 'Inject' and 'Wrap' functions set.
 | **'Pack' & 'Cover'**    | **'Inject' & 'Wrap'**     |
 | ----------------------- | ------------------------- |
 | `Pack(o).In`            | `Inject(o).Into`          |
@@ -324,3 +324,11 @@ And the following table represents analogs for the 'Pack' and 'Cover' functions 
 | `XCover(o).WhereXIs`    | `XWrap(o).WhereXIs`       |
 | `FirstCoverSecond`      | `FirstWrapSecond`         |
 
+#### `Join(o).With`, `XJoinWith(o).WhereXIs`, `JoinFirstWithSecond`
+The 'Join' family functions couple two handlers under the conjunction of their top conditions (aggregated by `And`).
+
+#### `Merge(o).With`, `XMergeWith(o).WhereXIs`, `MergeFirstWithSecond`
+The 'Merge' family functions couple two handlers under the conjunction of all their conditions.
+
+The following image is a representation of how the `Join` and `Merge` functions work.
+![Inject and Wrap](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/6.svg)
