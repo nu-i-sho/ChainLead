@@ -328,7 +328,25 @@ The following table represents analogs for the 'Pack' and 'Cover' functions from
 The 'Join' family functions couple two handlers under the conjunction of their top conditions (aggregated by `And`).
 
 #### `Merge(o).With`, `XMergeWith(o).WhereXIs`, `MergeFirstWithSecond`
-The 'Merge' family functions couple two handlers under the conjunction of all their conditions.
+The 'Merge' family functions couple two handlers under the conjunction of all their conditions. The following image is a representation of how the `Join` and `Merge` functions work.
 
-The following image is a representation of how the `Join` and `Merge` functions work.
 ![Inject and Wrap](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/6.svg)
+
+All those functional constructions can be applied to more than two arguments.
+
+| **First step**    | **Second step**  | **i-th step**    | **Last step**    |
+| ----------------- | ---------------- | ---------------- | ---------------- |
+| `a1`              | `.Then(a2)`      | `.Then(ai)`      | `.Then(an)`      |
+| `XThen(a2)`       | `.Then(a3)`      | `.Then(ai)`      | `.WhereXIs(a1)`  |
+| `Pack(a1)`        | `.In(a2)`        | `.ThenIn(ai)`    | `.ThenIn(an)`    |
+| `PackXIn(a2)`     | `.ThenIn(a3)`    | `.ThenIn(ai)`    | `.WhereXIs(a1)`  |
+| `Use(a1)`         | `.ToCover(a2)`   | `.ThenCover(ai)` | `.ThenCover(an)` |
+| `XCover(a2)`      | `.ThenCover(a3)` | `.ThenCover(ai)` | `.WhereXIs(a1)`  |
+| `Inject(a1)`      | `.Into(a2)`      | `.ThenInto(ai)`  | `.ThenInto(an)`  |
+| `InjectXInto(a2)` | `.ThenInto(a3)`  | `.ThenInto(ai)`  | `.WhereXIs(a1)`  |
+| `Use(a1)`         | `.ToWrap(a2)`    | `.ThenWrap(ai)`  | `.ThenWrap(an)`  |
+| `XWrap(a2)`       | `.ThenWrap(a3)`  | `ThenWrap(ai)`   | `.WhereXIs(a1)`  |
+| `Join(a1)`        | `.With(a2)`      | `.ThenWith(ai)`  | `.ThenWith(an)`  |
+| `JoinXWith(a2)`   | `.ThenWith(a3)`  | `.ThenWith(ai)`  | `.WhereXIs(a1)`  |
+| `Merge(a1)`       | `.With(a2)`      | `.ThenWith(ai)`  | `.ThenWith(an)`  |
+| `MergeXWith(a2)`  | `.ThenWith(a3)`  | `.ThenWith(ai)`  | `.WhereXIs(a1)`  |
