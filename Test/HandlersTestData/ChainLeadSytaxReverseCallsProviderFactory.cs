@@ -55,6 +55,9 @@
 
             public IHandler<T> Conditional<T>(IHandler<T> handler, ICondition<T> condition) =>
                 handler.When(condition);
+
+            public IHandler<T> Atomize<T>(IHandler<T> handler) =>
+                ChainLeadSyntax.Atomize(handler);
         }
     }
 }

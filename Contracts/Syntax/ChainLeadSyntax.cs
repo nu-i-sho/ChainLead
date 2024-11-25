@@ -209,6 +209,11 @@
                     Math.ForHandler.MergeFirstWithSecond,
                     next));
 
+        public static IHandler<T> Atomize<T>(
+            IHandler<T> handler) =>
+                Math.ForHandler
+                    .Atomize(handler);
+
         public static IHandler<T> When<T>(
             this IHandler<T> handler,
             ICondition<T> condition) =>

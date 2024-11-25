@@ -22,6 +22,8 @@
 
         IHandler<T> MergeFirstWithSecond<T>(IHandler<T> a, IHandler<T> b);
 
+        IHandler<T> Atomize<T>(IHandler<T> handler);
+
         IHandler<T> Conditional<T>(IHandler<T> handler, ICondition<T> condition);
     }
 }
