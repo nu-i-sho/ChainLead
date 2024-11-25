@@ -3,6 +3,7 @@
     // do not using ChainLead.Contracts.Syntax;
     using ChainLead.Contracts;
     using System;
+    using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
 
     public class HandlerMath(IConditionMath conditionMath)
         : IHandlerMath
@@ -109,6 +110,15 @@
                 _ => Conditional(abHandler,
                         conditionMath.And(aCondition, bCondition)),
             };
+        }
+
+        public IHandler<T> Atomize<T>(
+            IHandler<T> handler)
+        {
+            (handler, var condition) = SplitHandlerAndAllConditions(handler);
+            return condition != null
+                ? Conditional(handler, condition)
+                : handler;
         }
 
         public IHandler<T> Conditional<T>(

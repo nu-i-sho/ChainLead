@@ -21,12 +21,12 @@
                 new Condition<T>(new Func<T, bool>(predicate));
 
         public bool IsPredictableTrue<T>(
-            ICondition<T> predicate) =>
-                predicate is ITrue<T>;
+            ICondition<T> condition) =>
+                condition is ITrue<T>;
 
         public bool IsPredictableFalse<T>(
-            ICondition<T> predicate) =>
-                predicate is IFalse<T>;
+            ICondition<T> condition) =>
+                condition is IFalse<T>;
 
         public ICondition<T> And<T>(
             ICondition<T> a,
