@@ -256,7 +256,7 @@ var handler = new[] { /* steps list */ }
     .Aggregete(FirstThenSecond)
     .Then(logState);
 ```
-Everything looks great to me. But it has one problem. When conditions attached to handlers during execution return false, relevant handlers will not be executed but we will have redundant calls of `logState`. So, we need to couple our logging handler with each handler in our list and mix domain logic with copy-pasted technical details.
+Everything looks fine, but there is one problem. If conditions attached to handlers return false during execution, relevant handlers will not be executed, but there will be redundant calls of `logState`. So, we need to couple our logging handler with each handler in our list, which means mixing domain logic with copy-pasted technical details.
 ```CSharp
 var handler = new[]
     {
@@ -269,7 +269,7 @@ var handler = new[]
     .Aggregete(FirstThenSecond)
     .Then(logState);
 ```
-To avoid it we need some function that can couple two handlers but use the condition attached to the second one as the condition attached to the coupling result instead. ChainLead provides this function `Pack(first).In(Second)`, which can be used as in the code snipped below.
+To avoid this, we need some function that can couple two handlers, but use the condition attached to the second handler as the condition attached to the coupling result instead. ChainLead provides this function `Pack(first).In(Second)`, which can be used as in the code snippet below.
 ```CSharp
 var handler = new[] { /* steps list */ }
     .Select(Pack(logState).In)
@@ -278,7 +278,7 @@ var handler = new[] { /* steps list */ }
 ```    
 And our chain will have no extra logging handler calls as we want.
 #### `Use(o).ToCover` 
-The same problem exists when we want to add the handler to each handler in the main list to the end but under conditions attached to them. So, ChainLead has a function for this situation too. The following example shows the situation when we want to open a transaction before each handler call and close after.
+The same problem exists when we want to add the handler to the end of each handler in the main list but under conditions attached to them. So, ChainLead has a function for this case too. For example, the following code shows how to open a transaction before each handler call and close it afterward.
 ```CSharp
 var handler = new[]
     {
@@ -291,7 +291,7 @@ var handler = new[]
     .Aggregete(FirstThenSecond);
 ```
 #### `XCover(o).WhereXIs`
-If you like lambda expressions free code like me, you can use `XCover(closseTransactin).WhereXIs` instead of `x => Use(x).ToCover(closseTransactin)`.
+If you like code free of lambda expressions as I do, you can use `XCover(closseTransactin).WhereXIs` instead of `x => Use(x).ToCover(closseTransactin)`.
 ```CSharp
 var handler = new[] { /* db operations handlers list*/ }
     .Select(Pack(openTransaction).In)
@@ -302,7 +302,7 @@ var handler = new[] { /* db operations handlers list*/ }
 Of course, analogical syntax construction for reversed arguments order calls of `Pack(o).In` exists too. It is `PackXIn(o).WhereXIs`. 
 
 #### `PackFirstInSecond`, `FirstCoverSecond`
-'Pack' and 'Cover' have useful forms for aggregation, they are not carried `PackFirstInSecond` and `FirstCoverSecond`. It is not easy to find a good example where `Aggaragete(PackFirstInSecond)` or `Aggaragete(FirstCoverSecond)` is apt. But as you remember we are talking about "Advanced chain building" and using it in each real-life situation is not expected. 
+'Pack' and 'Cover' have useful non-curried forms for aggregation: `PackFirstInSecond` and `FirstCoverSecond`. It is difficult to find a good example where `Aggaragete(PackFirstInSecond)` or `Aggaragete(FirstCoverSecond)` is useful. But as you remember we are talking about "Advanced chain building" and using it in each real-life situation is not expected. 
 
 
 The following image summarizes how the 'Pack' and 'Cover' functions work.
@@ -310,7 +310,7 @@ The following image summarizes how the 'Pack' and 'Cover' functions work.
 
 #### `Inject(o).Into`, `InjectZInto(o).WhereXIs`, `InjectFirstIntoSecond`,
 #### `Use(o).ToWrap`, `XWrap(o).WhereXIs`, `FirstWrapSecond`
-The 'Pack' and 'Cover' functions put coupled handlers in the top attached condition only. If we want to put handlers in all conditions we can use functions from the 'Inject' and 'Wrap' family. And the following image show how they work. 
+The 'Pack' and 'Cover' functions put coupled handlers only in the top attached condition. If we want to put handlers in all conditions we can use functions from the 'Inject' and 'Wrap' family. And the following image shows how they work. 
 
 ![Inject and Wrap](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/5.svg)
 
@@ -328,7 +328,7 @@ The following table represents analogs for the 'Pack' and 'Cover' functions from
 The 'Join' family functions couple two handlers under the conjunction of their top conditions (aggregated by `And`).
 
 #### `Merge(o).With`, `XMergeWith(o).WhereXIs`, `MergeFirstWithSecond`
-The 'Merge' family functions couple two handlers under the conjunction of all their conditions. The following image is a representation of how the `Join` and `Merge` functions work.
+The 'Merge' family functions couple two handlers under the conjunction of all their conditions. The following image represents how the `Join` and `Merge` functions work.
 
 ![Inject and Wrap](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/6.svg)
 
