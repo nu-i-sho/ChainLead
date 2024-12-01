@@ -1220,12 +1220,150 @@ namespace ChainLead.Test
                             _math.Conditional);
         }
 
+        private void AtomizeZeroMakeHandlerThatIsNotZero<T>()
+        {
+            var zero = _math.Zero<T>();
+            zero = _math.Atomize(zero);
+            var isZero = _math.IsZero(zero);
+
+            Assert.That(isZero, Is.False);
+        }
+
+        [Test]
+        public void AtomizeZeroMakeHandlerThatIsNotZero__Int() =>
+            AtomizeZeroMakeHandlerThatIsNotZero<int>();
+
+        [Test]
+        public void AtomizeZeroMakeHandlerThatIsNotZero__String() =>
+            AtomizeZeroMakeHandlerThatIsNotZero<string>();
+
+        [Test]
+        public void AtomizeZeroMakeHandlerThatIsNotZero__Base() =>
+            AtomizeZeroMakeHandlerThatIsNotZero<Base>();
+
+        [Test]
+        public void AtomizeZeroMakeHandlerThatIsNotZero__Derived() =>
+            AtomizeZeroMakeHandlerThatIsNotZero<Derived>();
+
+        [Test]
+        public void AppendWithAtomizedConditionalHandlerIsTheSameAsWithRegularHandler(
+            [ValueSource(nameof(AllAppends))] string appendType,
+            [Values(true, false)] bool reverseHandlersOrder,
+            [Values(true, false)] bool lastConditionCheckResult)
+        {
+            var expectedLog = 
+                (reverseHandlersOrder, lastConditionCheckResult) switch
+                {
+                    (false, false) => "h[A]c[A]c[B]c[C]",
+                    (false, true)  => "h[A]c[A]c[B]c[C]h[B]",
+                    (true,  false) => "c[A]c[B]c[C]h[A]",
+                    (true,  true)  => "c[A]c[B]c[C]h[B]h[A]",
+                };
+
+            var executionLog = string.Empty;
+
+            foreach (var i in new[] { A, B })
+            {
+                _handlers[i]
+                    .Setup(o => o.Execute(Arg))
+                    .Callback(() => executionLog += $"h[{IndexToString(i)}]");
+
+                _conditions[i]
+                    .Setup(o => o.Check(Arg)).Returns(true)
+                    .Callback(() => executionLog += $"c[{IndexToString(i)}]");
+            }
+
+            _conditions[C]
+                .Setup(o => o.Check(Arg))
+                .Returns(lastConditionCheckResult)
+                .Callback(() => executionLog += $"c[{IndexToString(C)}]");
+
+            var atom = _handlers[A].Object;
+
+            var conditional = _handlers[B].Object;
+            conditional = _math.Conditional(conditional, _conditions[C].Object);
+            conditional = _math.Conditional(conditional, _conditions[B].Object);
+            conditional = _math.Conditional(conditional, _conditions[A].Object);
+
+            var atomizedConditional = _math.Atomize(conditional);
+
+            var append = AppendFunc<int>(by: appendType);
+            var (first, second) = reverseHandlersOrder
+                ? (atomizedConditional, atom)
+                : (atom, atomizedConditional);
+
+            var result = append(first, second);
+
+            result.Execute(Arg);
+
+            Assert.That(executionLog,
+                Is.EqualTo(expectedLog));
+        }
+
+        [Test]
+        public void AppendTwoAtomizedConditionalHandlerIsTheSameAsTwoRegularHandlers(
+            [ValueSource(nameof(AllAppends))] string appendType,
+            [Values(false, true)] bool firstLastConditionCheckResult,
+            [Values(false, true)] bool secondLastConditionCheckResult)
+        {
+            var expectedLog =
+                (firstLastConditionCheckResult,
+                secondLastConditionCheckResult) switch
+                {
+                    (false, false) => "c[B]c[C]c[D]c[F]c[G]c[H]",
+                    (false, true)  => "c[B]c[C]c[D]c[F]c[G]c[H]h[E]",
+                    (true,  false) => "c[B]c[C]c[D]h[A]c[F]c[G]c[H]",
+                    (true,  true)  => "c[B]c[C]c[D]h[A]c[F]c[G]c[H]h[E]",
+                };
+
+            var executionLog = string.Empty;
+
+            foreach (var i in new[] { A, E })
+                _handlers[i]
+                    .Setup(o => o.Execute(Arg))
+                    .Callback(() => executionLog += $"h[{IndexToString(i)}]");
+
+            foreach (var i in new[] { B, C, F, G })
+                _conditions[i]
+                    .Setup(o => o.Check(Arg)).Returns(true)
+                    .Callback(() => executionLog += $"c[{IndexToString(i)}]");
+
+            _conditions[D]
+                .Setup(o => o.Check(Arg))
+                .Returns(firstLastConditionCheckResult)
+                .Callback(() => executionLog += $"c[{IndexToString(D)}]");
+
+            _conditions[H]
+                .Setup(o => o.Check(Arg))
+                .Returns(secondLastConditionCheckResult)
+                .Callback(() => executionLog += $"c[{IndexToString(H)}]");
+
+            var first = _handlers[A].Object;
+            first = _math.Conditional(first, _conditions[D].Object);
+            first = _math.Conditional(first, _conditions[C].Object);
+            first = _math.Conditional(first, _conditions[B].Object);
+            first = _math.Atomize(first);
+
+            var second = _handlers[E].Object;
+            second = _math.Conditional(second, _conditions[H].Object);
+            second = _math.Conditional(second, _conditions[G].Object);
+            second = _math.Conditional(second, _conditions[F].Object);
+            second = _math.Atomize(second);
+
+            var append = AppendFunc<int>(by: appendType);
+            var result = append(first, second);
+            result.Execute(Arg);
+
+            Assert.That(executionLog,
+                Is.EqualTo(expectedLog));
+        }
+
         static IEnumerable<(int i, bool value)> ParseChecksSetup(
-            string conditionChecksSetup) =>
-                conditionChecksSetup
-                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(x => x.Split('-'))
-                    .Select(x => (i: ParseIndex(x[0][0]), value: ParseBool(x[1][0])));
+        string conditionChecksSetup) =>
+            conditionChecksSetup
+                .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                .Select(x => x.Split('-'))
+                .Select(x => (i: ParseIndex(x[0][0]), value: ParseBool(x[1][0])));
 
         void CheckNothingExecuted()
         {

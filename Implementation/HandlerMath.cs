@@ -3,7 +3,6 @@
     // do not using ChainLead.Contracts.Syntax;
     using ChainLead.Contracts;
     using System;
-    using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
 
     public class HandlerMath(IConditionMath conditionMath)
         : IHandlerMath
@@ -22,7 +21,7 @@
 
         public IHandler<T> MakeHandler<T>(
             Action<T> action) =>
-                new Handler<T>(action);
+                new Atom<T>(action);
 
         public IHandler<T> FirstThenSecond<T>(
                IHandler<T> a,
@@ -113,13 +112,10 @@
         }
 
         public IHandler<T> Atomize<T>(
-            IHandler<T> handler)
-        {
-            (handler, var condition) = SplitHandlerAndAllConditions(handler);
-            return condition != null
-                ? Conditional(handler, condition)
-                : handler;
-        }
+            IHandler<T> handler) =>
+                handler is not IAtom<T>
+                    ? new Atom<T>(handler.Execute)
+                    : handler;
 
         public IHandler<T> Conditional<T>(
             IHandler<T> handler,
@@ -165,14 +161,16 @@
         public readonly void Execute(T state) { }
     }
 
-    file struct Handler<T>(
-        Action<T> imlementation) : IHandler<T>
+    file interface IAtom<in T> : IHandler<T> { }
+
+    file struct Atom<T>(
+        Action<T> imlementation) : IAtom<T>
     {
         public readonly void Execute(T state) => 
             imlementation(state);
     }
 
-    file struct Sum<T>(
+    file record struct Sum<T>(
         IHandler<T> Prev, 
         IHandler<T> Next) : IHandler<T>
     {

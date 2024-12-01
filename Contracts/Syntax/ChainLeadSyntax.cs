@@ -210,7 +210,7 @@
                     next));
 
         public static IHandler<T> Atomize<T>(
-            IHandler<T> handler) =>
+            this IHandler<T> handler) =>
                 Math.ForHandler
                     .Atomize(handler);
 
