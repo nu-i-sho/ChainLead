@@ -287,7 +287,7 @@ var handler = new[]
         addDepartment.When(Not(employeeIsFreeContractor))
     }
     .Select(Pack(openTransaction).In)
-    .Select(x => Use(x).ToCover(closseTransactin))
+    .Select(x => Use(x).ToCover(closeTransactin))
     .Aggregete(FirstThenSecond);
 ```
 #### `XCover(o).WhereXIs`
@@ -332,7 +332,7 @@ The 'Merge' family functions couple two handlers under the conjunction of all th
 
 ![Inject and Wrap](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/6.svg)
 
-All those functional constructions can be applied to more than two arguments.
+All those functional constructions can be applied to more than two arguments. 
 
 | **First step**    | **Second step**  | **i-th step**    | **Last step**    |
 | ----------------- | ---------------- | ---------------- | ---------------- |
@@ -350,3 +350,29 @@ All those functional constructions can be applied to more than two arguments.
 | `JoinXWith(a2)`   | `.ThenWith(a3)`  | `.ThenWith(ai)`  | `.WhereXIs(a1)`  |
 | `Merge(a1)`       | `.With(a2)`      | `.ThenWith(ai)`  | `.ThenWith(an)`  |
 | `MergeXWith(a2)`  | `.ThenWith(a3)`  | `.ThenWith(ai)`  | `.WhereXIs(a1)`  |
+
+The following code shows an example of using multiple-step function calls.
+```CSharp
+var handler = new[]
+    {
+        addNewEmployee,
+        addEmployeeManager.When(employeeHasManager),
+        addDepartment.When(Not(employeeIsFreeContractor))
+    }
+    .Select(Pack(logState).In(openTransaction).ThenIn)
+    .Select(XCover(closeTransactin).ThenCover(notifyDone).WhereXIs)
+    .Aggregete(FirstThenSecond);
+```
+
+## Atomizing
+#### `Atomize`
+Handlers are structured, and ChainLead can see their structures and change them. But outside of ChainLead, all these details are invisible and all handlers provide nothing more than declared in `IHandler<T>`. And there is no ability to access the handler's structure outside ChainLead.
+
+![Handlers (in/out)side ChainLead](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/7.svg)
+
+If you want to close the handler structure for ChainLead too, you can easily do it with `Atomize`.
+
+![Handlers (in/out)side ChainLead](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/8.svg)
+
+So, as an example, if you want to close the ability to inject something into your handler (under the attached condition) you can atomize this handler. Also, atomized `Zero` loses the attributes of `Zero` and starts to be recognized by ChainLead as a regular handler (which does nothing).
+
