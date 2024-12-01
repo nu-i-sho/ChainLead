@@ -37,7 +37,7 @@ public static IHandler<State> Hamburger =>
 ```
 *(You can see this code in context and more [here](https://github.com/nu-i-sho/ChainLead/blob/main/Test/BurgerExampleAsTest.cs).)*
 
-## To use ChainLead
+## For using ChainLead
 it is necessary to configure the library (syntax) language by providing the implementations of chain mathematics. But do it once in your solution assembly point (where Dependency Injection is configured). 
 ```CSharp
 using ChainLead.Contracts;
