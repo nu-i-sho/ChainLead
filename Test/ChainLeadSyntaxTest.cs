@@ -100,6 +100,19 @@
             Assert.That(product, Is.SameAs(_handler.Object));
         }
 
+
+        [Test]
+        public void AtomizeReturnsMathAtomizeExecutionResult()
+        {
+            _handlerMath
+                .Setup(o => o.Atomize(_handlerA.Object))
+                .Returns(_handlerB.Object);
+
+            var product = _handlerA.Object.Atomize();
+
+            Assert.That(product, Is.SameAs(_handlerB.Object));
+        }
+
         [Test]
         public void A_Then_B_ReturnsEquivalentOf_FirstThenSecond_AB_FromMath()
         {
@@ -912,6 +925,34 @@
             Assert.That(
                 Condition<int>.False,
                 Is.SameAs(_condition.Object));
+        }
+
+        [Test]
+        public void IsPredictableTrueExecutesMathIsIsPredictableTrue(
+            [Values(false, true)] bool expectedResult)
+        {
+            _conditionMath
+                .Setup(o => o.IsPredictableTrue(_condition.Object))
+                .Returns(expectedResult);
+
+            var result = _condition.Object.IsPredictableTrue();
+
+            _conditionMath.Verify(o => o.IsPredictableTrue(_condition.Object), Times.Once);
+            Assert.That(result, Is.EqualTo(expectedResult));
+        }
+
+        [Test]
+        public void IsPredictableFalseExecutesMathIsIsPredictableFalse(
+            [Values(false, true)] bool expectedResult)
+        {
+            _conditionMath
+                .Setup(o => o.IsPredictableFalse(_condition.Object))
+                .Returns(expectedResult);
+
+            var result = _condition.Object.IsPredictableFalse();
+
+            _conditionMath.Verify(o => o.IsPredictableFalse(_condition.Object), Times.Once);
+            Assert.That(result, Is.EqualTo(expectedResult));
         }
     }
 }

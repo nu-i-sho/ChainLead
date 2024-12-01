@@ -59,14 +59,12 @@
             IThenWrap<T> ThenWrap(IHandler<T> next);
         }
 
-        public interface IThenCoverReverseCall<T>
-            : IReverseCall<T>
+        public interface IThenCoverReverseCall<T> : IReverseCall<T>
         {
             IThenCoverReverseCall<T> ThenCover(IHandler<T> next);
         }
 
-        public interface IThenWrapReverseCall<T>
-            : IReverseCall<T>
+        public interface IThenWrapReverseCall<T> : IReverseCall<T>
         {
             IThenWrapReverseCall<T> ThenWrap(IHandler<T> next);
         }
@@ -81,8 +79,7 @@
             IThenWith<T> ThenWith(IHandler<T> next);
         }
 
-        public interface IThenWithReverseCall<T>
-            : IReverseCall<T>
+        public interface IThenWithReverseCall<T> : IReverseCall<T>
         {
             IThenWithReverseCall<T> ThenWith(IHandler<T> next);
         }
