@@ -269,7 +269,7 @@ var handler = new[]
     .Aggregete(FirstThenSecond)
     .Then(logState);
 ```
-To avoid this, we need some function that can couple two handlers, but use the condition attached to the second handler as the condition attached to the coupling result instead. ChainLead provides this function `Pack(first).In(Second)`, which can be used as in the code snippet below.
+To avoid this, we need some function that can couple two handlers, but use the condition attached to the second handler as the condition attached to the coupling result instead. ChainLead provides this function `Pack(First).In(Second)`, which can be used as in the code snippet below.
 ```CSharp
 var handler = new[] { /* steps list */ }
     .Select(Pack(logState).In)
@@ -298,7 +298,7 @@ var handler = new[] { /* db operations handlers list*/ }
     .Select(XCover(closseTransactin).WhereXIs)
     .Aggregete(FirstThenSecond);
 ```
-#### `PackXInto(o).WhereXIs`
+#### `PackXIn(o).WhereXIs`
 Of course, analogical syntax construction for reversed arguments order calls of `Pack(o).In` exists too. It is `PackXIn(o).WhereXIs`. 
 
 #### `PackFirstInSecond`, `FirstCoverSecond`
@@ -308,7 +308,7 @@ Of course, analogical syntax construction for reversed arguments order calls of 
 The following image summarizes how the 'Pack' and 'Cover' functions work.
 ![Pack and Cover](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/4.svg)
 
-#### `Inject(o).Into`, `InjectZInto(o).WhereXIs`, `InjectFirstIntoSecond`,
+#### `Inject(o).Into`, `InjectXInto(o).WhereXIs`, `InjectFirstIntoSecond`,
 #### `Use(o).ToWrap`, `XWrap(o).WhereXIs`, `FirstWrapSecond`
 The 'Pack' and 'Cover' functions put coupled handlers only in the top attached condition. If we want to put handlers in all conditions we can use functions from the 'Inject' and 'Wrap' family. And the following image shows how they work. 
 
@@ -318,7 +318,7 @@ The following table represents analogs for the 'Pack' and 'Cover' functions from
 | **'Pack' & 'Cover'**    | **'Inject' & 'Wrap'**     |
 | ----------------------- | ------------------------- |
 | `Pack(o).In`            | `Inject(o).Into`          |
-| `PackXInto(o).WhereXIs` | `InjectXInto(o).WhereXIs` |
+| `PackXIn(o).WhereXIs`   | `InjectXInto(o).WhereXIs` |
 | `PackFirstInSecond`     | `InjectFirstIntoSecond`   |
 | `Use(o).ToCover`        | `Use(o).ToWrap`           |
 | `XCover(o).WhereXIs`    | `XWrap(o).WhereXIs`       |
