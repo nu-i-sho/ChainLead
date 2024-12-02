@@ -16,10 +16,6 @@
             Func<T, bool> predicate) =>
                 new Condition<T>(predicate);
 
-        public ICondition<T> MakeCondition<T>(
-            Predicate<T> predicate) =>
-                new Condition<T>(new Func<T, bool>(predicate));
-
         public bool IsPredictableTrue<T>(
             ICondition<T> condition) =>
                 condition is ITrue<T>;

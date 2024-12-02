@@ -11,6 +11,7 @@
   <ItemGroup>
     <InternalsVisibleTo Include="ChainLead.Test" />
     <InternalsVisibleTo Include="ChainLead.Implementation" />
+    <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
 
   <ItemGroup>

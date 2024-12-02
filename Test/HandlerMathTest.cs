@@ -143,7 +143,7 @@ namespace ChainLead.Test
 
         [Test]
         public void ZeroDoesNothing() =>
-            Assert.DoesNotThrow(() => _math.Zero<int>().Execute(5));
+            Assert.DoesNotThrow(() => _math.Zero<int>().Execute(Arg));
 
         [Test]
         public void ZeroIsZero()
@@ -1349,12 +1349,38 @@ namespace ChainLead.Test
                 Is.EqualTo(expectedLog));
         }
 
+        [Test]
+        public void ExtendedZeroIsZero()
+        {
+            var extended = new Mock<IExtendedHandler<int>>();
+            extended
+                .Setup(o => o.Origin)
+                .Returns(_math.Zero<int>());
+
+            var isZero = _math.IsZero(extended.Object);
+
+            Assert.That(isZero, Is.True);
+        }
+
+        [Test]
+        public void ExtendedNotZeroIsNotZero()
+        {
+            var extended = new Mock<IExtendedHandler<int>>();
+            extended
+                .Setup(o => o.Origin)
+                .Returns(_handlers[A].Object);
+
+            var isZero = _math.IsZero(extended.Object);
+
+            Assert.That(isZero, Is.False);
+        }
+
         static IEnumerable<(int i, bool value)> ParseChecksSetup(
-        string conditionChecksSetup) =>
-            conditionChecksSetup
-                .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                .Select(x => x.Split('-'))
-                .Select(x => (i: ParseIndex(x[0][0]), value: ParseBool(x[1][0])));
+            string conditionChecksSetup) =>
+                conditionChecksSetup
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x => x.Split('-'))
+                    .Select(x => (i: ParseIndex(x[0][0]), value: ParseBool(x[1][0])));
 
         void CheckNothingExecuted()
         {

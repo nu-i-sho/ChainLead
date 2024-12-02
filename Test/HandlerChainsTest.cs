@@ -52,7 +52,7 @@
             var expectedCallsLog = Enumerable.Concat(
                 ids.Reverse()
                    .Select(i => ConditionName(i, jds.Last())),
-                ids.SelectMany(i => 
+                ids.SelectMany(i =>
                         jds.Reverse()
                            .Skip(1)
                            .Select(j => ConditionName(i, j))
@@ -67,7 +67,19 @@
             [ValueSource(nameof(Jds))] string jds)
         {
             SetupConditionMathAnd();
-            PackAllConditionsTrueTest(ids, jds);
+
+            var chain = SetupChain(_math.JoinChain, ids, jds);
+            chain.Execute(Arg);
+
+            var expectedCallsLog = Enumerable.Concat(
+                ids.Select(i => ConditionName(i, jds.Last())),
+                ids.SelectMany(i =>
+                        jds.Reverse()
+                           .Skip(1)
+                           .Select(j => ConditionName(i, j))
+                           .Concat([HandlerName(i)])));
+
+            Assert.That(_callsLog, Is.EqualTo(expectedCallsLog));
         }
 
         [Test]
@@ -89,23 +101,29 @@
         }
 
         [Test]
-        public void CoverWrapAndThenAllConditionsTrueTest(
-            [Values(nameof(IHandlerChainingCallsProvider.CoverChain), 
-                    nameof(IHandlerChainingCallsProvider.WrapChain),
-                    nameof(IHandlerChainingCallsProvider.ThenChain))] string chainCallName,
+        public void CoverAllConditionsTrueTest(
             [ValueSource(nameof(Ids))] string ids,
-            [ValueSource(nameof(Jds))] string jds)
+            [ValueSource(nameof(Jds))] string jds) =>
+                CoverWrapOrThenAllConditionsTrueTest(_math.CoverChain, ids, jds);
+
+        [Test]
+        public void WrapAllConditionsTrueTest(
+            [ValueSource(nameof(Ids))] string ids,
+            [ValueSource(nameof(Jds))] string jds) =>
+                CoverWrapOrThenAllConditionsTrueTest(_math.WrapChain, ids, jds);
+
+        [Test]
+        public void ThenAllConditionsTrueTest(
+            [ValueSource(nameof(Ids))] string ids,
+            [ValueSource(nameof(Jds))] string jds) =>
+                CoverWrapOrThenAllConditionsTrueTest(_math.ThenChain, ids, jds);
+
+        void CoverWrapOrThenAllConditionsTrueTest(
+            Func<IEnumerable<IHandler<int>>, IHandler<int>> append,
+            string ids,
+            string jds)
         {
-            var chain = SetupChain(
-                chainCallName switch
-                {
-                    nameof(IHandlerChainingCallsProvider.CoverChain) => _math.CoverChain,
-                    nameof(IHandlerChainingCallsProvider.WrapChain) => _math.WrapChain,
-                    nameof(IHandlerChainingCallsProvider.ThenChain) => _math.ThenChain,
-                    _ => throw new ArgumentException(chainCallName)
-                }, 
-                ids,
-                jds);
+            var chain = SetupChain(append, ids, jds);
 
             chain.Execute(Arg);
 

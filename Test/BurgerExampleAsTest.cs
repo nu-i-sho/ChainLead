@@ -122,7 +122,12 @@
         const string veganBurger = "Vegan-Burger";
         const string doubleChikenBurger = $"{@double} {chikenBurger}";
 
-        record Order(string Name, params string[] Options) { }
+        class Order(string name, params string[] options)
+        {
+            public string Name => name;
+
+            public string[] Options => options;
+        }
 
         class State(Order order)
         {

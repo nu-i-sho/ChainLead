@@ -54,7 +54,7 @@
             ConditionMath.MakeCondition(predicate);
 
         public static ICondition<T> AsCondition<T>(this Predicate<T> predicate) =>
-            ConditionMath.MakeCondition(predicate);
+            ConditionMath.MakeCondition(new Func<T, bool>(predicate));
 
         public static bool IsZero<T>(this IHandler<T> handler) =>
             HandlerMath.IsZero(handler);
@@ -206,7 +206,7 @@
                 f(b, a);
     }
 
-    file readonly struct Acc<T>
+    file sealed class Acc<T>
     {
         readonly Func<IHandler<T>, IHandler<T>, IHandler<T>> _append;
         readonly Func<IHandler<T>, IHandler<T>> _call;
@@ -236,7 +236,7 @@
            _call(head);
     }
 
-    file readonly struct ThenReverseCallMorpheme<T>(Acc<T> acc)
+    file sealed class ThenReverseCallMorpheme<T>(Acc<T> acc)
         : Morpheme.IThenReverseCall<T>
     {
         public Morpheme.IThenReverseCall<T> Then(IHandler<T> next) => 
@@ -246,7 +246,7 @@
            acc.Close(head);
     }
 
-    file readonly struct InMorpheme<T>(
+    file sealed class InMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morpheme.IIn<T>
@@ -255,7 +255,7 @@
            new ThenInMorpheme<T>(append, append(prev, next));
     }
 
-    file readonly struct ThenInMorpheme<T>(
+    file sealed class ThenInMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morpheme.IThenIn<T>
@@ -266,7 +266,7 @@
            new ThenInMorpheme<T>(append, append(prev, next));
     }
 
-    file readonly struct ThenInReverseCallMorpheme<T>(Acc<T> acc) 
+    file sealed class ThenInReverseCallMorpheme<T>(Acc<T> acc) 
         : Morpheme.IThenInReverseCall<T>
     {
         public Morpheme.IThenInReverseCall<T> ThenIn(IHandler<T> next) =>
@@ -276,7 +276,7 @@
            acc.Close(head);
     }
 
-    file readonly struct IntoMorpheme<T>(
+    file sealed class IntoMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morpheme.IInto<T>
@@ -285,7 +285,7 @@
            new ThenIntoMorpheme<T>(append, append(prev, next));
     }
 
-    file readonly struct ThenIntoMorpheme<T>(
+    file sealed class ThenIntoMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morpheme.IThenInto<T>
@@ -296,7 +296,7 @@
            new ThenIntoMorpheme<T>(append, append(prev, next));
     }
 
-    file readonly struct ThenIntoReverseCallMorpheme<T>(Acc<T> acc) 
+    file sealed class ThenIntoReverseCallMorpheme<T>(Acc<T> acc) 
         : Morpheme.IThenIntoReverseCall<T>
     {
         public Morpheme.IThenIntoReverseCall<T> ThenInto(IHandler<T> next) =>
@@ -306,7 +306,7 @@
            acc.Close(head);
     }
 
-    file readonly struct ToCoverOrWrapMorpheme<T>(
+    file sealed class ToCoverOrWrapMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> cover,
             Func<IHandler<T>, IHandler<T>, IHandler<T>> wrap,
             IHandler<T> prev) 
@@ -319,7 +319,7 @@
            new ThenWrapMorpheme<T>(wrap, wrap(prev, next));
     }
 
-    file readonly struct ThenCoverMorpheme<T>(
+    file sealed class ThenCoverMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morpheme.IThenCover<T>
@@ -330,7 +330,7 @@
            new ThenCoverMorpheme<T>(append, append(prev, next));
     }
 
-    file readonly struct ThenWrapMorpheme<T>(
+    file sealed class ThenWrapMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morpheme.IThenWrap<T>
@@ -341,7 +341,7 @@
            new ThenWrapMorpheme<T>(append, append(prev, next));
     }
 
-    file readonly struct ThenCoverReverseCallMorpheme<T>(Acc<T> acc) : 
+    file sealed class ThenCoverReverseCallMorpheme<T>(Acc<T> acc) : 
         Morpheme.IThenCoverReverseCall<T>
     {
         public Morpheme.IThenCoverReverseCall<T> ThenCover(IHandler<T> next) =>
@@ -351,7 +351,7 @@
            acc.Close(head);
     }
 
-    file readonly struct ThenWrapReverseCallMorpheme<T>(Acc<T> acc) 
+    file sealed class ThenWrapReverseCallMorpheme<T>(Acc<T> acc) 
         : Morpheme.IThenWrapReverseCall<T>
     {
         public Morpheme.IThenWrapReverseCall<T> ThenWrap(IHandler<T> next) =>
@@ -361,7 +361,7 @@
            acc.Close(head);
     }
 
-    file readonly struct WithMorpheme<T>(
+    file sealed class WithMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morpheme.IWith<T>
@@ -370,7 +370,7 @@
            new ThenWithMorpheme<T>(append, append(prev, next));
     }
 
-    file readonly struct ThenWithMorpheme<T>(
+    file sealed class ThenWithMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             IHandler<T> prev) 
         : Morpheme.IThenWith<T>
@@ -381,7 +381,7 @@
            new ThenWithMorpheme<T>(append, append(prev, next));
     }
 
-    file readonly struct ThenWithReverseCallMorpheme<T>(Acc<T> acc) 
+    file sealed class ThenWithReverseCallMorpheme<T>(Acc<T> acc) 
         : Morpheme.IThenWithReverseCall<T>
     {
         public Morpheme.IThenWithReverseCall<T> ThenWith(IHandler<T> next) =>
