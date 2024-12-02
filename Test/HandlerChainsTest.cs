@@ -7,7 +7,7 @@
     using static System.Linq.Enumerable;
 
     [TestFixtureSource(nameof(Cases))]
-    public class HendlerChainsTest(IHandlerChainingCallsProviderFactory mathFactory)
+    public class HandlerChainsTest(IHandlerChainingCallsProviderFactory mathFactory)
     {
         const int Arg = 24309;
         static readonly string[] Ids = 

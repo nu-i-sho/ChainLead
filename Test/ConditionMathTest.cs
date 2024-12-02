@@ -227,7 +227,7 @@
         }
 
         [Test]
-        public void SomethingDarivedAndBaseFalseIsPredictableFalse(
+        public void SomethingDerivedAndBaseFalseIsPredictableFalse(
             [Values(False, True, Mock)] string something)
         {
             var somethingAndFalse = _math.And(

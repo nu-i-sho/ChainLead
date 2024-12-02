@@ -240,7 +240,7 @@
         }
 
         [Test]
-        public void HamburgerWithExtraPikleSlicesRecipeTest()
+        public void HamburgerWithExtraPickleSlicesRecipeTest()
         {
             var recipe = GetRecipeFor(new Order(hamburger,
                 $"+ {pickle}"));
@@ -265,7 +265,7 @@
         }
 
         [Test]
-        public void HamburgerWithAllToopingsRecipeTest()
+        public void HamburgerWithAllToppingsRecipeTest()
         {
             var recipe = GetRecipeFor(new Order(hamburger,
                 $"+ {pickle}",

@@ -851,7 +851,7 @@
         }
 
         [Test]
-        public void MakeReturnsMathMakePredicateExcutionResult()
+        public void MakeConditionReturnsMathMakeConditionExecutionResult()
         {
             var seed = new Func<int, bool>(_ => true);
 
@@ -865,7 +865,7 @@
         }
 
         [Test]
-        public void AsPredicateReturnsMathMakePredicat2ExcutionResult()
+        public void AsConditionReturnsMathMakeCondition2ExecutionResult()
         {
             var seed = new Func<int, bool>(_ => true);
 
@@ -880,7 +880,7 @@
 
 
         [Test]
-        public void OrReturnsMathOrExcutionResult()
+        public void OrReturnsMathOrExecutionResult()
         {
             _conditionMath
                 .Setup(o => o.Or(_conditionA.Object, _conditionB.Object))
@@ -892,7 +892,7 @@
         }
 
         [Test]
-        public void NotReturnsMathNotExcutionResult()
+        public void NotReturnsMathNotExecutionResult()
         {
             _conditionMath
                 .Setup(o => o.Not(_conditionA.Object))

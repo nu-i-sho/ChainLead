@@ -6,7 +6,7 @@
 
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
 
-    public class ChainLeadSytaxReverseCallsProviderFactory
+    public class ChainLeadSyntaxReverseCallsProviderFactory
         : IHandlerMathCallsProviderFactory
     {
         public IHandlerMath Create(IConditionMath conditionMath)

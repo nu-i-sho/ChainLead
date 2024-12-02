@@ -18,7 +18,7 @@ namespace ChainLead.Test
                 yield return new OriginalHandlerMathCallsProviderFactory();
                 yield return new ChainLeadSyntaxCallsProviderFactory();
                 yield return new ChainLeadSyntaxSeparatedCallsProviderFactory();
-                yield return new ChainLeadSytaxReverseCallsProviderFactory();
+                yield return new ChainLeadSyntaxReverseCallsProviderFactory();
             }
         }
 
