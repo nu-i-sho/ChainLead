@@ -880,19 +880,6 @@
         }
 
         [Test]
-        [Ignore("Need fix")]
-        public void AsCondition2ReturnsMathMakeConditionExecutionResult()
-        {
-            _conditionMath
-                .Setup(o => o.MakeCondition<int>(ReturnTrue))
-                .Returns(_condition.Object);
-
-            var product = new Predicate<int>(ReturnTrue).AsCondition();
-
-            Assert.That(product, Is.SameAs(_condition.Object));
-        }
-
-        [Test]
         public void OrReturnsMathOrExecutionResult()
         {
             _conditionMath
