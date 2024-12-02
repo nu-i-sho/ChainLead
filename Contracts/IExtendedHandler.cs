@@ -1,6 +1,6 @@
 ﻿namespace ChainLead.Contracts
 {
-    public interface IExtendedHandler<T> : IHandler<T>
+    public interface IExtendedHandler<in T> : IHandler<T>
     {
         internal IHandler<T> Origin { get; }
 
