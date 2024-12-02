@@ -5,6 +5,8 @@
 
     using ChainLead.Contracts.Syntax;
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
+    using ChainLead.Implementation;
+    using System;
 
     [TestFixture]
     public class ChainLeadSyntaxTest
@@ -81,9 +83,9 @@
                     _handlerC.Object.Execute(Arg);
                 });
 
-            ConfigureChainLeadSyntax
-                .WithHandlerMath(_handlerMath.Object)
-                .AndWithConditionMath(_conditionMath.Object);
+            ChainLeadSyntax.Configure(
+                _handlerMath.Object,
+                _conditionMath.Object);
         }
 
         [Test]

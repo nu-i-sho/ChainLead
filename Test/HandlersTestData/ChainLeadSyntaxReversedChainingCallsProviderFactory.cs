@@ -1,6 +1,7 @@
 ﻿namespace ChainLead.Test.HandlersTestData
 {
     using ChainLead.Contracts;
+    using ChainLead.Contracts.Syntax;
     using ChainLead.Implementation;
 
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
@@ -11,9 +12,7 @@
         public IHandlerChainingCallsProvider Create(IConditionMath conditionMath)
         {
             IHandlerMath math = new HandlerMath(conditionMath);
-            ConfigureChainLeadSyntax
-                .WithHandlerMath(math)
-                .AndWithConditionMath(conditionMath);
+            ChainLeadSyntax.Configure(math, conditionMath);
 
             return new Calls();
         }
@@ -87,15 +86,15 @@
 
             public IHandler<T> Conditional<T>(IHandler<T> handler, ICondition<T> condition) =>
                 handler.When(condition);
+
+            static T First<T>(IEnumerable<T> source) =>
+                source.First();
+
+            static T Second<T>(IEnumerable<T> source) =>
+                source.Skip(1).First();
+
+            static IEnumerable<T> Tail<T>(IEnumerable<T> source) =>
+                source.Skip(2);
         }
-
-        static T First<T>(IEnumerable<T> source) =>
-            source.First();
-
-        static T Second<T>(IEnumerable<T> source) =>
-            source.Skip(1).First();
-
-        static IEnumerable<T> Tail<T>(IEnumerable<T> source) =>
-            source.Skip(2);
     }
 }

@@ -10,9 +10,7 @@
         public IHandlerMath Create(IConditionMath conditionMath)
         {
             IHandlerMath math = new HandlerMath(conditionMath);
-            ChainLeadSyntax.ConfigureChainLeadSyntax
-                .WithHandlerMath(math)
-                .AndWithConditionMath(conditionMath);
+            ChainLeadSyntax.Configure(math, conditionMath);
 
             return new Calls();
         }

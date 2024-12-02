@@ -7,8 +7,8 @@
     [TestFixture]
     public class ConditionMathTest
     {
-        public class Base { }
-        public class Derived : Base { }
+        public class Base;
+        public class Derived : Base;
 
         public class Conditions
         {

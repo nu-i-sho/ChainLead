@@ -5,11 +5,11 @@ namespace ChainLead.Test
     using Moq;
     using NUnit.Framework.Internal;
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
     [TestFixtureSource(nameof(Cases))]
-    public class HandlerMathTest(
-        IHandlerMathCallsProviderFactory mathFactory)
+    public class HandlerMathTest(IHandlerMathCallsProviderFactory mathFactory)
     {
         public static IEnumerable<IHandlerMathCallsProviderFactory> Cases
         {
@@ -22,26 +22,17 @@ namespace ChainLead.Test
             }
         }
 
-        public class Base { }
-        public class Derived : Base { }
+        public interface IBase;
+        public interface IDerived : IBase;
 
-        IHandlerMath _math;
-
-        IHandler<int> _zeroInt;
-        IHandler<Base> _zeroBase;
-        IHandler<Derived> _zeroDerived;
-
-        Mock<IHandler<int>> _handler;
-        Mock<ICondition<int>> _condition;
-
-        const int 
+        const int
             A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8,
             First = A, Last = I, Missing = -1;
 
-        Mock<IHandler<int>>[] _handlers;
-        Mock<ICondition<int>>[] _conditions;
-
-        Mock<IConditionMath> _conditionMath;
+        [AllowNull] IHandlerMath _math;
+        [AllowNull] Mock<IHandler<int>>[] _handlers;
+        [AllowNull] Mock<ICondition<int>>[] _conditions;
+        [AllowNull] Mock<IConditionMath> _conditionMath;
 
         const string
             FirstThenSecond = nameof(IHandlerMath.FirstThenSecond),
@@ -80,17 +71,14 @@ namespace ChainLead.Test
         const int Arg = 7643;
 
         [SetUp]
+        [MemberNotNull(nameof(_math))]
+        [MemberNotNull(nameof(_handlers))]
+        [MemberNotNull(nameof(_conditions))]
+        [MemberNotNull(nameof(_conditionMath))]
         public void Setup()
         {
             _conditionMath = MockPredicateMath();
             _math = mathFactory.Create(_conditionMath.Object);
-
-            _zeroInt = _math.Zero<int>();
-            _zeroBase = _math.Zero<Base>();
-            _zeroDerived = _math.Zero<Derived>();
-
-            _handler = new Mock<IHandler<int>> { Name = nameof(_handler) };
-            _condition = new Mock<ICondition<int>> { Name = nameof(_condition) };
 
             var name = nameof(_handlers);
             _handlers = Enumerable
@@ -113,10 +101,10 @@ namespace ChainLead.Test
 
             MockTrue<int>("True");
             MockFalse<int>("False");
-            MockTrue<Base>($"True<{nameof(Base)}>");
-            MockFalse<Base>($"False<{nameof(Base)}>");
-            MockTrue<Derived>($"True<{nameof(Derived)}>");
-            MockFalse<Derived>($"False<{nameof(Derived)}>");
+            MockTrue<IBase>($"True<{nameof(IBase)}>");
+            MockFalse<IBase>($"False<{nameof(IBase)}>");
+            MockTrue<IDerived>($"True<{nameof(IDerived)}>");
+            MockFalse<IDerived>($"False<{nameof(IDerived)}>");
 
             return math;
 
@@ -141,7 +129,7 @@ namespace ChainLead.Test
 
             ICondition<T> MockFalse<T>(string name)
             {
-                var @false = new Mock<ICondition<T>> { Name = "False" };
+                var @false = new Mock<ICondition<T>> { Name = name };
 
                 math.Setup(o => o.False<T>())
                     .Returns(@false.Object);
@@ -155,19 +143,19 @@ namespace ChainLead.Test
 
         [Test]
         public void ZeroDoesNothing() =>
-            Assert.DoesNotThrow(() => _zeroInt.Execute(5));
+            Assert.DoesNotThrow(() => _math.Zero<int>().Execute(5));
 
         [Test]
         public void ZeroIsZero()
         {
-            var isZero = _math.IsZero(_zeroInt);
+            var isZero = _math.IsZero(_math.Zero<int>());
             Assert.That(isZero, Is.True);
         }
 
         [Test]
         public void ZeroForBaseClassIsZeroForDerivedClass()
         {
-            var isZero = _math.IsZero<Derived>(_zeroBase);
+            var isZero = _math.IsZero<IDerived>(_math.Zero<IBase>());
             Assert.That(isZero, Is.True);
         }
 
@@ -176,8 +164,8 @@ namespace ChainLead.Test
             [ValueSource(nameof(AllAppends))] string appendType)
         {
             var append = AppendFunc<int>(by: appendType);
-            var zeroInt = _math.Zero<int>();
-            var zeroZero = append(_zeroInt, zeroInt);
+            var zeros = new[] { _math.Zero<int>(), _math.Zero<int>() };
+            var zeroZero = append(zeros[0], zeros[1]);
             var isZero = _math.IsZero(zeroZero);
 
             Assert.That(isZero, Is.True);
@@ -187,8 +175,8 @@ namespace ChainLead.Test
         public void BaseZeroAppendDerivedZeroIsDerivedZero(
             [ValueSource(nameof(AllAppends))] string appendType)
         {
-            var append = AppendFunc<Derived>(by: appendType);
-            var chain = append(_zeroBase, _zeroDerived);
+            var append = AppendFunc<IDerived>(by: appendType);
+            var chain = append(_math.Zero<IBase>(), _math.Zero<IDerived>());
             var isZero = _math.IsZero(chain);
 
             Assert.That(isZero, Is.True);
@@ -198,8 +186,8 @@ namespace ChainLead.Test
         public void DerivedZeroAppendBaseZeroChainIsDerivedZero(
             [ValueSource(nameof(AllAppends))] string appendType)
         {
-            var append = AppendFunc<Derived>(by: appendType);
-            var chain = append(_zeroDerived, _zeroBase);
+            var append = AppendFunc<IDerived>(by: appendType);
+            var chain = append(_math.Zero<IDerived>(), _math.Zero<IBase>());
             var isZero = _math.IsZero(chain);
 
             Assert.That(isZero, Is.True);
@@ -261,12 +249,12 @@ namespace ChainLead.Test
             [ValueSource(nameof(AllAppends))] string appendType)
         {
             var chain = Enumerable
-                .Repeat(_handler.Object, count)
+                .Repeat(_handlers[A].Object, count)
                 .Aggregate(AppendFunc<int>(by: appendType));
 
             chain.Execute(Arg);
 
-            _handler.Verify(
+            _handlers[A].Verify(
                 o => o.Execute(Arg),
                 Times.Exactly(count));
         }
@@ -397,38 +385,41 @@ namespace ChainLead.Test
         [Test]
         public void ConditionalZeroIsZero()
         {
-            var conditionalZero = _math.Conditional(_zeroInt, _condition.Object);
+            var conditionalZero = _math.Conditional(
+                _math.Zero<int>(), 
+                _conditions[A].Object);
+            
             Assert.That(_math.IsZero(conditionalZero), Is.True);
         }
 
         [Test]
         public void WhenConditionReturnsTrue__HandlerIsExecuted()
         {
-            _condition
+            _conditions[A]
                 .Setup(o => o.Check(Arg))
                 .Returns(true);
 
             var conditional = _math
-                .Conditional(_handler.Object, _condition.Object);
+                .Conditional(_handlers[A].Object, _conditions[A].Object);
 
             conditional.Execute(Arg);
 
-            _handler.Verify(o => o.Execute(Arg), Times.Once);
+            _handlers[A].Verify(o => o.Execute(Arg), Times.Once);
         }
 
         [Test]
         public void WhenConditionReturnsFalse__HandlerIsNotExecuted()
         {
-            _condition
+            _conditions[A]
                 .Setup(o => o.Check(Arg))
                 .Returns(false);
 
             var conditional = _math
-                .Conditional(_handler.Object, _condition.Object);
+                .Conditional(_handlers[A].Object, _conditions[A].Object);
 
             conditional.Execute(Arg);
 
-            _handler.Verify(o => o.Execute(Arg), Times.Never);
+            _handlers[A].Verify(o => o.Execute(Arg), Times.Never);
         }
 
         [Test]
@@ -440,14 +431,14 @@ namespace ChainLead.Test
 
             var conditional = new[] { A, B, C }
                 .Select(i => _conditions[i].Object)
-                .Aggregate(_handler.Object, _math.Conditional);
+                .Aggregate(_handlers[A].Object, _math.Conditional);
 
             conditional.Execute(Arg);
 
             _conditions[C].Verify(o => o.Check(Arg), Times.Once);
             _conditions[B].Verify(o => o.Check(Arg), Times.Never);
             _conditions[A].Verify(o => o.Check(Arg), Times.Never);
-            _handler.Verify(o => o.Execute(Arg), Times.Never);
+            _handlers[A].Verify(o => o.Execute(Arg), Times.Never);
         }
 
         [Test]
@@ -474,7 +465,7 @@ namespace ChainLead.Test
             var conditional =
                 falses.Concat(trues)
                       .Select(x => x.Object)
-                      .Aggregate(_handler.Object, _math.Conditional);
+                      .Aggregate(_handlers[A].Object, _math.Conditional);
 
             conditional.Execute(Arg);
 
@@ -486,7 +477,7 @@ namespace ChainLead.Test
             foreach (var x in falses.Take(uncheckedCount))
                 x.Verify(o => o.Check(Arg), Times.Never);
 
-            _handler.Verify(o => o.Execute(Arg),
+            _handlers[A].Verify(o => o.Execute(Arg),
                 ExecutionExpectedWhen(falseCount == 0));
         }
 
@@ -504,7 +495,7 @@ namespace ChainLead.Test
 
             var h = new[] { A, B, C }
                 .Select(i => _conditions[i].Object)
-                .Aggregate(_handler.Object, _math.Conditional);
+                .Aggregate(_handlers[A].Object, _math.Conditional);
 
             h.Execute(Arg);
 
@@ -1239,11 +1230,11 @@ namespace ChainLead.Test
 
         [Test]
         public void AtomizeZeroMakeHandlerThatIsNotZero__Base() =>
-            AtomizeZeroMakeHandlerThatIsNotZero<Base>();
+            AtomizeZeroMakeHandlerThatIsNotZero<IBase>();
 
         [Test]
         public void AtomizeZeroMakeHandlerThatIsNotZero__Derived() =>
-            AtomizeZeroMakeHandlerThatIsNotZero<Derived>();
+            AtomizeZeroMakeHandlerThatIsNotZero<IDerived>();
 
         [Test]
         public void AppendWithAtomizedConditionalHandlerIsTheSameAsWithRegularHandler(
