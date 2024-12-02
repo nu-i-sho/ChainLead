@@ -1,6 +1,6 @@
 ﻿namespace ChainLead.Implementation
 {
-    // do not using ChainLead.Contracts.Syntax;
+    //// DO NOT using ChainLead.Contracts.Syntax;
     using ChainLead.Contracts;
     using System;
 
@@ -15,10 +15,6 @@
         public ICondition<T> MakeCondition<T>(
             Func<T, bool> predicate) =>
                 new Condition<T>(predicate);
-
-        public ICondition<T> MakeCondition<T>(
-            Predicate<T> predicate) =>
-                new Condition<T>(new Func<T, bool>(predicate));
 
         public bool IsPredictableTrue<T>(
             ICondition<T> condition) =>

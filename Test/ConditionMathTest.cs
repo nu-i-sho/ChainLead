@@ -7,8 +7,8 @@
     [TestFixture]
     public class ConditionMathTest
     {
-        public class Base { }
-        public class Derived : Base { }
+        public class Base;
+        public class Derived : Base;
 
         public class Conditions
         {
@@ -19,20 +19,30 @@
 
         IConditionMath _math;
 
-        const string True = "true", False = "false", Mock = "mock";
+        const int Arg = 7938;
+        const string True = "true", False = "false", A = "A", B = "B";
+
+        Dictionary<string, Mock<ICondition<int>>> _conditionMocks; 
         Conditions _conditions;
 
         [SetUp]
         public void Setup()
         {
             _math = new ConditionMath();
+
+            _conditionMocks = new Dictionary<string, Mock<ICondition<int>>>
+            {
+                { A, new Mock<ICondition<int>>() { Name = A } },
+                { B, new Mock<ICondition<int>>() { Name = B } },
+            };
+
             _conditions = new Conditions
             {
                 ForInt = new Dictionary<string, ICondition<int>>
                 {
                     { True, _math.True<int>() },
                     { False, _math.False<int>() },
-                    { Mock, new Mock<ICondition<int>>().Object }
+                    { A, _conditionMocks[A].Object }
                 },
                 ForBase = new Dictionary<string, ICondition<Base>>
                 {
@@ -43,7 +53,7 @@
                 {
                     { True, _math.True<Derived>() },
                     { False, _math.False<Derived>() },
-                    { Mock, new Mock<ICondition<Derived>>().Object }
+                    { A, new Mock<ICondition<Derived>>().Object }
                 },
             };
         }
@@ -51,14 +61,14 @@
         [Test]
         public void TrueCheckReturnsTrue()
         {
-            var result = _conditions.ForInt[True].Check(678);
+            var result = _conditions.ForInt[True].Check(Arg);
             Assert.That(result, Is.True);
         }
 
         [Test]
         public void FalseCheckReturnsTrue()
         {
-            var result = _conditions.ForInt[False].Check(903);   
+            var result = _conditions.ForInt[False].Check(Arg);   
             Assert.That(result, Is.False);
         }
 
@@ -137,7 +147,7 @@
 
         [Test]
         public void FalseAndSomethingIsPredictableFalse(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var falseAndSomething = _math.And(
                 _math.False<int>(),
@@ -150,7 +160,7 @@
 
         [Test]
         public void BaseFalseAndSomethingDerivedIsPredictableFalse(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var falseAndSomething = _math.And(
                 _conditions.ForBase[False],
@@ -163,7 +173,7 @@
 
         [Test]
         public void FalseAndSomethingIsNotPredictableTrue(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {            
             var falseAndSomething = _math.And(
                 _math.False<int>(),
@@ -176,7 +186,7 @@
 
         [Test]
         public void BaseFalseAndSomethingDerivedIsNotPredictableTrue(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var falseAndSomething = _math.And(
                 _conditions.ForBase[False],
@@ -189,7 +199,7 @@
 
         [Test]
         public void FalseAndSomethingCheckIsFalse(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var falseAndSomething = _math.And(
                 _math.False<int>(),
@@ -202,7 +212,7 @@
 
         [Test]
         public void BaseFalseAndSomethingDerivedCheckIsFalse(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var falseAndSomething = _math.And(
                 _conditions.ForBase[False],
@@ -215,7 +225,7 @@
 
         [Test]
         public void SomethingAndFalseIsPredictableFalse(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var somethingAndFalse = _math.And(
                 _conditions.ForInt[something],
@@ -227,8 +237,8 @@
         }
 
         [Test]
-        public void SomethingDarivedAndBaseFalseIsPredictableFalse(
-            [Values(False, True, Mock)] string something)
+        public void SomethingDerivedAndBaseFalseIsPredictableFalse(
+            [Values(False, True, A)] string something)
         {
             var somethingAndFalse = _math.And(
                 _conditions.ForDerived[something],
@@ -241,7 +251,7 @@
 
         [Test]
         public void SomethingAndFalseIsNotPredictableTrue(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var somethingAndFalse = _math.And(
                 _conditions.ForInt[something],
@@ -254,7 +264,7 @@
 
         [Test]
         public void SomethingDerivedAndBaseFalseIsNotPredictableTrue(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var somethingAndFalse = _math.And(
                 _conditions.ForDerived[something],
@@ -267,20 +277,20 @@
 
         [Test]
         public void SomethingAndFalseCheckIsFalse(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var somethingAndFalse = _math.And(
                 _conditions.ForInt[something],
                 _math.False<int>());
 
-            var result = somethingAndFalse.Check(628);
+            var result = somethingAndFalse.Check(Arg);
 
             Assert.That(result, Is.False);
         }
 
         [Test]
         public void SomethingDerivedAndBaseFalseCheckIsFalse(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var somethingAndFalse = _math.And(
                 _conditions.ForDerived[something],
@@ -295,39 +305,38 @@
         public void SomethingOrFalseIsSomething()
         {
             var somethingOrFalse = _math.Or(
-                _conditions.ForInt[Mock],
+                _conditions.ForInt[A],
                 _conditions.ForInt[False]);
 
             Assert.That(somethingOrFalse,
-                Is.SameAs(_conditions.ForInt[Mock]));
+                Is.SameAs(_conditions.ForInt[A]));
         }
 
         [Test]
         public void SomethingDerivedOrBaseFalseIsSomethingDerived()
         {
             var somethingOrFalse = _math.Or(
-                _conditions.ForDerived[Mock],
+                _conditions.ForDerived[A],
                 _conditions.ForBase[False]);
 
             Assert.That(somethingOrFalse,
-                Is.SameAs(_conditions.ForDerived[Mock]));
+                Is.SameAs(_conditions.ForDerived[A]));
         }
 
         [Test]
         public void SomethingOrFalseCheckIsSomethingCheck(
             [Values(false, true)] bool somethingCheckResult)
         {
-            const int arg = 798;
-            var something = new Mock<ICondition<int>>();
+            var something = _conditionMocks[A];
             something
-                .Setup(o => o.Check(arg))
+                .Setup(o => o.Check(Arg))
                 .Returns(somethingCheckResult);
 
             var somethingOrFalse = _math.Or(
                 something.Object,
                 _conditions.ForInt[False]);
 
-            var result = somethingOrFalse.Check(arg);
+            var result = somethingOrFalse.Check(Arg);
 
             Assert.That(result, 
                 Is.EqualTo(somethingCheckResult));
@@ -355,7 +364,7 @@
 
         [Test]
         public void FalseOrSomethingIsSomething(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var falseOrSomething = _math.Or(
                 _math.False<int>(),
@@ -367,7 +376,7 @@
 
         [Test]
         public void BaseFalseOrSomethingDerivedIsSomethingDerived(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var falseOrSomething = _math.Or(
                 _conditions.ForBase[False],
@@ -379,7 +388,7 @@
 
         [Test]
         public void TrueOrSomethingIsPredictableTrue(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var trueOrSomething = _math.Or(
                 _math.True<int>(),
@@ -392,7 +401,7 @@
 
         [Test]
         public void BaseTrueOrSomethingDerivedIsPredictableTrue(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var trueOrSomething = _math.Or(
                 _conditions.ForBase[True],
@@ -405,7 +414,7 @@
 
         [Test]
         public void TrueOrSomethingIsNotPredictableFalse(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var trueOrSomething = _math.Or(
                 _math.True<int>(),
@@ -418,7 +427,7 @@
 
         [Test]
         public void BaseTrueOrSomethingDerivedIsNotPredictableFalse(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var trueOrSomething = _math.Or(
                 _conditions.ForBase[True],
@@ -431,7 +440,7 @@
 
         [Test]
         public void TrueOrSomethingCheckIsTrue(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var trueOrSomething = _math.Or(
                 _math.True<int>(),
@@ -444,7 +453,7 @@
 
         [Test]
         public void BaseTrueOrSomethingDerivedCheckIsTrue(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var trueOrSomething = _math.Or(
                 _conditions.ForBase[True],
@@ -457,7 +466,7 @@
 
         [Test]
         public void SomethingOrTrueIsPredictableTrue(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var somethingOrTrue = _math.Or(
                 _conditions.ForInt[something],
@@ -470,7 +479,7 @@
 
         [Test]
         public void SomethingDerivedOrBaseTrueIsPredictableTrue(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var somethingOrTrue = _math.Or(
                 _conditions.ForDerived[something],
@@ -483,7 +492,7 @@
 
         [Test]
         public void SomethingOrTrueIsNotPredictableFalse(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var somethingOrTrue = _math.Or(
                 _conditions.ForInt[something],
@@ -496,7 +505,7 @@
 
         [Test]
         public void SomethingDerivedOrBaseTrueIsNotPredictableFalse(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var somethingOrTrue = _math.Or(
                 _conditions.ForDerived[something],
@@ -509,20 +518,20 @@
 
         [Test]
         public void SomethingOrTrueCheckIsTrue(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var somethingOrTrue = _math.Or(
                 _conditions.ForInt[something],
                 _math.True<int>());
 
-            var result = somethingOrTrue.Check(325);
+            var result = somethingOrTrue.Check(Arg);
 
             Assert.That(result, Is.True);
         }
 
         [Test]
         public void SomethingDerivedOrBaseTrueCheckIsTrue(
-            [Values(False, True, Mock)] string something)
+            [Values(False, True, A)] string something)
         {
             var somethingOrTrue = _math.Or(
                 _conditions.ForDerived[something],
@@ -537,22 +546,22 @@
         public void SomethingAndTrueIsSomething()
         {
             var somethingAndTrue = _math.And(
-                _conditions.ForInt[Mock], 
+                _conditions.ForInt[A], 
                 _conditions.ForInt[True]);
             
             Assert.That(somethingAndTrue, 
-                Is.SameAs(_conditions.ForInt[Mock]));
+                Is.SameAs(_conditions.ForInt[A]));
         }
 
         [Test]
         public void SomethingDerivedAndBaseTrueIsSomethingDerived()
         {
             var somethingAndTrue = _math.And(
-                _conditions.ForDerived[Mock],
+                _conditions.ForDerived[A],
                 _conditions.ForBase[True]);
 
             Assert.That(somethingAndTrue,
-                Is.SameAs(_conditions.ForDerived[Mock]));
+                Is.SameAs(_conditions.ForDerived[A]));
         }
 
         [Test]
@@ -560,10 +569,10 @@
         {
             var trueAndSomething = _math.And(
                 _conditions.ForInt[True],
-                _conditions.ForInt[Mock]);
+                _conditions.ForInt[A]);
 
             Assert.That(trueAndSomething,
-                Is.SameAs(_conditions.ForInt[Mock]));
+                Is.SameAs(_conditions.ForInt[A]));
         }
 
         [Test]
@@ -571,10 +580,10 @@
         {
             var trueAndSomething = _math.And(
                 _conditions.ForBase[True],
-                _conditions.ForDerived[Mock]);
+                _conditions.ForDerived[A]);
 
             Assert.That(trueAndSomething,
-                Is.SameAs(_conditions.ForDerived[Mock]));
+                Is.SameAs(_conditions.ForDerived[A]));
         }
 
         [Test]
@@ -689,7 +698,7 @@
         public void NotTrueCheckIsFalse()
         {
             var notTrue = _math.Not(_conditions.ForInt[True]);
-            var result = notTrue.Check(567);
+            var result = notTrue.Check(Arg);
 
             Assert.That(result, Is.False);
         }
@@ -698,9 +707,101 @@
         public void NotFalseCheckIsTrue()
         {
             var notFalse = _math.Not(_conditions.ForInt[False]);
-            var result = notFalse.Check(567);
+            var result = notFalse.Check(Arg);
 
             Assert.That(result, Is.True);
+        }
+
+        [Test]
+        public void MakeConditionCallsEncapsulatedFunc()
+        {
+            bool called = false;
+            var condition = _math.MakeCondition<int>(_ => called = true);
+
+            condition.Check(Arg);
+
+            Assert.That(called, Is.True);
+        }
+
+        [Test]
+        public void MakeConditionReturnsEncapsulatedFuncResult(
+            [Values(false, true)] bool funcResult)
+        {
+            var condition = _math.MakeCondition<int>(_ => funcResult);
+            var result = condition.Check(Arg);
+
+            Assert.That(result, Is.EqualTo(funcResult));
+        }
+
+        [TestCase(false, true)]
+        [TestCase(true, false)]
+        public void NotConditionCheckTest(
+            bool aResult,
+            bool notAExpectedResult)
+        {
+            _conditionMocks[A]
+                .Setup(o => o.Check(Arg))
+                .Returns(aResult);
+
+            var notA = _math.Not(_conditionMocks[A].Object);
+            var notAResult = notA.Check(Arg);
+
+            Assert.That(notAResult,
+                Is.EqualTo(notAExpectedResult));
+        }
+
+        [TestCase(false, false, false)]
+        [TestCase(false, true, false)]
+        [TestCase(true, false, false)]
+        [TestCase(true, true, true)]
+        public void AndConditionCheckTest(
+            bool aResult,
+            bool bResult,
+            bool abExpectedResult)
+        {
+            _conditionMocks[A]
+                .Setup(o => o.Check(Arg))
+                .Returns(aResult);
+
+            _conditionMocks[B]
+                .Setup(o => o.Check(Arg))
+                .Returns(bResult);
+
+            var ab = _math.And(
+                _conditionMocks[A].Object,
+                _conditionMocks[B].Object);
+
+            var abResult = ab.Check(Arg);
+
+            Assert.That(abResult, 
+                Is.EqualTo(abExpectedResult));
+        }
+
+        [TestCase(false, false, false)]
+        [TestCase(false, true, true)]
+        [TestCase(true, false, true)]
+        [TestCase(true, true, true)]
+        public void OrConditionCheckTest(
+            bool aResult,
+            bool bResult,
+            bool abExpectedResult)
+        {
+            _conditionMocks[A]
+                .Setup(o => o.Check(Arg))
+                .Returns(aResult);
+
+            _conditionMocks[B]
+                .Setup(o => o.Check(Arg))
+                .Returns(bResult);
+
+            var ab = _math.Or(
+                _conditionMocks[A].Object,
+                _conditionMocks[B].Object);
+
+            var abResult = ab.Check(Arg);
+
+            Assert.That(abResult,
+                Is.EqualTo(abExpectedResult));
         }
     }
 }

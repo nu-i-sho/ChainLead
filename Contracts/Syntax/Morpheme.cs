@@ -1,10 +1,10 @@
 ﻿namespace ChainLead.Contracts.Syntax
 {
-    public static class Morphem
+    public static class Morpheme
     {
         public interface IReverseCall<T>
         {
-            IHandler<T> WhereXIs(IHandler<T> x);
+            IHandler<T> WhereXIs(IHandler<T> head);
         }
 
         public interface IThenReverseCall<T> : IReverseCall<T>

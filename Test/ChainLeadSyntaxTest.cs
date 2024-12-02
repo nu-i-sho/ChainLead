@@ -1,11 +1,12 @@
 ﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts;
+    using ChainLead.Contracts.Syntax;
+    using System;
     using Moq;
 
-    using ChainLead.Contracts.Syntax;
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
-
+    
     [TestFixture]
     public class ChainLeadSyntaxTest
     {
@@ -26,6 +27,7 @@
         Mock<ICondition<int>> _condition;
         Mock<ICondition<int>> _conditionA;
         Mock<ICondition<int>> _conditionB;
+        Mock<ICondition<int>> _conditionAB;
 
         [SetUp]
         public void Setup()
@@ -40,18 +42,12 @@
             _handlerAB = new Mock<IHandler<int>>() { Name = nameof(_handlerAB) };
             _handlerABC = new Mock<IHandler<int>>() { Name = nameof(_handlerABC) };
 
-            _condition = new Mock<ICondition<int>>();
-            _conditionA = new Mock<ICondition<int>>();
-            _conditionB = new Mock<ICondition<int>>();
+            _condition = new Mock<ICondition<int>>() { Name = nameof(_condition) };
+            _conditionA = new Mock<ICondition<int>>() { Name = nameof(_conditionA) };
+            _conditionB = new Mock<ICondition<int>>() { Name = nameof(_conditionB) };
+            _conditionAB = new Mock<ICondition<int>>() { Name = nameof(_conditionAB) };
 
             _handlersExecutionResult = string.Empty;
-
-            _handlerMath
-                .Setup(o => o.InjectFirstIntoSecond(It.IsAny<IHandler<int>>(), It.IsAny<IHandler<int>>()))
-                .Callback((IHandler<int> x, IHandler<int> y) =>
-                {
-
-                });
 
             _handlerA
                 .Setup(o => o.Execute(Arg))
@@ -81,25 +77,34 @@
                     _handlerC.Object.Execute(Arg);
                 });
 
-            ConfigureChainLeadSyntax
-                .WithHandlerMath(_handlerMath.Object)
-                .AndWithConditionMath(_conditionMath.Object);
+            ChainLeadSyntax.Configure(
+                _handlerMath.Object,
+                _conditionMath.Object);
         }
 
         [Test]
         public void MakeHandlerReturnsMathMakeExecutionResult()
         {
-            var seed = new Action<int>(_ => { });
-
             _handlerMath
-                .Setup(o => o.MakeHandler(seed))
+                .Setup(o => o.MakeHandler<int>(DoNothing))
                 .Returns(_handler.Object);
             
-            var product = MakeHandler(seed);
+            var product = MakeHandler<int>(DoNothing);
 
             Assert.That(product, Is.SameAs(_handler.Object));
         }
 
+        [Test]
+        public void AsHandlerReturnsMathMakeExecutionResult()
+        {
+            _handlerMath
+                .Setup(o => o.MakeHandler<int>(DoNothing))
+                .Returns(_handler.Object);
+
+            var product = new Action<int>(DoNothing).AsHandler();
+
+            Assert.That(product, Is.SameAs(_handler.Object));
+        }
 
         [Test]
         public void AtomizeReturnsMathAtomizeExecutionResult()
@@ -851,36 +856,31 @@
         }
 
         [Test]
-        public void MakeReturnsMathMakePredicateExcutionResult()
+        public void MakeConditionReturnsMathMakeConditionExecutionResult()
         {
-            var seed = new Func<int, bool>(_ => true);
-
             _conditionMath
-                .Setup(o => o.MakeCondition(seed))
+                .Setup(o => o.MakeCondition<int>(ReturnTrue))
                 .Returns(_condition.Object);
 
-            var product = MakeCondition(seed);
+            var product = MakeCondition<int>(ReturnTrue);
 
             Assert.That(product, Is.SameAs(_condition.Object));
         }
 
         [Test]
-        public void AsPredicateReturnsMathMakePredicat2ExcutionResult()
+        public void AsConditionReturnsMathMakeConditionExecutionResult()
         {
-            var seed = new Func<int, bool>(_ => true);
-
             _conditionMath
-                .Setup(o => o.MakeCondition(seed))
+                .Setup(o => o.MakeCondition<int>(ReturnTrue))
                 .Returns(_condition.Object);
 
-            var product = seed.AsCondition();
+            var product = new Func<int, bool>(ReturnTrue).AsCondition();
 
             Assert.That(product, Is.SameAs(_condition.Object));
         }
 
-
         [Test]
-        public void OrReturnsMathOrExcutionResult()
+        public void OrReturnsMathOrExecutionResult()
         {
             _conditionMath
                 .Setup(o => o.Or(_conditionA.Object, _conditionB.Object))
@@ -892,7 +892,7 @@
         }
 
         [Test]
-        public void NotReturnsMathNotExcutionResult()
+        public void NotReturnsMathNotExecutionResult()
         {
             _conditionMath
                 .Setup(o => o.Not(_conditionA.Object))
@@ -954,5 +954,55 @@
             _conditionMath.Verify(o => o.IsPredictableFalse(_condition.Object), Times.Once);
             Assert.That(result, Is.EqualTo(expectedResult));
         }
+
+        [Test]
+        public void ReverseFunctionTest()
+        {
+            string Log(string a, string b) => a + b;
+
+            var result = Reverse<string>(Log)("A", "B");
+
+            Assert.That(result, Is.EqualTo("BA"));
+        }
+
+        [Test]
+        public void AndReturnsConditionMathAndResult()
+        {
+            _conditionMath
+                .Setup(o => o.And(_conditionA.Object, _conditionB.Object))
+                .Returns(_conditionAB.Object);
+
+            var ab = _conditionA.Object.And(_conditionB.Object);
+
+            Assert.That(ab, Is.SameAs(_conditionAB.Object));
+        }
+
+        [Test]
+        public void OrReturnsConditionMathOrResult()
+        {
+            _conditionMath
+                .Setup(o => o.Or(_conditionA.Object, _conditionB.Object))
+                .Returns(_conditionAB.Object);
+
+            var ab = _conditionA.Object.Or(_conditionB.Object);
+
+            Assert.That(ab, Is.SameAs(_conditionAB.Object));
+        }
+
+        [Test]
+        public void NotReturnsConditionMathNotResult()
+        {
+            _conditionMath
+                .Setup(o => o.Not(_conditionA.Object))
+                .Returns(_conditionB.Object);
+
+            var b = Not(_conditionA.Object);
+
+            Assert.That(b, Is.SameAs(_conditionB.Object));
+        }
+
+        static bool ReturnTrue(int _) => true;
+
+        static void DoNothing(int _) { /* DO NOTHING */ }
     }
 }

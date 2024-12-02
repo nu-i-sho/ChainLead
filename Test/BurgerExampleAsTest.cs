@@ -1,6 +1,7 @@
 ﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts;
+    using ChainLead.Contracts.Syntax;
     using ChainLead.Implementation;
     using System.Text;
     using System;
@@ -17,9 +18,9 @@
             new[]
             {
                 Hamburger.When(NameIs(hamburger)),
-                Fishburger.When(NameIs(fishburger)),
-                Chikenburger.When(NameIs(chikenburger)
-                              .Or(NameIs(doubleChikenburger))),
+                Fishburger.When(NameIs(fishBurger)),
+                Chikenburger.When(NameIs(chikenBurger)
+                              .Or(NameIs(doubleChikenBurger))),
                 UncknownBurger
             }
             .Select(WithConditionThat(RecipeIsMissing))
@@ -116,11 +117,17 @@
 
         const string @double = "Double";
         const string hamburger = "Hamburger";
-        const string fishburger = "Fishburger";
-        const string chikenburger = "Chikenburger";
-        const string doubleChikenburger = $"{@double} {@chikenburger}";
+        const string fishBurger = "Fish-Burger";
+        const string chikenBurger = "Chiken-Burger";
+        const string veganBurger = "Vegan-Burger";
+        const string doubleChikenBurger = $"{@double} {chikenBurger}";
 
-        record Order(string Name, params string[] Options) { }
+        class Order(string name, params string[] options)
+        {
+            public string Name => name;
+
+            public string[] Options => options;
+        }
 
         class State(Order order)
         {
@@ -210,9 +217,7 @@
             var conditionMath = new ConditionMath();
             var handlerMath = new HandlerMath(conditionMath);
             
-            ConfigureChainLeadSyntax
-                .WithHandlerMath(handlerMath)
-                .AndWithConditionMath(conditionMath);
+            ChainLeadSyntax.Configure(handlerMath, conditionMath);
         }
 
         [Test]
@@ -240,7 +245,7 @@
         }
 
         [Test]
-        public void HamburgerWithExtraPikleSlicesRecipeTest()
+        public void HamburgerWithExtraPickleSlicesRecipeTest()
         {
             var recipe = GetRecipeFor(new Order(hamburger,
                 $"+ {pickle}"));
@@ -265,7 +270,7 @@
         }
 
         [Test]
-        public void HamburgerWithAllToopingsRecipeTest()
+        public void HamburgerWithAllToppingsRecipeTest()
         {
             var recipe = GetRecipeFor(new Order(hamburger,
                 $"+ {pickle}",
@@ -343,9 +348,9 @@
         }
 
         [Test]
-        public void FishburgerRecipeTest()
+        public void FishBurgerRecipeTest()
         {
-            var recipe = GetRecipeFor(new Order(fishburger));
+            var recipe = GetRecipeFor(new Order(fishBurger));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -365,9 +370,9 @@
         }
 
         [Test]
-        public void ChickenburgerRecipeTest()
+        public void ChickenBurgerRecipeTest()
         {
-            var recipe = GetRecipeFor(new Order(chikenburger));
+            var recipe = GetRecipeFor(new Order(chikenBurger));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -387,9 +392,9 @@
         }
 
         [Test]
-        public void DoubleChickenburgerRecipeTest()
+        public void DoubleChickenBurgerRecipeTest()
         {
-            var recipe = GetRecipeFor(new Order(doubleChikenburger));
+            var recipe = GetRecipeFor(new Order(doubleChikenBurger));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -409,12 +414,12 @@
         }
 
         [Test]
-        public void VeganburgerRecipeTest()
+        public void VeganBurgerRecipeTest()
         {
-            var recipe = GetRecipeFor(new Order("Veganburger"));
+            var recipe = GetRecipeFor(new Order(veganBurger));
 
             Assert.That(recipe,
-                Is.EqualTo("There is no recipe for Veganburger"));
+                Is.EqualTo($"There is no recipe for {veganBurger}"));
         }
 
         static string Text(params string[] lines) =>

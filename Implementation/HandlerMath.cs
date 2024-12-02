@@ -1,6 +1,6 @@
 ﻿namespace ChainLead.Implementation
 {
-    // do not using ChainLead.Contracts.Syntax;
+    //// DO NOT using ChainLead.Contracts.Syntax;
     using ChainLead.Contracts;
     using System;
 
@@ -156,36 +156,40 @@
 
     file interface IZero<in T> : IHandler<T> { }
 
-    file struct Zero<T> : IZero<T>
+    file sealed class Zero<T> : IZero<T>
     {
-        public readonly void Execute(T state) { }
+        public void Execute(T state) { }
     }
 
     file interface IAtom<in T> : IHandler<T> { }
 
-    file struct Atom<T>(
+    file sealed class Atom<T>(
         Action<T> imlementation) : IAtom<T>
     {
-        public readonly void Execute(T state) => 
+        public void Execute(T state) => 
             imlementation(state);
     }
 
-    file record struct Sum<T>(
-        IHandler<T> Prev, 
-        IHandler<T> Next) : IHandler<T>
+    file sealed class Sum<T>(
+        IHandler<T> prev, 
+        IHandler<T> next) : IHandler<T>
     {
-        public readonly void Execute(T state)
+        public void Execute(T state)
         {
-            Prev.Execute(state);
-            Next.Execute(state);
+            prev.Execute(state);
+            next.Execute(state);
         }
     }
 
-    file record struct Conditional<T>(
-        IHandler<T> Handler,
-        ICondition<T> Condition) : IHandler<T>
+    file sealed class Conditional<T>(
+        IHandler<T> handler,
+        ICondition<T> condition) : IHandler<T>
     {
-        public readonly void Execute(T state)
+        public IHandler<T> Handler => handler;
+
+        public ICondition<T> Condition => condition;
+
+        public void Execute(T state)
         {
             if (Condition.Check(state))
                 Handler.Execute(state);

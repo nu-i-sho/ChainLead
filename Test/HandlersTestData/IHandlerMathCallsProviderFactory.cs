@@ -4,6 +4,6 @@
 
     public interface IHandlerMathCallsProviderFactory
     {
-        IHandlerMath Create(IConditionMath conditionalMath);
+        IHandlerMath Create(IConditionMath conditionMath);
     }
 }

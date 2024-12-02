@@ -6,15 +6,13 @@
 
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
 
-    public class ChainLeadSytaxReverseCallsProviderFactory
+    public class ChainLeadSyntaxReverseCallsProviderFactory
         : IHandlerMathCallsProviderFactory
     {
         public IHandlerMath Create(IConditionMath conditionMath)
         {
             IHandlerMath math = new HandlerMath(conditionMath);
-            ConfigureChainLeadSyntax
-                .WithHandlerMath(math)
-                .AndWithConditionMath(conditionMath);
+            ChainLeadSyntax.Configure(math, conditionMath);
 
             return new Calls();
         }
