@@ -2,14 +2,19 @@ namespace ChainLead.Test
 {
     using ChainLead.Contracts;
     using ChainLead.Test.HandlersTestData;
+    using ChainLead.Test.Help;
+
     using Moq;
     using NUnit.Framework.Internal;
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
+    using static ChainLead.Test.Help.Constants;
+    using static ChainLead.Test.Help.Constants.Appends;
+
     [TestFixtureSource(nameof(Cases))]
-    public class HandlerMathTest(IHandlerMathCallsProviderFactory mathFactory)
+    public partial class HandlerMathTest(IHandlerMathCallsProviderFactory mathFactory)
     {
         public static IEnumerable<IHandlerMathCallsProviderFactory> Cases
         {
@@ -25,34 +30,8 @@ namespace ChainLead.Test
         public interface IBase;
         public interface IDerived : IBase;
 
-        const int
-            A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8,
-            First = A, Last = I, Missing = -1;
-
         [AllowNull] IHandlerMath _math;
-        [AllowNull] Mock<IHandler<int>>[] _handlers;
-        [AllowNull] Mock<ICondition<int>>[] _conditions;
-        [AllowNull] Mock<IConditionMath> _conditionMath;
-
-        const string
-            FirstThenSecond = nameof(IHandlerMath.FirstThenSecond),
-            PackFirstInSecond = nameof(IHandlerMath.PackFirstInSecond),
-            InjectFirstIntoSecond = nameof(IHandlerMath.InjectFirstIntoSecond),
-            FirstCoverSecond = nameof(IHandlerMath.FirstCoverSecond),
-            FirstWrapSecond = nameof(IHandlerMath.FirstWrapSecond),
-            JoinFirstWithSecond = nameof(IHandlerMath.JoinFirstWithSecond),
-            MergeFirstWithSecond = nameof(IHandlerMath.MergeFirstWithSecond);
-
-        static readonly string[] AllAppends =
-        [
-            FirstThenSecond,
-            PackFirstInSecond,
-            InjectFirstIntoSecond,
-            FirstCoverSecond,
-            FirstWrapSecond,
-            JoinFirstWithSecond,
-            MergeFirstWithSecond
-        ];
+        [AllowNull] ChainLeadMocks _mockOf;
 
         Func<IHandler<T>, IHandler<T>, IHandler<T>>
             AppendFunc<T>(string by) =>
@@ -72,33 +51,16 @@ namespace ChainLead.Test
 
         [SetUp]
         [MemberNotNull(nameof(_math))]
-        [MemberNotNull(nameof(_handlers))]
-        [MemberNotNull(nameof(_conditions))]
-        [MemberNotNull(nameof(_conditionMath))]
+        [MemberNotNull(nameof(_mockOf))]
         public void Setup()
         {
-            _conditionMath = MockPredicateMath();
-            _math = mathFactory.Create(_conditionMath.Object);
-
-            var name = nameof(_handlers);
-            _handlers = Enumerable
-                .Range(First, Last + 1)
-                .Select(IndexToString)
-                .Select(i => new Mock<IHandler<int>>{ Name = $"{name}[{i}]" })
-                .ToArray();
-
-            name = nameof(_conditions);
-            _conditions = Enumerable
-                .Range(First, Last + 1)
-                .Select(IndexToString)
-                .Select(i => new Mock<ICondition<int>> { Name = $"{name}[{i}]" })
-                .ToArray();
+            _mockOf = new ChainLeadMocks();
+            MockConditionMath();
+            _math = mathFactory.Create(_mockOf.ConditionMath.Object);
         }
 
-        Mock<IConditionMath> MockPredicateMath()
+        void MockConditionMath()
         {
-            var math = new Mock<IConditionMath>();
-
             MockTrue<int>("True");
             MockFalse<int>("False");
             MockTrue<IBase>($"True<{nameof(IBase)}>");
@@ -106,22 +68,24 @@ namespace ChainLead.Test
             MockTrue<IDerived>($"True<{nameof(IDerived)}>");
             MockFalse<IDerived>($"False<{nameof(IDerived)}>");
 
-            return math;
-
             ICondition<T> MockTrue<T>(string name)
             {
                 var @true = new Mock<ICondition<T>>() { Name = name };
 
-                math.Setup(o => o.True<T>())
+                _mockOf.ConditionMath
+                    .Setup(o => o.True<T>())
                     .Returns(@true.Object);
 
-                math.Setup(o => o.IsPredictableTrue(@true.Object))
+                _mockOf.ConditionMath
+                    .Setup(o => o.IsPredictableTrue(@true.Object))
                     .Returns(true);
 
-                math.Setup(o => o.And(@true.Object, It.IsAny<ICondition<T>>()))
+                _mockOf.ConditionMath
+                    .Setup(o => o.And(@true.Object, It.IsAny<ICondition<T>>()))
                     .Returns((ICondition<T> a, ICondition<T> b) => b);
 
-                math.Setup(o => o.And(It.IsAny<ICondition<T>>(), @true.Object))
+                _mockOf.ConditionMath
+                    .Setup(o => o.And(It.IsAny<ICondition<T>>(), @true.Object))
                     .Returns((ICondition<T> a, ICondition<T> b) => a);
 
                 return @true.Object;
@@ -131,10 +95,12 @@ namespace ChainLead.Test
             {
                 var @false = new Mock<ICondition<T>> { Name = name };
 
-                math.Setup(o => o.False<T>())
+                _mockOf.ConditionMath
+                    .Setup(o => o.False<T>())
                     .Returns(@false.Object);
 
-                math.Setup(o => o.IsPredictableFalse(@false.Object))
+                _mockOf.ConditionMath
+                    .Setup(o => o.IsPredictableFalse(@false.Object))
                     .Returns(true);
 
                 return @false.Object;
@@ -161,7 +127,7 @@ namespace ChainLead.Test
 
         [Test]
         public void ZeroAppendZeroIsZero(
-            [ValueSource(nameof(AllAppends))] string appendType)
+            [ValueSource(typeof(Appends), nameof(All))] string appendType)
         {
             var append = AppendFunc<int>(by: appendType);
             var zeros = new[] { _math.Zero<int>(), _math.Zero<int>() };
@@ -173,7 +139,7 @@ namespace ChainLead.Test
 
         [Test]
         public void BaseZeroAppendDerivedZeroIsDerivedZero(
-            [ValueSource(nameof(AllAppends))] string appendType)
+            [ValueSource(typeof(Appends), nameof(All))] string appendType)
         {
             var append = AppendFunc<IDerived>(by: appendType);
             var chain = append(_math.Zero<IBase>(), _math.Zero<IDerived>());
@@ -184,7 +150,7 @@ namespace ChainLead.Test
 
         [Test]
         public void DerivedZeroAppendBaseZeroChainIsDerivedZero(
-            [ValueSource(nameof(AllAppends))] string appendType)
+            [ValueSource(typeof(Appends), nameof(All))] string appendType)
         {
             var append = AppendFunc<IDerived>(by: appendType);
             var chain = append(_math.Zero<IDerived>(), _math.Zero<IBase>());
@@ -206,239 +172,179 @@ namespace ChainLead.Test
 
         [Test]
         public void AppendIsNotCommutative(
-            [ValueSource(nameof(AllAppends))] string appendType)
+            [ValueSource(typeof(Appends), nameof(All))] string appendType)
         {
             var append = AppendFunc<int>(by: appendType);
+            List<HandlerIndex> abExecution = [];
+            List<HandlerIndex> baExecution = [];
+            List<HandlerIndex> execution = [];
 
-            var abChainResult = string.Empty;
-            var baChainResult = string.Empty;
-            var acc = string.Empty;
-
-            _handlers[A]
-                .Setup(o => o.Execute(Arg))
-                .Callback(() => acc += 'a');
-
-            _handlers[B]
-                .Setup(o => o.Execute(Arg))
-                .Callback(() => acc += 'b');
-
+            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
+            
             var ab = append(
-                _handlers[A].Object,
-                _handlers[B].Object);
+                _mockOf.Handlers[A].Object,
+                _mockOf.Handlers[B].Object);
 
             var ba = append(
-                _handlers[B].Object,
-                _handlers[A].Object);
+                _mockOf.Handlers[B].Object,
+                _mockOf.Handlers[A].Object);
 
             ab.Execute(Arg);
-            abChainResult = acc;
+            abExecution.AddRange(execution);
 
-            acc = string.Empty;
+            execution.Clear();
 
             ba.Execute(Arg);
-            baChainResult = acc;
+            baExecution.AddRange(execution);
 
-            Assert.That(
-                abChainResult,
-                Is.Not.EqualTo(baChainResult));
+            Assert.That(abExecution,
+                Is.Not.EqualTo(baExecution));
         }
 
         [Test]
         public void AppendIsNotIdempotent(
             [Values(2, 3, 4, 5, 100)] int count,
-            [ValueSource(nameof(AllAppends))] string appendType)
+            [ValueSource(typeof(Appends), nameof(All))] string appendType)
         {
-            var chain = Enumerable
-                .Repeat(_handlers[A].Object, count)
-                .Aggregate(AppendFunc<int>(by: appendType));
+            Enumerable
+                .Repeat(_mockOf.Handlers[A].Object, count)
+                .Aggregate(AppendFunc<int>(by: appendType))
+                .Execute(Arg);
 
-            chain.Execute(Arg);
-
-            _handlers[A].Verify(
-                o => o.Execute(Arg),
-                Times.Exactly(count));
+            _mockOf.Handlers[A].Verify__Execute(Times.Exactly(count));
         }
 
         [Test]
         public void UnconditionalChainIsAssociative(
-            [ValueSource(nameof(AllAppends))] string appendType)
+            [ValueSource(typeof(Appends), nameof(All))] string appendType)
         {
-            var acc = string.Empty;
-            var ab_cExecutionResult = string.Empty;
-            var a_bcExecutionResult = string.Empty;
-
             var append = AppendFunc<int>(by: appendType);
+            List<HandlerIndex> ab_cExecution = [];
+            List<HandlerIndex> a_bcExecution = [];
+            List<HandlerIndex> execution = [];
 
-            foreach (var h in _handlers)
-                h.Setup(o => o.Execute(Arg))
-                 .Callback(() => acc += 'a');
+            _mockOf.Handlers[A, B, C].Setup__Execute__LoggingInto(execution);
 
             var ab_c =
                 append(
                     append(
-                        _handlers[A].Object,
-                        _handlers[B].Object),
-                    _handlers[C].Object);
+                        _mockOf.Handlers[A].Object,
+                        _mockOf.Handlers[B].Object),
+                    _mockOf.Handlers[C].Object);
 
             var a_bc =
                 append(
-                    _handlers[A].Object,
+                    _mockOf.Handlers[A].Object,
                     append(
-                        _handlers[B].Object,
-                        _handlers[C].Object));
+                        _mockOf.Handlers[B].Object,
+                        _mockOf.Handlers[C].Object));
 
             ab_c.Execute(Arg);
-            ab_cExecutionResult = acc;
+            ab_cExecution.AddRange(execution);
 
-            acc = string.Empty;
+            execution.Clear();
 
             a_bc.Execute(Arg);
-            a_bcExecutionResult = acc;
+            a_bcExecution.AddRange(execution);
 
-            Assert.That(
-                ab_cExecutionResult,
-                Is.EqualTo(a_bcExecutionResult));
+            Assert.That(ab_cExecution,
+                Is.EqualTo(a_bcExecution));
         }
-
-        public static string[] OneByOneCases =>
-        [
-            "ab", "abc", "abcd",
-            "abcdueiruoewiroiewepwo",
-            "aaaaaaaaaaaaaaaaaaaaaaa"
-        ];
 
         [Test]
         public void ChainExecutesHandlersOneByOne(
-            [ValueSource(nameof(AllAppends))] string appendType,
-            [ValueSource(nameof(OneByOneCases))] string handlersSource)
+            [ValueSource(typeof(Appends), nameof(All))] string appendType,
+            [ValueSource(nameof(Cases1))] Case1 @case)
         {
-            string executionResult = string.Empty;
-            IHandler<int>[] handlers = handlersSource
-                .Select(x =>
-                {
-                    var handler = new Mock<IHandler<int>>();
-                    handler
-                        .Setup(o => o.Execute(Arg))
-                        .Callback(() => executionResult += x);
+            List<HandlerIndex> execution = [];
 
-                    return handler.Object;
-                })
-                .ToArray();
+            _mockOf.Handlers[@case.ChainIndices.Distinct()]
+                .Setup__Execute__LoggingInto(execution); 
 
-            var chain = handlers
+            var chain = @case.ChainIndices
+                .Select(_mockOf.Handlers.GetObject)
                 .Aggregate(AppendFunc<int>(by: appendType));
 
             chain.Execute(Arg);
 
-            Assert.That(
-                executionResult,
-                Is.EqualTo(handlersSource));
+            Assert.That(execution,
+                Is.EqualTo(@case.ChainIndices));
         }
-
-        public static (string, string)[] OneByOneWithoutZerosCases =>
-        [
-            ("0a", "a"),
-            ("a0", "a"),
-            ("0a0", "a"),
-            ("0000a000", "a"),
-            ("abcd0ue0i00ruo0ewi000r000oie000wepw0o0",
-             "abcdueiruoewiroiewepwo"),
-            ("a0a0a0a0a0a0a0a0a0aaaa0000aaa0a0aaaaaaa000aaaaaa0aaa0aa00aaaa000",
-             "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-        ];
 
         [Test]
         public void ChainExecutesHandlersOneByOneAndIgnoresZeros(
-            [ValueSource(nameof(AllAppends))] string appendType,
-            [ValueSource(nameof(OneByOneWithoutZerosCases))] (string, string) @case)
+            [ValueSource(typeof(Appends), nameof(All))] string appendType,
+            [ValueSource(nameof(Cases2))] Case2 @case)
         {
-            (var handlersSource, var expectedResult) = @case;
+            List<HandlerIndex> execution = [];
 
-            string executionResult = string.Empty;
-            IHandler<int>[] handlers = handlersSource
-                .Select(x =>
-                {
-                    if (x == '0')
-                    {
-                        return _math.Zero<int>();
-                    }
+            var uniqueIndices = @case.ChainIndicesWithNullsAsZeros
+                 .Where(NotNull).Select(Denullify).Distinct();
 
-                    var handler = new Mock<IHandler<int>>();
-                    handler
-                        .Setup(o => o.Execute(Arg))
-                        .Callback(() => executionResult += x);
+            _mockOf.Handlers[uniqueIndices]
+                 .Setup__Execute__LoggingInto(execution);
 
-                    return handler.Object;
-                })
-                .ToArray();
+            @case.ChainIndicesWithNullsAsZeros
+                 .Select(i => i != null
+                     ? _mockOf.Handlers[i].Object
+                     : _math.Zero<int>())
+                 .Aggregate(AppendFunc<int>(by: appendType))
+                 .Execute(Arg);
 
-            var chain = handlers
-                .Aggregate(AppendFunc<int>(by: appendType));
-
-            chain.Execute(Arg);
-
-            Assert.That(
-                executionResult,
-                Is.EqualTo(expectedResult));
+            Assert.That(execution,
+                Is.EqualTo(@case.ExpectedExecution));
         }
 
         [Test]
         public void ConditionalZeroIsZero()
         {
             var conditionalZero = _math.Conditional(
-                _math.Zero<int>(), 
-                _conditions[A].Object);
+                _math.Zero<int>(),
+                _mockOf.Conditions[X].Object);
             
-            Assert.That(_math.IsZero(conditionalZero), Is.True);
+            Assert.That(_math.IsZero(conditionalZero), 
+                Is.True);
         }
 
         [Test]
         public void WhenConditionReturnsTrue__HandlerIsExecuted()
         {
-            _conditions[A]
-                .Setup(o => o.Check(Arg))
-                .Returns(true);
+            _mockOf.Conditions[X].Setup__Check(returns: true);
+            
+            _math.Conditional(
+                    _mockOf.Handlers[A].Object,
+                    _mockOf.Conditions[X].Object)
+                 .Execute(Arg);
 
-            var conditional = _math
-                .Conditional(_handlers[A].Object, _conditions[A].Object);
-
-            conditional.Execute(Arg);
-
-            _handlers[A].Verify(o => o.Execute(Arg), Times.Once);
+            _mockOf.Handlers[A].Verify__Execute(Times.Once);
         }
 
         [Test]
         public void WhenConditionReturnsFalse__HandlerIsNotExecuted()
         {
-            _conditions[A]
-                .Setup(o => o.Check(Arg))
-                .Returns(false);
+            _mockOf.Conditions[X].Setup__Check(returns: false);
 
-            var conditional = _math
-                .Conditional(_handlers[A].Object, _conditions[A].Object);
+            _math.Conditional(
+                    _mockOf.Handlers[A].Object,
+                    _mockOf.Conditions[X].Object)
+                 .Execute(Arg);
 
-            conditional.Execute(Arg);
-
-            _handlers[A].Verify(o => o.Execute(Arg), Times.Never);
+            _mockOf.Handlers[A].Verify__Execute(Times.Never);
         }
 
         [Test]
         public void WhenTopConditionReturnsFalse__AllOtherChecksAndExecutionsAreNotCalled()
         {
-            _conditions[C]
-                .Setup(o => o.Check(Arg))
-                .Returns(false);
+            _mockOf.Conditions[Z].Setup__Check(returns: false);
 
-            var conditional = new[] { A, B, C }
-                .Select(i => _conditions[i].Object)
-                .Aggregate(_handlers[A].Object, _math.Conditional);
+            var conditional = _mockOf.Conditions[X, Y, Z].Objects
+                .Aggregate(_mockOf.Handlers[A].Object, _math.Conditional);
 
             conditional.Execute(Arg);
 
-            _conditions[C].Verify(o => o.Check(Arg), Times.Once);
-            _conditions[B].Verify(o => o.Check(Arg), Times.Never);
-            _conditions[A].Verify(o => o.Check(Arg), Times.Never);
-            _handlers[A].Verify(o => o.Execute(Arg), Times.Never);
+            _mockOf.Conditions[Z].Verify__Check(Times.Once);
+            _mockOf.Conditions[X, Y].Verify__Check(Times.Never);
+            _mockOf.Handlers[A].Verify__Execute(Times.Never);
         }
 
         [Test]
@@ -446,481 +352,210 @@ namespace ChainLead.Test
             [Values(0, 1, 2, 5)] int trueCount,
             [Values(0, 1, 2, 5)] int falseCount)
         {
-            var trues = new Mock<ICondition<int>>[trueCount];
-            for (int i = 0; i < trueCount; i++)
-            {
-                trues[i] = new Mock<ICondition<int>>();
-                trues[i].Setup(o => o.Check(Arg))
-                        .Returns(true);
-            }
+            var trues = _mockOf.Conditions.Take(trueCount);
+            var falses = _mockOf.Conditions.Skip(trueCount).Take(falseCount);
 
-            var falses = new Mock<ICondition<int>>[falseCount];
-            for (int i = 0; i < falseCount; i++)
-            {
-                falses[i] = new Mock<ICondition<int>>();
-                falses[i].Setup(o => o.Check(Arg))
-                         .Returns(false);
-            }
+            trues.Setup__Check(returns: true);
+            falses.Setup__Check(returns: false);
 
-            var conditional =
-                falses.Concat(trues)
-                      .Select(x => x.Object)
-                      .Aggregate(_handlers[A].Object, _math.Conditional);
+            var all = falses.Concat(trues);
+            var conditional = all.Objects
+                .Aggregate(_mockOf.Handlers[A].Object, _math.Conditional);
 
             conditional.Execute(Arg);
 
-            var uncheckedCount = int.Max(0, falseCount - 1);
+            var checkedCount = trueCount + int.Min(1, falseCount);
 
-            foreach (var x in trues.Concat(falses.Skip(uncheckedCount)))
-                x.Verify(o => o.Check(Arg), Times.Once);
-
-            foreach (var x in falses.Take(uncheckedCount))
-                x.Verify(o => o.Check(Arg), Times.Never);
-
-            _handlers[A].Verify(o => o.Execute(Arg),
-                ExecutionExpectedWhen(falseCount == 0));
+            all.Reverse().Take(checkedCount).Verify__Check(Times.Once);
+            all.Reverse().Skip(checkedCount).Verify__Check(Times.Never);
+            _mockOf.Handlers[A].Verify__Execute(OnceWhen(falseCount == 0));
         }
 
         [Test]
-        public void ChecksOrderEqualsConditionsWrappingOrder(
-            [Values("123")] string abcMarkers,
-            [Values("321")] string expectedLog)
+        public void ChecksOrderEqualsConditionsReverseAttachingOrder()
         {
-            var checksLog = string.Empty;
+            List<ConditionIndex> checksLog = [];
 
-            foreach (var i in new[] { A, B, C })
-                _conditions[i]
-                    .Setup(o => o.Check(Arg)).Returns(true)
-                    .Callback(() => checksLog += abcMarkers[i]);
+            _mockOf.Conditions[X, Y, Z].Setup__Check__LoggingInto(checksLog);  
+            _mockOf.Conditions[X, Y, Z].Objects
+                .Aggregate(_mockOf.Handlers[A].Object, _math.Conditional)
+                .Execute(Arg);
 
-            var h = new[] { A, B, C }
-                .Select(i => _conditions[i].Object)
-                .Aggregate(_handlers[A].Object, _math.Conditional);
-
-            h.Execute(Arg);
-
-            Assert.That(checksLog, Is.EqualTo(expectedLog));
+            Assert.That(checksLog, Is.EqualTo(new[] { Z, Y, X }));
         }
 
         [TestCase("00")]
+        [TestCase("10")]
+        [TestCase("01")]
         [TestCase("111")]
-        [TestCase("01100011")]
-        [TestCase("1111100001001010")]
-        [TestCase("0101010111100010000111")]
+        [TestCase("101")]
+        [TestCase("010")]
+        [TestCase("1011100110")]
+        [TestCase("0110110001")]
+        [TestCase("0101010101")]
+        [TestCase("1111111111")]
+        [TestCase("0000000000")]
         public void ConditionalHandlersAddedToChainExecuteRelevantHandlers(
             string conditionsSetup)
         {
-            var chainLength = conditionsSetup.Length;
+            var setup = conditionsSetup.Select(ParseBool);
+            var conditions = _mockOf.Conditions.Take(setup.Count());
+            var handlers = _mockOf.Handlers.Take(setup.Count());
 
-            var handlers = Enumerable
-                .Range(0, chainLength)
-                .Select(_ => new Mock<IHandler<int>>())
-                .ToArray();
+            conditions.Setup__Check(returns: setup);
 
-            var conditions = Enumerable
-                .Range(0, chainLength)
-                .Select(_ => new Mock<ICondition<int>>())
-                .ToArray();
+            Enumerable
+                .Zip(handlers.Objects, conditions.Objects, _math.Conditional)
+                .Aggregate(_math.FirstThenSecond)
+                .Execute(Arg);
 
-            foreach (var x in conditions.Zip(conditionsSetup,
-                (condition, result) => new { condition, result }))
-            {
-                x.condition
-                 .Setup(o => o.Check(Arg))
-                 .Returns(ParseBool(x.result));
-            }
-
-            var chain = Enumerable
-                .Zip(handlers.Select(x => x.Object),
-                     conditions.Select(x => x.Object),
-                     _math.Conditional)
-                .Aggregate(_math.FirstThenSecond);
-
-            chain.Execute(Arg);
-
-            for (int i = 0; i < chainLength; i++)
-            {
-                conditions[i].Verify(o => o.Check(Arg), Times.Once);
-                handlers[i].Verify(o => o.Execute(Arg),
-                    ExecutionExpectedWhen(conditionsSetup[i] == '1'));
-            }
+            conditions.Verify__Check(Times.Once);
+            handlers.Verify__Execute(EachWhen(setup));
         }
 
-        [TestCase("000", "X1")]
-        [TestCase("010", "B0")]
-        [TestCase("011", "B1")]
-        [TestCase("100", "A0")]
-        [TestCase("101", "A1")]
-        [TestCase("110", "C0")]
-        [TestCase("111", "C1")]
-        public void JoinFirstWithSecondCreatesNewHandlerWithRelevantPredicate(
-            string setup,
-            string expectation)
+        [TestCaseSource(nameof(Cases3))]
+        public void JoinFirstWithSecondCreatesNewHandlerWithRelevantCondition(Case3 @case)
         {
-            bool aIsConditional = ParseBool(setup[0]);
-            bool bIsConditional = ParseBool(setup[1]);
-            bool checkResult = ParseBool(setup[2]);
-            int expectedCondition = ParseIndex(expectation[0]);
-            bool handlersExecutionExpected = ParseBool(expectation[1]);
+            _mockOf.ConditionMath.Setup__And(X, Y, returns: Z);
 
-            _conditionMath
-                .Setup(o => o.And(_conditions[A].Object, _conditions[B].Object))
-                .Returns(_conditions[C].Object);
+            var expectedCondition = _mockOf.Conditions[@case.ExpectedCondition];
+            expectedCondition.Setup__Check(@case.FinalConditionCheckResult);
 
-            if (expectedCondition != Missing)
-                _conditions[expectedCondition]
-                    .Setup(o => o.Check(Arg))
-                    .Returns(checkResult);
+            var a = _mockOf.Handlers[A].Object;
+            if (@case.AIsConditional)
+                a = _math.Conditional(a, _mockOf.Conditions[X].Object);
 
-            var a = aIsConditional
-                ? _math.Conditional(_handlers[A].Object, _conditions[A].Object)
-                : _handlers[A].Object;
+            var b = _mockOf.Handlers[B].Object;
+            if (@case.BIsConditional)
+                b = _math.Conditional(b, _mockOf.Conditions[Y].Object);
 
-            var b = bIsConditional 
-                ? _math.Conditional(_handlers[B].Object, _conditions[B].Object)
-                : _handlers[B].Object;
+            _math.JoinFirstWithSecond(a, b)
+                 .Execute(Arg);
 
-            CheckNothingExecuted();
-
-            var ab = _math.JoinFirstWithSecond(a, b);
-
-            CheckNothingExecuted();
-
-            ab.Execute(Arg);
-
-            if (expectedCondition != Missing)
-                _conditions[expectedCondition]
-                    .Verify(o => o.Check(Arg), Times.Once);
-
-            foreach (var i in new[] { A, B, C }
-                      .Except([ expectedCondition ]))
-                _conditions[i].Verify(o => o.Check(Arg), Times.Never);
-
-            foreach (var i in new[] { A, B })
-                _handlers[i].Verify(o => o.Execute(Arg),
-                    ExecutionExpectedWhen(handlersExecutionExpected));
+            expectedCondition.Verify__Check(Times.Once);
+            _mockOf.Conditions[X, Y, Z].Except([expectedCondition]).Verify__Check(Times.Never);
+            _mockOf.Handlers[A, B].Verify__Execute(OnceWhen(@case.HandlersExecutionExpected));
         }
 
-        //         A-C--F    ABCDEF    A-C
-        [TestCase("0-0--0", "000001", "0-0")]
-        [TestCase("0-1--0", "000001", "0-0")]
-        [TestCase("1-0--0", "000001", "0-0")]
-        [TestCase("1-1--0", "000001", "0-0")]
-        [TestCase("0-0--1", "101001", "0-0")]
-        [TestCase("0-1--1", "101001", "0-1")]
-        [TestCase("1-0--1", "101001", "1-0")]
-        [TestCase("1-1--1", "101001", "1-1")]
-        public void JoinFirstWithSecondConjunctsOnlyTopConditions(
-            string conditionCheckResult,
-            string conditionCheckExpected,
-            string handlerExecuteExpected)
+        [TestCaseSource(nameof(Cases4))]
+        public void JoinFirstWithSecondConjunctsOnlyTopConditions(Case4 @case)
         {
-            var checkExpectations = new[] { A, B, C, D, E, F }
-                .ToDictionary(i => i, i => ParseBool(conditionCheckExpected[i]));
+            var unexpectedAnd = W;
+            var aTop = U;
+            var bTop = V;
+            var aTop_And_bTop = Z;
+            var aBottom = X;
+            var bBottom = Y;
 
-            var executeExpectations = new[] { A, C }
-                .ToDictionary(i => i, i => ParseBool(handlerExecuteExpected[i]));
+            _mockOf.Conditions[aBottom, bBottom, aTop_And_bTop]
+                .Setup__Check(@case.CheckSetup);
 
-            foreach (var i in new[] { A, C, F })
-                _conditions[i]
-                    .Setup(o => o.Check(Arg))
-                    .Returns(ParseBool(conditionCheckResult[i]));
+            _mockOf.ConditionMath.Setup__And__ForAny(returns: unexpectedAnd);
+            _mockOf.ConditionMath.Setup__And(aTop, bTop, returns: aTop_And_bTop);
 
-            _conditionMath
-                .Setup(x => x.And(
-                    It.IsAny<ICondition<int>>(),
-                    It.IsAny<ICondition<int>>()))
-                .Returns(_conditions[E].Object);
+            var a = _mockOf.Handlers[A].Object;
+            a = _math.Conditional(a, _mockOf.Conditions[aBottom].Object);
+            a = _math.Conditional(a, _mockOf.Conditions[aTop].Object);
 
-            _conditionMath
-                .Setup(x => x.And(
-                    _conditions[B].Object,
-                    _conditions[D].Object))
-                .Returns(_conditions[F].Object);
+            var b = _mockOf.Handlers[B].Object;
+            b = _math.Conditional(b, _mockOf.Conditions[bBottom].Object);
+            b = _math.Conditional(b, _mockOf.Conditions[bTop].Object);
 
-            var a_a  = _math.Conditional(_handlers[A].Object, _conditions[A].Object);
-            var a_ab = _math.Conditional(a_a, _conditions[B].Object);
+            _math.JoinFirstWithSecond(a, b)
+                 .Execute(Arg);
 
-            var c_c  = _math.Conditional(_handlers[C].Object, _conditions[C].Object);
-            var c_cd = _math.Conditional(c_c, _conditions[D].Object);
-
-            CheckNothingExecuted();
-
-            var a_ab__JoinWith__c_cd = _math.JoinFirstWithSecond(a_ab, c_cd);
-
-            CheckNothingExecuted();
-
-            a_ab__JoinWith__c_cd.Execute(Arg);
-
-            foreach (var i in new[] { A, B, C, D, E, F })
-                _conditions[i].Verify(o => o.Check(Arg),
-                    ExecutionExpectedWhen(checkExpectations[i]));
-
-            foreach (var i in new[] { A, C })
-                _handlers[i].Verify(o => o.Execute(Arg),
-                    ExecutionExpectedWhen(executeExpectations[i]));
+            _mockOf.Conditions[aBottom, bBottom, aTop_And_bTop].Verify__Check(EachWhen(@case.CheckExpected));
+            _mockOf.Conditions[unexpectedAnd, aTop, bTop].Verify__Check(Times.Never);
+            _mockOf.Handlers[A, B].Verify__Execute(EachWhen(@case.ExecutionExpected));
         }
 
-        [TestCase("", "", "", "", "AB")]
-        [TestCase("A", "", "A-0", "A", "")]
-        [TestCase("A", "", "A-1", "A", "AB")]
-        [TestCase("AC", "", "C-0", "C", "")]
-        [TestCase("AC", "", "C-1,A-0", "CA", "B")]
-        [TestCase("AC", "", "C-1,A-1", "CA", "AB")]
-        [TestCase("ACD", "", "D-0", "D", "")]
-        [TestCase("ACD", "", "D-1,C-0", "DC", "B")]
-        [TestCase("ACD", "", "D-1,C-1,A-0", "DCA", "B")]
-        [TestCase("ACD", "", "D-1,C-1,A-1", "DCA", "AB")]
-        
-        [TestCase("A", "B", "H-0", "H", "")]
-        [TestCase("AC", "B", "H-0", "H", "")]
-        [TestCase("ACD", "B", "H-0", "H", "")]
-        [TestCase("A", "B", "H-0", "H", "")]
-        [TestCase("A", "BC", "H-0", "H", "")]
-        [TestCase("A", "BCD", "H-0", "H", "")]
-        [TestCase("AC", "BD", "H-0", "H", "")]
-        [TestCase("ACD", "BE", "H-0", "H", "")]
-        [TestCase("ACD", "BEF", "H-0", "H", "")]
-        [TestCase("AC", "BEF", "H-0", "H", "")]
-        
-        [TestCase("A", "B", "H-1", "H", "AB")]
-        [TestCase("AC", "B", "H-1,A-0", "HA", "B")]
-        [TestCase("AC", "B", "H-1,A-1", "HA", "AB")]
-        [TestCase("ACD", "B", "H-1,C-0", "HC", "B")]
-        [TestCase("ACD", "B", "H-1,C-1,A-0", "HCA", "B")]
-        [TestCase("ACD", "B", "H-1,C-1,A-1", "HCA", "AB")]
-
-        [TestCase("A", "BC", "H-1,B-0", "HB", "A")]
-        [TestCase("A", "BC", "H-1,B-1", "HB", "AB")]
-        [TestCase("A", "BCD", "H-1,C-0", "HC", "A")]
-        [TestCase("A", "BCD", "H-1,C-1,B-0", "HCB", "A")]
-        [TestCase("A", "BCD", "H-1,C-1,B-1", "HCB", "AB")]
-
-        [TestCase("AC", "BD", "H-1,A-0,B-0", "HAB", "")]
-        [TestCase("AC", "BD", "H-1,A-1,B-0", "HAB", "A")]
-        [TestCase("AC", "BD", "H-1,A-0,B-1", "HAB", "B")]
-        [TestCase("AC", "BD", "H-1,A-1,B-1", "HAB", "AB")]
-
-        [TestCase("ACD", "BE", "H-1,C-0,B-0", "HCB", "")]
-        [TestCase("ACD", "BE", "H-1,C-1,A-0,B-0", "HCAB", "")]
-        [TestCase("ACD", "BE", "H-1,C-1,A-1,B-0", "HCAB", "A")]
-        [TestCase("ACD", "BE", "H-1,C-0,B-1", "HCB", "B")]
-        [TestCase("ACD", "BE", "H-1,C-1,A-0,B-1", "HCAB", "B")]
-        [TestCase("ACD", "BE", "H-1,C-1,A-1,B-1", "HCAB", "AB")]
-
-        [TestCase("ACD", "BEF", "H-1,C-0,E-0", "HCE", "")]
-        [TestCase("ACD", "BEF", "H-1,C-1,A-0,E-0", "HCAE", "")]
-        [TestCase("ACD", "BEF", "H-1,C-1,A-0,E-1,B-0", "HCAEB", "")]
-        [TestCase("ACD", "BEF", "H-1,C-1,A-1,E-0", "HCAE", "A")]
-        [TestCase("ACD", "BEF", "H-1,C-1,A-1,E-1,B-0", "HCAEB", "A")]
-        [TestCase("ACD", "BEF", "H-1,C-0,E-1,B-0", "HCEB", "")]
-        [TestCase("ACD", "BEF", "H-1,C-0,E-1,B-1", "HCEB", "B")]
-        [TestCase("ACD", "BEF", "H-1,C-1,A-0,E-1,B-1", "HCAEB", "B")]
-        [TestCase("ACD", "BEF", "H-1,C-1,A-1,E-1,B-1", "HCAEB", "AB")]
-        public void JoinFirstWithSecondConjunctsOnlyTopConditions(
-            string aHandlerConditions,
-            string bHandlerConditions,
-            string conditionsChecksSetup,
-            string expectedToCheck,
-            string expectedToExecute)
+        [TestCaseSource(nameof(Cases5))]
+        public void JoinFirstWithSecondConjunctsOnlyTopConditions(Case5 @case)
         {
-            var @checked = expectedToCheck.Select(ParseIndex).ToArray();
-            var executed = expectedToExecute.Select(ParseIndex).ToArray();
+            _mockOf.Conditions[@case.ChecksSetup.Keys]
+                 .Setup__Check(@case.ChecksSetup.Values);
 
-            foreach (var (i, value) in ParseChecksSetup(conditionsChecksSetup))
-                _conditions[i]
-                    .Setup(o => o.Check(Arg))
-                    .Returns(value);
+            _mockOf.ConditionMath.Setup__And__ForAny(returns: Q);
 
-            _conditionMath
-                .Setup(x => x.And(
-                    It.IsAny<ICondition<int>>(),
-                    It.IsAny<ICondition<int>>()))
-                .Returns(_conditions[I].Object);
+            if (@case.AConditions.Any() &&
+                @case.BConditions.Any())
+                    _mockOf.ConditionMath.Setup__And(
+                        @case.AConditions.Last(),
+                        @case.BConditions.Last(),
+                        returns: R);
 
-            if (aHandlerConditions.Length != 0 &&
-                bHandlerConditions.Length != 0)
-                    _conditionMath
-                        .Setup(x => x.And(
-                            _conditions[ParseIndex(aHandlerConditions.Last())].Object,
-                            _conditions[ParseIndex(bHandlerConditions.Last())].Object))
-                        .Returns(_conditions[H].Object);
+            var a = _mockOf.Conditions[@case.AConditions].Objects
+                .Aggregate(_mockOf.Handlers[A].Object, _math.Conditional);
 
-            var a = aHandlerConditions
-                .Select(ParseIndex)
-                .Select(i => _conditions[i].Object)
-                .Aggregate(_handlers[A].Object, _math.Conditional);
+            var b = _mockOf.Conditions[@case.AConditions].Objects
+                .Aggregate(_mockOf.Handlers[B].Object, _math.Conditional);
 
-            var b = bHandlerConditions
-                .Select(ParseIndex)
-                .Select(i => _conditions[i].Object)
-                .Aggregate(_handlers[B].Object, _math.Conditional);
+            _math.JoinFirstWithSecond(a, b)
+                 .Execute(Arg);
 
-            CheckNothingExecuted();
+            var expectedToCheck = _mockOf.Conditions[@case.CheckExpected];
+            var expectedToExecute = _mockOf.Handlers[@case.ExecuteExpected];
 
-            var ab = _math.JoinFirstWithSecond(a, b);
+            expectedToCheck.Verify__Check(Times.Once);
+            _mockOf.Conditions.Except(expectedToCheck).Verify__Check(Times.Never);
 
-            CheckNothingExecuted();
-
-            ab.Execute(Arg);
-
-            for (int i = First; i <= Last; i++)
-                _conditions[i]
-                    .Verify(o => o.Check(Arg),
-                            ExecutionExpectedWhen(@checked.Contains(i)));
-
-            _handlers[A].Verify(o => o.Execute(Arg),
-                ExecutionExpectedWhen(executed.Contains(A)));
-
-            _handlers[B].Verify(o => o.Execute(Arg),
-                ExecutionExpectedWhen(executed.Contains(B)));
+            expectedToExecute.Verify__Execute(Times.Once);
+            _mockOf.Handlers.Except(expectedToExecute).Verify__Execute(Times.Never);
         }
 
-        [TestCase("AB", "", false)]
-        [TestCase("ABC", "", false)]
-        [TestCase("ABCDE", "", false)]
-        [TestCase("ABCDEFGH", "", false)]
-
-        [TestCase("", "AB", false)]
-        [TestCase("", "ABC", false)]
-        [TestCase("", "ABCDE", false)]
-        [TestCase("", "ABCDEFGH", false)]
-
-        [TestCase("AB", "", true)]
-        [TestCase("ABC", "", true)]
-        [TestCase("ABCDE", "", true)]
-        [TestCase("ABCDEFGH", "", true)]
-
-        [TestCase("", "AB", true)]
-        [TestCase("", "ABC", true)]
-        [TestCase("", "ABCDE", true)]
-        [TestCase("", "ABCDEFGH", true)]
-
-        [TestCase("A", "B", false)]
-        [TestCase("AB", "C", false)]
-        [TestCase("AB", "CD", false)]
-        [TestCase("ABC", "D", false)]
-        [TestCase("ABC", "DE", false)]
-        [TestCase("ABC", "DEF", false)]
-        [TestCase("ABCDE", "F", false)]
-        [TestCase("ABCDE", "FG", false)]
-        [TestCase("ABCDE", "FGH", false)]
-        [TestCase("ABCDE", "FGHI", false)]
-        [TestCase("ABCDEFG", "H", false)]
-        [TestCase("ABCDEFG", "HI", false)]
-        [TestCase("ABCDEFGH", "I", false)]
-
-        [TestCase("B", "A", false)]
-        [TestCase("C", "AB", false)]
-        [TestCase("CD", "AB", false)]
-        [TestCase("D", "ABC", false)]
-        [TestCase("DE", "ABC", false)]
-        [TestCase("DEF", "ABC", false)]
-        [TestCase("F", "ABCDE", false)]
-        [TestCase("FG", "ABCDE", false)]
-        [TestCase("FGH", "ABCDE", false)]
-        [TestCase("FGHI", "ABCDE", false)]
-        [TestCase("H", "ABCDEFG", false)]
-        [TestCase("HI", "ABCDEFG", false)]
-        [TestCase("I", "ABCDEFGH", false)]
-
-        [TestCase("A", "B", true)]
-        [TestCase("AB", "C", true)]
-        [TestCase("AB", "CD", true)]
-        [TestCase("ABC", "D", true)]
-        [TestCase("ABC", "DE", true)]
-        [TestCase("ABC", "DEF", true)]
-        [TestCase("ABCDE", "F", true)]
-        [TestCase("ABCDE", "FG", true)]
-        [TestCase("ABCDE", "FGH", true)]
-        [TestCase("ABCDE", "FGHI", true)]
-        [TestCase("ABCDEFG", "H", true)]
-        [TestCase("ABCDEFG", "HI", true)]
-        [TestCase("ABCDEFGH", "I", true)]
-
-        [TestCase("B", "A", true)]
-        [TestCase("C", "AB", true)]
-        [TestCase("CD", "AB", true)]
-        [TestCase("D", "ABC", true)]
-        [TestCase("DE", "ABC", true)]
-        [TestCase("DEF", "ABC", true)]
-        [TestCase("F", "ABCDE", true)]
-        [TestCase("FG", "ABCDE", true)]
-        [TestCase("FGH", "ABCDE", true)]
-        [TestCase("FGHI", "ABCDE", true)]
-        [TestCase("H", "ABCDEFG", true)]
-        [TestCase("HI", "ABCDEFG", true)]
-        [TestCase("I", "ABCDEFGH", true)]
+        [Test]
         public void MergeFirstWithSecondConjunctsAllConditions(
-            string aHandlerConditions,
-            string bHandlerConditions,
-            bool finalConditionResult)
+            [ValueSource(nameof(Cases6))] Case6 @case,
+            [Values(true, false)] bool finalConditionResult)
         {
-            var conditions = Enumerable.Range(First, Last + 1)
-                .ToDictionary(IndexToString, i => _conditions[i].Object);
+            ConditionMock? lastAnd = null;
 
-            var finalCondition = new Mock<ICondition<int>>(); 
-
-            _conditionMath
+            _mockOf.ConditionMath
                 .Setup(o => o.And(
-                    It.IsAny<ICondition<int>>(), 
+                    It.IsAny<ICondition<int>>(),
                     It.IsAny<ICondition<int>>()))
-                
-                .Returns((ICondition<int> x, ICondition<int> y) =>
+                .Returns((ICondition<int> a, ICondition<int> b) =>
                 {
-                    var i = conditions.First(z => z.Value == x).Key;
-                    var j = conditions.First(z => z.Value == y).Key;
-                    var ij = new string((i + j).Order().ToArray());
+                    var aMock = Mock.Get(a) as ConditionMock;
+                    var bMock = Mock.Get(b) as ConditionMock;
 
-                    finalCondition = new Mock<ICondition<int>>()
+                    if (aMock != null && bMock != null)
                     {
-                        Name = $"predicate|{ij}|"
-                    };
+                        var i = ConditionIndex.Make(aMock.Index.Value + bMock.Index.Value);
+                        var and = new ConditionMock(i);
+                        lastAnd = and;
 
-                    conditions.Add(ij, finalCondition.Object);
+                        return and.Object;
+                    }
 
-                    return finalCondition.Object; 
+                    return new Mock<ICondition<int>>().Object;
                 });
 
-            var a = aHandlerConditions
-                .Select(ParseIndex)
-                .Select(i => _conditions[i].Object)
-                .Aggregate(_handlers[A].Object, _math.Conditional);
+            var a = _mockOf.Conditions[@case.AConditions].Objects
+                .Aggregate(_mockOf.Handlers[A].Object, _math.Conditional);
 
-            var b = bHandlerConditions
-                .Select(ParseIndex)
-                .Select(i => _conditions[i].Object)
-                .Aggregate(_handlers[B].Object, _math.Conditional);
-
-            CheckNothingExecuted();
+            var b = _mockOf.Conditions[@case.BConditions].Objects
+                .Aggregate(_mockOf.Handlers[B].Object, _math.Conditional);
 
             var ab = _math.MergeFirstWithSecond(a, b);
 
-            CheckNothingExecuted();
+            Assert.That(lastAnd, Is.Not.Null);
 
-            finalCondition
-                .Setup(o => o.Check(Arg))
-                .Returns(finalConditionResult);
+            var allAnded = lastAnd.Index.Value.Select(ConditionIndex.Make);
+            var expected = Enumerable.Concat(
+                @case.AConditions,
+                @case.BConditions);
+
+            Assert.That(allAnded,
+                Is.EquivalentTo(expected));
+
+            lastAnd.Setup__Check(returns: finalConditionResult);
 
             ab.Execute(Arg);
 
-            var key = new string(
-                (aHandlerConditions + bHandlerConditions)
-                    .Order()
-                    .ToArray());
-
-            var resultCondition = conditions[key];
-
-            Assert.That(resultCondition,
-                Is.SameAs(finalCondition.Object));
-
-            finalCondition.Verify(o => o.Check(Arg), Times.Once);
-
-            _handlers[A].Verify(o => o.Execute(Arg),
-                ExecutionExpectedWhen(finalConditionResult));
-
-            _handlers[A].Verify(o => o.Execute(Arg),
-                ExecutionExpectedWhen(finalConditionResult));
+            lastAnd.Verify__Check(Times.Once);
+            _mockOf.Handlers[A, B].Verify__Execute(
+                OnceWhen(finalConditionResult));
         }
 
         [Test]
@@ -928,287 +563,48 @@ namespace ChainLead.Test
             [Values(false, true)] bool order,
             [Values(false, true)] bool checkResult)
         {
-            _conditions[A]
-                .Setup(o => o.Check(Arg))
-                .Returns(checkResult);
+            _mockOf.Conditions[X].Setup__Check(checkResult);
 
-            var x = _math.Conditional(_handlers[A].Object, _conditions[A].Object);
-            var y = _handlers[B].Object;
+            var x = _math.Conditional(
+                _mockOf.Handlers[A].Object,
+                _mockOf.Conditions[X].Object);
 
-            CheckNothingExecuted();
+            var y = _mockOf.Handlers[B].Object;
 
             var z = order
                 ? _math.MergeFirstWithSecond(x, y)
                 : _math.MergeFirstWithSecond(y, x);
 
-            CheckNothingExecuted();
-
             z.Execute(Arg);
 
-            _conditions[A].Verify(o => o.Check(Arg), Times.Once);
-
-            _handlers[A].Verify(o => o.Execute(Arg),
-                ExecutionExpectedWhen(checkResult));
-
-            _handlers[B].Verify(o => o.Execute(Arg),
-                ExecutionExpectedWhen(checkResult));
+            _mockOf.Conditions[X].Verify__Check(Times.Once);
+            _mockOf.Handlers[A, B].Verify__Execute(OnceWhen(checkResult));
         }
 
-
-        [TestCase(InjectFirstIntoSecond, "", "", "", "[A][B]")]
-        [TestCase(InjectFirstIntoSecond, "C", "", "C-0", "C[B]")]
-        [TestCase(InjectFirstIntoSecond, "C", "", "C-1", "C[A][B]")]
-        [TestCase(InjectFirstIntoSecond, "", "C", "C-0", "C")]
-        [TestCase(InjectFirstIntoSecond, "", "C", "C-1", "C[A][B]")]
-        [TestCase(InjectFirstIntoSecond, "CD", "", "D-0", "D[B]")]
-        [TestCase(InjectFirstIntoSecond, "CD", "", "D-1,C-0", "DC[B]")]
-        [TestCase(InjectFirstIntoSecond, "CD", "", "D-1,C-1", "DC[A][B]")]
-        [TestCase(InjectFirstIntoSecond, "", "CD", "D-0", "D")]
-        [TestCase(InjectFirstIntoSecond, "", "CD", "D-1,C-0", "DC")]
-        [TestCase(InjectFirstIntoSecond, "", "CD", "D-1,C-1", "DC[A][B]")]
-        [TestCase(InjectFirstIntoSecond, "CDEF", "", "F-0", "F[B]")]
-        [TestCase(InjectFirstIntoSecond, "CDEF", "", "F-1,E-0", "FE[B]")]
-        [TestCase(InjectFirstIntoSecond, "CDEF", "", "F-1,E-1,D-0", "FED[B]")]
-        [TestCase(InjectFirstIntoSecond, "CDEF", "", "F-1,E-1,D-1,C-0", "FEDC[B]")]
-        [TestCase(InjectFirstIntoSecond, "CDEF", "", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
-        [TestCase(InjectFirstIntoSecond, "", "CDEF", "F-0", "F")]
-        [TestCase(InjectFirstIntoSecond, "", "CDEF", "F-1,E-0", "FE")]
-        [TestCase(InjectFirstIntoSecond, "", "CDEF", "F-1,E-1,D-0", "FED")]
-        [TestCase(InjectFirstIntoSecond, "", "CDEF", "F-1,E-1,D-1,C-0", "FEDC")]
-        [TestCase(InjectFirstIntoSecond, "", "CDEF", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
-
-        [TestCase(InjectFirstIntoSecond, "C", "D", "D-0", "D")]
-        [TestCase(InjectFirstIntoSecond, "C", "D", "D-1,C-0", "DC[B]")]
-        [TestCase(InjectFirstIntoSecond, "C", "D", "D-1,C-1", "DC[A][B]")]
-        [TestCase(InjectFirstIntoSecond, "CD", "E", "E-0", "E")]
-        [TestCase(InjectFirstIntoSecond, "CD", "E", "E-1,D-0", "ED[B]")]
-        [TestCase(InjectFirstIntoSecond, "CD", "E", "E-1,D-1,C-0", "EDC[B]")]
-        [TestCase(InjectFirstIntoSecond, "CD", "E", "E-1,D-1,C-1", "EDC[A][B]")]
-        [TestCase(InjectFirstIntoSecond, "C", "DE", "E-0", "E")]
-        [TestCase(InjectFirstIntoSecond, "C", "DE", "E-1,D-0", "ED")]
-        [TestCase(InjectFirstIntoSecond, "C", "DE", "E-1,D-1,C-0", "EDC[B]")]
-        [TestCase(InjectFirstIntoSecond, "C", "DE", "E-1,D-1,C-1", "EDC[A][B]")]
-        [TestCase(InjectFirstIntoSecond, "CD", "EF", "F-0", "F")]
-        [TestCase(InjectFirstIntoSecond, "CD", "EF", "F-1,E-0", "FE")]
-        [TestCase(InjectFirstIntoSecond, "CD", "EF", "F-1,E-1,D-0", "FED[B]")]
-        [TestCase(InjectFirstIntoSecond, "CD", "EF", "F-1,E-1,D-1,C-0", "FEDC[B]")]
-        [TestCase(InjectFirstIntoSecond, "CD", "EF", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
-        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-0", "H")]
-        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-1,G-0", "HG")]
-        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-1,G-1,F-0", "HGF")]
-        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-1,G-1,F-1,E-0", "HGFE[B]")]
-        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-1,G-1,F-1,E-1,D-0", "HGFED[B]")]
-        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-1,G-1,F-1,E-1,D-1,C-0", "HGFEDC[B]")]
-        [TestCase(InjectFirstIntoSecond, "CDE", "FGH", "H-1,G-1,F-1,E-1,D-1,C-1", "HGFEDC[A][B]")]
-
-        [TestCase(FirstWrapSecond, "", "", "", "[A][B]")]
-        [TestCase(FirstWrapSecond, "C", "", "C-0", "C")]
-        [TestCase(FirstWrapSecond, "C", "", "C-1", "C[A][B]")]
-        [TestCase(FirstWrapSecond, "", "C", "C-0", "[A]C")]
-        [TestCase(FirstWrapSecond, "", "C", "C-1", "[A]C[B]")]
-        [TestCase(FirstWrapSecond, "CD", "", "D-0", "D")]
-        [TestCase(FirstWrapSecond, "CD", "", "D-1,C-0", "DC")]
-        [TestCase(FirstWrapSecond, "CD", "", "D-1,C-1", "DC[A][B]")]
-        [TestCase(FirstWrapSecond, "", "CD", "D-0", "[A]D")]
-        [TestCase(FirstWrapSecond, "", "CD", "D-1,C-0", "[A]DC")]
-        [TestCase(FirstWrapSecond, "", "CD", "D-1,C-1", "[A]DC[B]")]
-        [TestCase(FirstWrapSecond, "CDEF", "", "F-0", "F")]
-        [TestCase(FirstWrapSecond, "CDEF", "", "F-1,E-0", "FE")]
-        [TestCase(FirstWrapSecond, "CDEF", "", "F-1,E-1,D-0", "FED")]
-        [TestCase(FirstWrapSecond, "CDEF", "", "F-1,E-1,D-1,C-0", "FEDC")]
-        [TestCase(FirstWrapSecond, "CDEF", "", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
-        [TestCase(FirstWrapSecond, "", "CDEF", "F-0", "[A]F")]
-        [TestCase(FirstWrapSecond, "", "CDEF", "F-1,E-0", "[A]FE")]
-        [TestCase(FirstWrapSecond, "", "CDEF", "F-1,E-1,D-0", "[A]FED")]
-        [TestCase(FirstWrapSecond, "", "CDEF", "F-1,E-1,D-1,C-0", "[A]FEDC")]
-        [TestCase(FirstWrapSecond, "", "CDEF", "F-1,E-1,D-1,C-1", "[A]FEDC[B]")]
-
-        [TestCase(FirstWrapSecond, "C", "D", "C-0", "C")]
-        [TestCase(FirstWrapSecond, "C", "D", "C-1,D-0", "C[A]D")]
-        [TestCase(FirstWrapSecond, "C", "D", "C-1,D-1", "C[A]D[B]")]
-        [TestCase(FirstWrapSecond, "CD", "E", "D-0", "D")]
-        [TestCase(FirstWrapSecond, "CD", "E", "D-1,C-0", "DC")]
-        [TestCase(FirstWrapSecond, "CD", "E", "D-1,C-1,E-0", "DC[A]E")]
-        [TestCase(FirstWrapSecond, "CD", "E", "D-1,C-1,E-1", "DC[A]E[B]")]
-        [TestCase(FirstWrapSecond, "C", "DE", "C-0", "C")]
-        [TestCase(FirstWrapSecond, "C", "DE", "C-1,E-0", "C[A]E")]
-        [TestCase(FirstWrapSecond, "C", "DE", "C-1,E-1,D-0", "C[A]ED")]
-        [TestCase(FirstWrapSecond, "C", "DE", "C-1,E-1,D-1", "C[A]ED[B]")]
-        [TestCase(FirstWrapSecond, "CD", "EF", "D-0", "D")]
-        [TestCase(FirstWrapSecond, "CD", "EF", "D-1,C-0", "DC")]
-        [TestCase(FirstWrapSecond, "CD", "EF", "D-1,C-1,F-0", "DC[A]F")]
-        [TestCase(FirstWrapSecond, "CD", "EF", "D-1,C-1,F-1,E-0", "DC[A]FE")]
-        [TestCase(FirstWrapSecond, "CD", "EF", "D-1,C-1,F-1,E-1", "DC[A]FE[B]")]
-        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-0", "E")]
-        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-1,D-0", "ED")]
-        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-1,D-1,C-0", "EDC")]
-        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-1,D-1,C-1,H-0", "EDC[A]H")]
-        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-0", "EDC[A]HG")]
-        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-1,F-0", "EDC[A]HGF")]
-        [TestCase(FirstWrapSecond, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-1,F-1", "EDC[A]HGF[B]")]
-
-        [TestCase(PackFirstInSecond, "", "", "", "[A][B]")]
-        [TestCase(PackFirstInSecond, "C", "", "C-0", "C[B]")]
-        [TestCase(PackFirstInSecond, "C", "", "C-1", "C[A][B]")]
-        [TestCase(PackFirstInSecond, "", "C", "C-0", "C")]
-        [TestCase(PackFirstInSecond, "", "C", "C-1", "C[A][B]")]
-        [TestCase(PackFirstInSecond, "CD", "", "D-0", "D[B]")]
-        [TestCase(PackFirstInSecond, "CD", "", "D-1,C-0", "DC[B]")]
-        [TestCase(PackFirstInSecond, "CD", "", "D-1,C-1", "DC[A][B]")]
-        [TestCase(PackFirstInSecond, "", "CD", "D-0", "D")]
-        [TestCase(PackFirstInSecond, "", "CD", "D-1,C-0", "D[A]C")]
-        [TestCase(PackFirstInSecond, "", "CD", "D-1,C-1", "D[A]C[B]")]
-        [TestCase(PackFirstInSecond, "CDEF", "", "F-0", "F[B]")]
-        [TestCase(PackFirstInSecond, "CDEF", "", "F-1,E-0", "FE[B]")]
-        [TestCase(PackFirstInSecond, "CDEF", "", "F-1,E-1,D-0", "FED[B]")]
-        [TestCase(PackFirstInSecond, "CDEF", "", "F-1,E-1,D-1,C-0", "FEDC[B]")]
-        [TestCase(PackFirstInSecond, "CDEF", "", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
-        [TestCase(PackFirstInSecond, "", "CDEF", "F-0", "F")]
-        [TestCase(PackFirstInSecond, "", "CDEF", "F-1,E-0", "F[A]E")]
-        [TestCase(PackFirstInSecond, "", "CDEF", "F-1,E-1,D-0", "F[A]ED")]
-        [TestCase(PackFirstInSecond, "", "CDEF", "F-1,E-1,D-1,C-0", "F[A]EDC")]
-        [TestCase(PackFirstInSecond, "", "CDEF", "F-1,E-1,D-1,C-1", "F[A]EDC[B]")]
-
-        [TestCase(PackFirstInSecond, "C", "D", "D-0", "D")]
-        [TestCase(PackFirstInSecond, "C", "D", "D-1,C-0", "DC[B]")]
-        [TestCase(PackFirstInSecond, "C", "D", "D-1,C-1", "DC[A][B]")]
-        [TestCase(PackFirstInSecond, "CD", "E", "E-0", "E")]
-        [TestCase(PackFirstInSecond, "CD", "E", "E-1,D-0", "ED[B]")]
-        [TestCase(PackFirstInSecond, "CD", "E", "E-1,D-1,C-0", "EDC[B]")]
-        [TestCase(PackFirstInSecond, "CD", "E", "E-1,D-1,C-1", "EDC[A][B]")]
-        [TestCase(PackFirstInSecond, "C", "DE", "E-0", "E")]
-        [TestCase(PackFirstInSecond, "C", "DE", "E-1,C-0,D-0", "ECD")]
-        [TestCase(PackFirstInSecond, "C", "DE", "E-1,C-1,D-0", "EC[A]D")]
-        [TestCase(PackFirstInSecond, "C", "DE", "E-1,C-1,D-1", "EC[A]D[B]")]
-        [TestCase(PackFirstInSecond, "CD", "EF", "F-0", "F")]
-        [TestCase(PackFirstInSecond, "CD", "EF", "F-1,D-0,E-0", "FDE")]
-        [TestCase(PackFirstInSecond, "CD", "EF", "F-1,D-0,E-1", "FDE[B]")]
-        [TestCase(PackFirstInSecond, "CD", "EF", "F-1,D-1,C-0,E-0", "FDCE")]
-        [TestCase(PackFirstInSecond, "CD", "EF", "F-1,D-1,C-0,E-1", "FDCE[B]")]
-        [TestCase(PackFirstInSecond, "CD", "EF", "F-1,D-1,C-1,E-0", "FDC[A]E")]
-        [TestCase(PackFirstInSecond, "CD", "EF", "F-1,D-1,C-1,E-1", "FDC[A]E[B]")]
-        [TestCase(PackFirstInSecond, "CDE", "FGH", "H-0", "H")]
-        [TestCase(PackFirstInSecond, "CDE", "FGH", "H-1,E-0,G-0", "HEG")]
-        [TestCase(PackFirstInSecond, "CDE", "FGH", "H-1,E-1,D-0,G-0", "HEDG")]
-        [TestCase(PackFirstInSecond, "CDE", "FGH", "H-1,E-1,D-1,C-0,G-0", "HEDCG")]
-        [TestCase(PackFirstInSecond, "CDE", "FGH", "H-1,E-1,D-1,C-1,G-0", "HEDC[A]G")]
-        [TestCase(PackFirstInSecond, "CDE", "FGH", "H-1,E-0,G-0", "HEG")]
-        [TestCase(PackFirstInSecond, "CDE", "FGH", "H-1,E-0,G-1,F-0", "HEGF")]
-        [TestCase(PackFirstInSecond, "CDE", "FGH", "H-1,E-0,G-1,F-1", "HEGF[B]")]
-        [TestCase(PackFirstInSecond, "CDE", "FGH", "H-1,E-1,D-0,G-1,F-0", "HEDGF")]
-        [TestCase(PackFirstInSecond, "CDE", "FGH", "H-1,E-1,D-1,C-0,G-1,F-0", "HEDCGF")]
-        [TestCase(PackFirstInSecond, "CDE", "FGH", "H-1,E-1,D-1,C-1,G-1,F-0", "HEDC[A]GF")]
-        [TestCase(PackFirstInSecond, "CDE", "FGH", "H-1,E-1,D-1,C-0,G-1,F-1", "HEDCGF[B]")]
-        [TestCase(PackFirstInSecond, "CDE", "FGH", "H-1,E-1,D-1,C-1,G-1,F-1", "HEDC[A]GF[B]")]
-
-        [TestCase(FirstCoverSecond, "", "", "", "[A][B]")]
-        [TestCase(FirstCoverSecond, "C", "", "C-0", "C")]
-        [TestCase(FirstCoverSecond, "C", "", "C-1", "C[A][B]")]
-        [TestCase(FirstCoverSecond, "", "C", "C-0", "[A]C")]
-        [TestCase(FirstCoverSecond, "", "C", "C-1", "[A]C[B]")]
-        [TestCase(FirstCoverSecond, "CD", "", "D-0", "D")]
-        [TestCase(FirstCoverSecond, "CD", "", "D-1,C-0", "DC[B]")]
-        [TestCase(FirstCoverSecond, "CD", "", "D-1,C-1", "DC[A][B]")]
-        [TestCase(FirstCoverSecond, "", "CD", "D-0", "[A]D")]
-        [TestCase(FirstCoverSecond, "", "CD", "D-1,C-0", "[A]DC")]
-        [TestCase(FirstCoverSecond, "", "CD", "D-1,C-1", "[A]DC[B]")]
-        [TestCase(FirstCoverSecond, "CDEF", "", "F-0", "F")]
-        [TestCase(FirstCoverSecond, "CDEF", "", "F-1,E-0", "FE[B]")]
-        [TestCase(FirstCoverSecond, "CDEF", "", "F-1,E-1,D-0", "FED[B]")]
-        [TestCase(FirstCoverSecond, "CDEF", "", "F-1,E-1,D-1,C-0", "FEDC[B]")]
-        [TestCase(FirstCoverSecond, "CDEF", "", "F-1,E-1,D-1,C-1", "FEDC[A][B]")]
-        [TestCase(FirstCoverSecond, "", "CDEF", "F-0", "[A]F")]
-        [TestCase(FirstCoverSecond, "", "CDEF", "F-1,E-0", "[A]FE")]
-        [TestCase(FirstCoverSecond, "", "CDEF", "F-1,E-1,D-0", "[A]FED")]
-        [TestCase(FirstCoverSecond, "", "CDEF", "F-1,E-1,D-1,C-0", "[A]FEDC")]
-        [TestCase(FirstCoverSecond, "", "CDEF", "F-1,E-1,D-1,C-1", "[A]FEDC[B]")]
-
-        [TestCase(FirstCoverSecond, "C", "D", "C-0", "C")]
-        [TestCase(FirstCoverSecond, "C", "D", "C-1,D-0", "C[A]D")]
-        [TestCase(FirstCoverSecond, "C", "D", "C-1,D-1", "C[A]D[B]")]
-        [TestCase(FirstCoverSecond, "CD", "E", "D-0", "D")]
-        [TestCase(FirstCoverSecond, "CD", "E", "D-1,C-0,E-0", "DCE")]
-        [TestCase(FirstCoverSecond, "CD", "E", "D-1,C-1,E-0", "DC[A]E")]
-        [TestCase(FirstCoverSecond, "CD", "E", "D-1,C-0,E-1", "DCE[B]")]
-        [TestCase(FirstCoverSecond, "CD", "E", "E-1,D-1,C-1", "DC[A]E[B]")]
-        [TestCase(FirstCoverSecond, "C", "DE", "C-0", "C")]
-        [TestCase(FirstCoverSecond, "C", "DE", "C-1,E-0", "C[A]E")]
-        [TestCase(FirstCoverSecond, "C", "DE", "C-1,E-1,D-0", "C[A]ED")]
-        [TestCase(FirstCoverSecond, "C", "DE", "C-1,E-1,D-1", "C[A]ED[B]")]
-        [TestCase(FirstCoverSecond, "CD", "EF", "D-0", "D")]
-        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-0,F-0", "DCF")]
-        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-1,F-0", "DC[A]F")]
-        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-1,F-1,E-0", "DC[A]FE")]
-        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-0,F-1,E-0", "DCFE")]
-        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-1,F-1,E-0", "DC[A]FE")]
-        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-0,F-1,E-1", "DCFE[B]")]
-        [TestCase(FirstCoverSecond, "CD", "EF", "D-1,C-1,F-1,E-1", "DC[A]FE[B]")]
-        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-0", "E")]
-        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-0,H-0", "EDH")]
-        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-0,H-0", "EDCH")]
-        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-0", "EDC[A]HG")]
-        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-1,F-0", "EDC[A]HGF")]
-        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-1,H-1,G-1,F-1", "EDC[A]HGF[B]")]
-        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-0,H-1,G-0", "EDHG")]
-        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-0,H-1,G-1,F-0", "EDHGF")]
-        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-0,H-1,G-1,F-1", "EDHGF[B]")]
-        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-0,H-1,G-0", "EDCHG")]
-        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-0,H-1,G-1,F-0", "EDCHGF")]
-        [TestCase(FirstCoverSecond, "CDE", "FGH", "E-1,D-1,C-0,H-1,G-1,F-1", "EDCHGF[B]")]
-        public void Pack_Inject_Cover_Wrap_CreateCorrectConditionsCascade(
-            string appendType,
-            string aHandlerConditions,
-            string bHandlerConditions,
-            string conditionsChecksSetup,
-            string expectedCallsOrder)
+        [TestCaseSource(nameof(Cases7))]
+        public void CorrectConditionsCascadeTest(Case7 @case)
         {
-            var checksResult = ParseChecksSetup(conditionsChecksSetup)
-                .ToDictionary(x => x.i, x => x.value);
+            List<MockIndex> execution = [];
 
-            var callsOrder = string.Empty;
+            _mockOf.Conditions[@case.AConditions].Setup__Check__LoggingInto(execution);
+            _mockOf.Conditions[@case.BConditions].Setup__Check__LoggingInto(execution);
+            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
 
-            foreach (var i in new[] { A, B })
-                _handlers[i]
-                    .Setup(o => o.Execute(Arg))
-                    .Callback(() => callsOrder += $"[{IndexToString(i)}]");
+            _mockOf.Conditions[@case.ChecksSetup.Keys]
+                .Setup__Check(returns: @case.ChecksSetup.Values);
 
-            var a = CombineHandler(aHandlerConditions, A);
-            var b = CombineHandler(bHandlerConditions, B);
+            var a = _mockOf.Conditions[@case.AConditions].Objects
+                .Aggregate(_mockOf.Handlers[A].Object, _math.Conditional);
 
-            var append = AppendFunc<int>(by: appendType);
+            var b = _mockOf.Conditions[@case.AConditions].Objects
+                .Aggregate(_mockOf.Handlers[B].Object, _math.Conditional);
 
-            CheckNothingExecuted();
-
+            var append = AppendFunc<int>(by: @case.AppendType);
             var ab = append(a, b);
-
-            CheckNothingExecuted();
-
             ab.Execute(Arg);
 
-            Assert.That(callsOrder,
-                Is.EqualTo(expectedCallsOrder));
-
-            IHandler<int> CombineHandler(
-                string conditionsSetup, 
-                int handlerIndex) =>
-                    conditionsSetup
-                        .Select(x =>
-                        {
-                            var i = ParseIndex(x);
-                            var p = _conditions[i];
-
-                            if (checksResult.TryGetValue(i, out bool result))
-                                p.Setup(o => o.Check(Arg)).Returns(result)
-                                 .Callback(() => callsOrder += x);
-                            else
-                                p.Setup(o => o.Check(Arg))
-                                 .Callback(() => callsOrder += x);
-
-                            return p.Object;
-                        })
-                        .Aggregate(
-                            _handlers[handlerIndex].Object,
-                            _math.Conditional);
+            Assert.That(execution,
+                Is.EqualTo(@case.ExpectedCallsOrder));
         }
 
         private void AtomizeZeroMakeHandlerThatIsNotZero<T>()
@@ -1238,44 +634,28 @@ namespace ChainLead.Test
 
         [Test]
         public void AppendWithAtomizedConditionalHandlerIsTheSameAsWithRegularHandler(
-            [ValueSource(nameof(AllAppends))] string appendType,
+            [ValueSource(typeof(Appends), nameof(All))] string appendType,
             [Values(true, false)] bool reverseHandlersOrder,
             [Values(true, false)] bool lastConditionCheckResult)
         {
-            var expectedLog = 
+            List<MockIndex> expectedLog = 
                 (reverseHandlersOrder, lastConditionCheckResult) switch
                 {
-                    (false, false) => "h[A]c[A]c[B]c[C]",
-                    (false, true)  => "h[A]c[A]c[B]c[C]h[B]",
-                    (true,  false) => "c[A]c[B]c[C]h[A]",
-                    (true,  true)  => "c[A]c[B]c[C]h[B]h[A]",
+                    (false, false) => [A, X, Y, Z],
+                    (false, true)  => [A, X, Y, Z, B],
+                    (true,  false) => [X, Y, Z, B],
+                    (true,  true)  => [X, Y, Z, A, B]
                 };
 
-            var executionLog = string.Empty;
+            List<MockIndex> executionLog = [];
 
-            foreach (var i in new[] { A, B })
-            {
-                _handlers[i]
-                    .Setup(o => o.Execute(Arg))
-                    .Callback(() => executionLog += $"h[{IndexToString(i)}]");
+            _mockOf.Conditions.Setup__Check__LoggingInto(executionLog); 
+            _mockOf.Handlers.Setup__Execute__LoggingInto(executionLog);
 
-                _conditions[i]
-                    .Setup(o => o.Check(Arg)).Returns(true)
-                    .Callback(() => executionLog += $"c[{IndexToString(i)}]");
-            }
-
-            _conditions[C]
-                .Setup(o => o.Check(Arg))
-                .Returns(lastConditionCheckResult)
-                .Callback(() => executionLog += $"c[{IndexToString(C)}]");
-
-            var atom = _handlers[A].Object;
-
-            var conditional = _handlers[B].Object;
-            conditional = _math.Conditional(conditional, _conditions[C].Object);
-            conditional = _math.Conditional(conditional, _conditions[B].Object);
-            conditional = _math.Conditional(conditional, _conditions[A].Object);
-
+            var atom = _mockOf.Handlers[A].Object;
+            var conditional = _mockOf.Conditions[Z, Y, X].Objects 
+                .Aggregate(_mockOf.Handlers[B].Object, _math.Conditional);
+            
             var atomizedConditional = _math.Atomize(conditional);
 
             var append = AppendFunc<int>(by: appendType);
@@ -1293,59 +673,39 @@ namespace ChainLead.Test
 
         [Test]
         public void AppendTwoAtomizedConditionalHandlerIsTheSameAsTwoRegularHandlers(
-            [ValueSource(nameof(AllAppends))] string appendType,
-            [Values(false, true)] bool firstLastConditionCheckResult,
-            [Values(false, true)] bool secondLastConditionCheckResult)
+            [ValueSource(typeof(Appends), nameof(All))] string appendType,
+            [Values(false, true)] bool aBottomCheckResult,
+            [Values(false, true)] bool bBottomCheckResult)
         {
-            var expectedLog =
-                (firstLastConditionCheckResult,
-                secondLastConditionCheckResult) switch
+            MockIndex[] expectedLog =
+                (aBottomCheckResult, bBottomCheckResult) switch
                 {
-                    (false, false) => "c[B]c[C]c[D]c[F]c[G]c[H]",
-                    (false, true)  => "c[B]c[C]c[D]c[F]c[G]c[H]h[E]",
-                    (true,  false) => "c[B]c[C]c[D]h[A]c[F]c[G]c[H]",
-                    (true,  true)  => "c[B]c[C]c[D]h[A]c[F]c[G]c[H]h[E]",
+                    (false, false) => [U, V, W, X, Y, Z],
+                    (false, true)  => [U, V, W, X, Y, Z, B],
+                    (true,  false) => [U, V, W, A, X, Y, Z], 
+                    (true,  true)  => [U, V, W, A, X, Y, Z, B] 
                 };
 
-            var executionLog = string.Empty;
+            List<MockIndex> execution = [];
 
-            foreach (var i in new[] { A, E })
-                _handlers[i]
-                    .Setup(o => o.Execute(Arg))
-                    .Callback(() => executionLog += $"h[{IndexToString(i)}]");
+            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
+            _mockOf.Conditions[U, V, W, X, Y, Z].Setup__Check__LoggingInto(execution);
 
-            foreach (var i in new[] { B, C, F, G })
-                _conditions[i]
-                    .Setup(o => o.Check(Arg)).Returns(true)
-                    .Callback(() => executionLog += $"c[{IndexToString(i)}]");
+            _mockOf.Conditions[W].Setup__Check(returns: aBottomCheckResult);
+            _mockOf.Conditions[Z].Setup__Check(returns: bBottomCheckResult);
 
-            _conditions[D]
-                .Setup(o => o.Check(Arg))
-                .Returns(firstLastConditionCheckResult)
-                .Callback(() => executionLog += $"c[{IndexToString(D)}]");
+            var a = _mockOf.Conditions[W, V, U].Objects
+                .Aggregate(_mockOf.Handlers[A].Object, _math.Conditional);
 
-            _conditions[H]
-                .Setup(o => o.Check(Arg))
-                .Returns(secondLastConditionCheckResult)
-                .Callback(() => executionLog += $"c[{IndexToString(H)}]");
+            var b = _mockOf.Conditions[Z, Y, X].Objects
+                .Aggregate(_mockOf.Handlers[B].Object, _math.Conditional);
 
-            var first = _handlers[A].Object;
-            first = _math.Conditional(first, _conditions[D].Object);
-            first = _math.Conditional(first, _conditions[C].Object);
-            first = _math.Conditional(first, _conditions[B].Object);
-            first = _math.Atomize(first);
-
-            var second = _handlers[E].Object;
-            second = _math.Conditional(second, _conditions[H].Object);
-            second = _math.Conditional(second, _conditions[G].Object);
-            second = _math.Conditional(second, _conditions[F].Object);
-            second = _math.Atomize(second);
-
+            
             var append = AppendFunc<int>(by: appendType);
-            var result = append(first, second);
+            var result = append(a, b);
             result.Execute(Arg);
 
-            Assert.That(executionLog,
+            Assert.That(execution,
                 Is.EqualTo(expectedLog));
         }
 
@@ -1368,47 +728,23 @@ namespace ChainLead.Test
             var extended = new Mock<IExtendedHandler<int>>();
             extended
                 .Setup(o => o.Origin)
-                .Returns(_handlers[A].Object);
+                .Returns(_mockOf.Handlers[A].Object);
 
             var isZero = _math.IsZero(extended.Object);
 
             Assert.That(isZero, Is.False);
         }
 
-        static IEnumerable<(int i, bool value)> ParseChecksSetup(
-            string conditionChecksSetup) =>
-                conditionChecksSetup
-                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(x => x.Split('-'))
-                    .Select(x => (i: ParseIndex(x[0][0]), value: ParseBool(x[1][0])));
-
-        void CheckNothingExecuted()
-        {
-            foreach (var mock in _conditions)
-                mock.Verify(o => o.Check(Arg), Times.Never);
-
-            foreach (var mock in _handlers)
-                mock.Verify(o => o.Execute(Arg), Times.Never);
-        }
-
-        static Func<Times> ExecutionExpectedWhen(bool value) =>
+        static Func<Times> OnceWhen(bool value) =>
             value ? Times.Once : Times.Never;
+
+        static IEnumerable<Func<Times>> EachWhen(IEnumerable<bool> value) =>
+            value.Select(OnceWhen);
 
         static bool ParseBool(char mask) => mask == '1';
 
-        static int ParseIndex(char mask) =>
-            mask switch
-            {
-                'X' => Missing,
-                _ => mask - 'A'
-            };
+        static bool NotNull(object? x) => x != null;
 
-        static string IndexToString(int i) =>
-            (i switch
-            {
-                Missing => 'X',
-                _ => (char)('A' + i)
-            })
-            .ToString();
+        static T Denullify<T>(T? x) where T : class => x!;
     }
 }
