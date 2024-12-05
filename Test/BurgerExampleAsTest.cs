@@ -247,7 +247,7 @@
         [Test]
         public void HamburgerWithExtraPickleSlicesRecipeTest()
         {
-            var recipe = GetRecipeFor(new Order(hamburger,
+            var recipe = GetRecipeFor(new(hamburger,
                 $"+ {pickle}"));
 
             Assert.That(recipe,
@@ -272,7 +272,7 @@
         [Test]
         public void HamburgerWithAllToppingsRecipeTest()
         {
-            var recipe = GetRecipeFor(new Order(hamburger,
+            var recipe = GetRecipeFor(new(hamburger,
                 $"+ {pickle}",
                 $"+ {bacon}"));
 
@@ -300,7 +300,7 @@
         [Test]
         public void HamburgerWithoutEverythingThatCanBeExcludedRecipeTest()
         {
-            var recipe = GetRecipeFor(new Order(hamburger,
+            var recipe = GetRecipeFor(new(hamburger,
                 $"- {pepper}",
                 $"- {onion}",
                 $"- {mustard}"));
@@ -323,7 +323,7 @@
         [Test]
         public void HamburgerWithoutEverythingThatCanBeExcludedAndAllToppingsRecipeTest()
         {
-            var recipe = GetRecipeFor(new Order(hamburger,
+            var recipe = GetRecipeFor(new(hamburger,
                     $"- {pepper}",
                     $"- {onion}",
                     $"- {mustard}",
@@ -350,7 +350,7 @@
         [Test]
         public void FishBurgerRecipeTest()
         {
-            var recipe = GetRecipeFor(new Order(fishBurger));
+            var recipe = GetRecipeFor(new(fishBurger));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -372,7 +372,7 @@
         [Test]
         public void ChickenBurgerRecipeTest()
         {
-            var recipe = GetRecipeFor(new Order(chikenBurger));
+            var recipe = GetRecipeFor(new(chikenBurger));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -394,7 +394,7 @@
         [Test]
         public void DoubleChickenBurgerRecipeTest()
         {
-            var recipe = GetRecipeFor(new Order(doubleChikenBurger));
+            var recipe = GetRecipeFor(new(doubleChikenBurger));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -416,7 +416,7 @@
         [Test]
         public void VeganBurgerRecipeTest()
         {
-            var recipe = GetRecipeFor(new Order(veganBurger));
+            var recipe = GetRecipeFor(new(veganBurger));
 
             Assert.That(recipe,
                 Is.EqualTo($"There is no recipe for {veganBurger}"));

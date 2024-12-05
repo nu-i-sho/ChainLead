@@ -6,8 +6,8 @@
     using static Constants;
 
     public class HandlerMathMock(
-        HandlerMocksCollection handlers,
-        ConditionMocksCollection conditions)
+        DummyHandlersCollection handlers,
+        DummyConditionsCollection conditions)
         : Mock<IHandlerMath>
     {
         public void Setup__Zero(HandlerIndex returns) =>
@@ -26,9 +26,7 @@
            .Returns(handlers[i].Object)
            .Callback((Action<int> f) => action = f);
 
-            handlers[i]
-                .Setup(o => o.Execute(Arg))
-                .Callback((int x) => action!(x));
+            handlers[i].AddCallback(() => action!(Arg));
         }
 
         public void Setup__FirstThenSecond(

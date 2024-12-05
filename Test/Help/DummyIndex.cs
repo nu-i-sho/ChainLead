@@ -1,6 +1,6 @@
 ﻿namespace ChainLead.Test.Help
 {
-    public class MockIndex
+    public class DummyIndex
     {
         public virtual char ViewBorder => '?';
         
@@ -8,18 +8,16 @@
 
         public string View => $"{ViewBorder}{Value}{ViewBorder}";
 
-        protected MockIndex(string value) => Value = value;
+        public DummyIndex(string value) => Value = value;
 
-        public static MockIndex Make(string value) =>
-            new MockIndex(value);
+        public static DummyIndex Make(string value) => new(value);
 
-        public static MockIndex Make(char value) =>
-            new MockIndex(value.ToString());
+        public static DummyIndex Make(char value) => new(value.ToString());
 
         public override string ToString() => View;
 
         public override bool Equals(object? obj) =>
-            obj is MockIndex && ((MockIndex)obj).View == View;
+            obj is DummyIndex && ((DummyIndex)obj).View == View;
 
         public override int GetHashCode() =>
             View.GetHashCode();

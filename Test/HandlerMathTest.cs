@@ -1,6 +1,7 @@
 namespace ChainLead.Test
 {
     using ChainLead.Contracts;
+    using ChainLead.Implementation;
     using ChainLead.Test.HandlersTestData;
     using ChainLead.Test.Help;
 
@@ -46,8 +47,6 @@ namespace ChainLead.Test
                     MergeFirstWithSecond => _math.MergeFirstWithSecond,
                     _ => throw new ArgumentOutOfRangeException(nameof(by))
                 };
-
-        const int Arg = 7643;
 
         [SetUp]
         [MemberNotNull(nameof(_math))]
@@ -112,18 +111,12 @@ namespace ChainLead.Test
             Assert.DoesNotThrow(() => _math.Zero<int>().Execute(Arg));
 
         [Test]
-        public void ZeroIsZero()
-        {
-            var isZero = _math.IsZero(_math.Zero<int>());
-            Assert.That(isZero, Is.True);
-        }
+        public void ZeroIsZero() =>
+            Assert.That(_math.IsZero(_math.Zero<int>()));
 
         [Test]
-        public void ZeroForBaseClassIsZeroForDerivedClass()
-        {
-            var isZero = _math.IsZero<IDerived>(_math.Zero<IBase>());
-            Assert.That(isZero, Is.True);
-        }
+        public void ZeroForBaseClassIsZeroForDerivedClass() =>
+            Assert.That(_math.IsZero<IDerived>(_math.Zero<IBase>()));
 
         [Test]
         public void ZeroAppendZeroIsZero(
@@ -131,10 +124,9 @@ namespace ChainLead.Test
         {
             var append = AppendFunc<int>(by: appendType);
             var zeros = new[] { _math.Zero<int>(), _math.Zero<int>() };
-            var zeroZero = append(zeros[0], zeros[1]);
-            var isZero = _math.IsZero(zeroZero);
-
-            Assert.That(isZero, Is.True);
+            var twoZeros = append(zeros[0], zeros[1]);
+            
+            Assert.That(_math.IsZero(twoZeros));
         }
 
         [Test]
@@ -143,9 +135,8 @@ namespace ChainLead.Test
         {
             var append = AppendFunc<IDerived>(by: appendType);
             var chain = append(_math.Zero<IBase>(), _math.Zero<IDerived>());
-            var isZero = _math.IsZero(chain);
-
-            Assert.That(isZero, Is.True);
+            
+            Assert.That(_math.IsZero(chain));
         }
 
         [Test]
@@ -154,9 +145,8 @@ namespace ChainLead.Test
         {
             var append = AppendFunc<IDerived>(by: appendType);
             var chain = append(_math.Zero<IDerived>(), _math.Zero<IBase>());
-            var isZero = _math.IsZero(chain);
-
-            Assert.That(isZero, Is.True);
+            
+            Assert.That(_math.IsZero(chain));
         }
 
         [Test]
@@ -179,7 +169,7 @@ namespace ChainLead.Test
             List<HandlerIndex> baExecution = [];
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
             
             var ab = append(
                 _mockOf.Handlers[A].Object,
@@ -211,7 +201,7 @@ namespace ChainLead.Test
                 .Aggregate(AppendFunc<int>(by: appendType))
                 .Execute(Arg);
 
-            _mockOf.Handlers[A].Verify__Execute(Times.Exactly(count));
+            Assert.That(_mockOf.Handlers[A].WasExecuted(count).Times);
         }
 
         [Test]
@@ -223,7 +213,7 @@ namespace ChainLead.Test
             List<HandlerIndex> a_bcExecution = [];
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
             var ab_c =
                 append(
@@ -259,7 +249,7 @@ namespace ChainLead.Test
             List<HandlerIndex> execution = [];
 
             _mockOf.Handlers[@case.ChainIndices.Distinct()]
-                .Setup__Execute__LoggingInto(execution); 
+                .AddLoggingInto(execution); 
 
             var chain = @case.ChainIndices
                 .Select(_mockOf.Handlers.GetObject)
@@ -282,7 +272,7 @@ namespace ChainLead.Test
                  .Where(NotNull).Select(Denullify).Distinct();
 
             _mockOf.Handlers[uniqueIndices]
-                 .Setup__Execute__LoggingInto(execution);
+                 .AddLoggingInto(execution);
 
             @case.ChainIndicesWithNullsAsZeros
                  .Select(i => i != null
@@ -302,49 +292,51 @@ namespace ChainLead.Test
                 _math.Zero<int>(),
                 _mockOf.Conditions[X].Object);
             
-            Assert.That(_math.IsZero(conditionalZero), 
-                Is.True);
+            Assert.That(_math.IsZero(conditionalZero));
         }
 
         [Test]
         public void WhenConditionReturnsTrue__HandlerIsExecuted()
         {
-            _mockOf.Conditions[X].Setup__Check(returns: true);
+            _mockOf.Conditions[X].SetResult(true);
             
             _math.Conditional(
                     _mockOf.Handlers[A].Object,
                     _mockOf.Conditions[X].Object)
                  .Execute(Arg);
 
-            _mockOf.Handlers[A].Verify__Execute(Times.Once);
+            Assert.That(_mockOf.Handlers[A].WasExecutedOnce());
         }
 
         [Test]
         public void WhenConditionReturnsFalse__HandlerIsNotExecuted()
         {
-            _mockOf.Conditions[X].Setup__Check(returns: false);
+            _mockOf.Conditions[X].SetResult(false);
 
             _math.Conditional(
                     _mockOf.Handlers[A].Object,
                     _mockOf.Conditions[X].Object)
                  .Execute(Arg);
 
-            _mockOf.Handlers[A].Verify__Execute(Times.Never);
+            Assert.That(_mockOf.Handlers[A].WasNeverExecuted());
         }
 
         [Test]
         public void WhenTopConditionReturnsFalse__AllOtherChecksAndExecutionsAreNotCalled()
         {
-            _mockOf.Conditions[Z].Setup__Check(returns: false);
+            _mockOf.Conditions[Z].SetResult(false);
 
             var conditional = _mockOf.Conditions[X, Y, Z].Objects
                 .Aggregate(_mockOf.Handlers[A].Object, _math.Conditional);
 
             conditional.Execute(Arg);
 
-            _mockOf.Conditions[Z].Verify__Check(Times.Once);
-            _mockOf.Conditions[X, Y].Verify__Check(Times.Never);
-            _mockOf.Handlers[A].Verify__Execute(Times.Never);
+            Assert.Multiple(() =>
+            {
+                Assert.That(_mockOf.Conditions[Z].WasCheckedOnce());
+                Assert.That(_mockOf.Conditions[X, Y].NoOneWasChecked());
+                Assert.That(_mockOf.Handlers[A].WasNeverExecuted());
+            });
         }
 
         [Test]
@@ -355,8 +347,8 @@ namespace ChainLead.Test
             var trues = _mockOf.Conditions.Take(trueCount);
             var falses = _mockOf.Conditions.Skip(trueCount).Take(falseCount);
 
-            trues.Setup__Check(returns: true);
-            falses.Setup__Check(returns: false);
+            trues.SetResults(true);
+            falses.SetResults(false);
 
             var all = falses.Concat(trues);
             var conditional = all.Objects
@@ -366,9 +358,12 @@ namespace ChainLead.Test
 
             var checkedCount = trueCount + int.Min(1, falseCount);
 
-            all.Reverse().Take(checkedCount).Verify__Check(Times.Once);
-            all.Reverse().Skip(checkedCount).Verify__Check(Times.Never);
-            _mockOf.Handlers[A].Verify__Execute(OnceWhen(falseCount == 0));
+            Assert.Multiple(() =>
+            {
+                Assert.That(all.Reverse().Take(checkedCount).EachWasCheckedOnce());
+                Assert.That(all.Reverse().Skip(checkedCount).NoOneWasChecked());
+                Assert.That(_mockOf.Handlers[A].WasExecutedOnceWhen(falseCount == 0).ElseNever);
+            });
         }
 
         [Test]
@@ -376,7 +371,8 @@ namespace ChainLead.Test
         {
             List<ConditionIndex> checksLog = [];
 
-            _mockOf.Conditions[X, Y, Z].Setup__Check__LoggingInto(checksLog);  
+            _mockOf.Conditions[X, Y, Z].AddLoggingInto(checksLog);
+            _mockOf.Conditions[X, Y, Z].SetResults(true);
             _mockOf.Conditions[X, Y, Z].Objects
                 .Aggregate(_mockOf.Handlers[A].Object, _math.Conditional)
                 .Execute(Arg);
@@ -402,15 +398,18 @@ namespace ChainLead.Test
             var conditions = _mockOf.Conditions.Take(setup.Count());
             var handlers = _mockOf.Handlers.Take(setup.Count());
 
-            conditions.Setup__Check(returns: setup);
+            conditions.SetResults(setup);
 
             Enumerable
                 .Zip(handlers.Objects, conditions.Objects, _math.Conditional)
                 .Aggregate(_math.FirstThenSecond)
                 .Execute(Arg);
 
-            conditions.Verify__Check(Times.Once);
-            handlers.Verify__Execute(EachWhen(setup));
+            Assert.Multiple(() =>
+            {
+                Assert.That(conditions.EachWasCheckedOnce());
+                Assert.That(handlers.VerifyExecution(setup));
+            });
         }
 
         [TestCaseSource(nameof(Cases3))]
@@ -419,7 +418,7 @@ namespace ChainLead.Test
             _mockOf.ConditionMath.Setup__And(X, Y, returns: Z);
 
             var expectedCondition = _mockOf.Conditions[@case.ExpectedCondition];
-            expectedCondition.Setup__Check(@case.FinalConditionCheckResult);
+            expectedCondition.SetResult(@case.FinalConditionCheckResult);
 
             var a = _mockOf.Handlers[A].Object;
             if (@case.AIsConditional)
@@ -432,48 +431,59 @@ namespace ChainLead.Test
             _math.JoinFirstWithSecond(a, b)
                  .Execute(Arg);
 
-            expectedCondition.Verify__Check(Times.Once);
-            _mockOf.Conditions[X, Y, Z].Except([expectedCondition]).Verify__Check(Times.Never);
-            _mockOf.Handlers[A, B].Verify__Execute(OnceWhen(@case.HandlersExecutionExpected));
+            Assert.Multiple(() =>
+            {
+                Assert.That(expectedCondition.WasCheckedOnce());
+                Assert.That(_mockOf.Conditions[X, Y, Z].Except([expectedCondition]).NoOneWasChecked());
+                Assert.That(_mockOf.Handlers[A, B].EachWasExecutedOnceWhen(@case.HandlersExecutionExpected).ElseNoOne);
+            });
         }
 
         [TestCaseSource(nameof(Cases4))]
-        public void JoinFirstWithSecondConjunctsOnlyTopConditions(Case4 @case)
+        public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(Case4 @case)
         {
-            var unexpectedAnd = W;
-            var aTop = U;
-            var bTop = V;
-            var aTop_And_bTop = Z;
-            var aBottom = X;
-            var bBottom = Y;
+            ConditionIndex 
+                aTop = new("A TOP"),
+                bTop = new("B TOP"),
+                aTop_And_bTop = new("A TOP & B TOP"),
+                aBottom = new("A BOTTOM"),
+                bBottom = new("B BOTTOM"),
+                unexpectedAnd = new("UNEXPECTED &");
 
-            _mockOf.Conditions[aBottom, bBottom, aTop_And_bTop]
-                .Setup__Check(@case.CheckSetup);
+            var mockOf = new ChainLeadMocks(conditionIndices: 
+                [aTop, bTop, aTop_And_bTop, aBottom, bBottom, unexpectedAnd]);
 
-            _mockOf.ConditionMath.Setup__And__ForAny(returns: unexpectedAnd);
-            _mockOf.ConditionMath.Setup__And(aTop, bTop, returns: aTop_And_bTop);
+            IHandlerMath math = new HandlerMath(mockOf.ConditionMath.Object);
 
-            var a = _mockOf.Handlers[A].Object;
-            a = _math.Conditional(a, _mockOf.Conditions[aBottom].Object);
-            a = _math.Conditional(a, _mockOf.Conditions[aTop].Object);
+            mockOf.Conditions[aBottom, bBottom, aTop_And_bTop].SetResults(@case.CheckSetup);
+
+            mockOf.ConditionMath.Setup__And__ForAny(returns: unexpectedAnd);
+            mockOf.ConditionMath.Setup__And(aTop, bTop, returns: aTop_And_bTop);
+
+            var a = mockOf.Handlers[A].Object;
+            a = math.Conditional(a, mockOf.Conditions[aBottom].Object);
+            a = math.Conditional(a, mockOf.Conditions[aTop].Object);
 
             var b = _mockOf.Handlers[B].Object;
-            b = _math.Conditional(b, _mockOf.Conditions[bBottom].Object);
-            b = _math.Conditional(b, _mockOf.Conditions[bTop].Object);
+            b = math.Conditional(b, mockOf.Conditions[bBottom].Object);
+            b = math.Conditional(b, mockOf.Conditions[bTop].Object);
 
-            _math.JoinFirstWithSecond(a, b)
-                 .Execute(Arg);
+            var ab = math.JoinFirstWithSecond(a, b);
+            ab.Execute(Arg);
 
-            _mockOf.Conditions[aBottom, bBottom, aTop_And_bTop].Verify__Check(EachWhen(@case.CheckExpected));
-            _mockOf.Conditions[unexpectedAnd, aTop, bTop].Verify__Check(Times.Never);
-            _mockOf.Handlers[A, B].Verify__Execute(EachWhen(@case.ExecutionExpected));
+            Assert.Multiple(() =>
+            {
+                Assert.That(mockOf.Conditions[aBottom, bBottom, aTop_And_bTop].VerifyChecks(@case.CheckExpected));
+                Assert.That(mockOf.Conditions[unexpectedAnd, aTop, bTop].NoOneWasChecked());
+                Assert.That(mockOf.Handlers[A, B].VerifyExecution(@case.ExecutionExpected));
+            });
         }
 
         [TestCaseSource(nameof(Cases5))]
         public void JoinFirstWithSecondConjunctsOnlyTopConditions(Case5 @case)
         {
             _mockOf.Conditions[@case.ChecksSetup.Keys]
-                 .Setup__Check(@case.ChecksSetup.Values);
+                   .SetResults(@case.ChecksSetup.Values);
 
             _mockOf.ConditionMath.Setup__And__ForAny(returns: Q);
 
@@ -487,7 +497,7 @@ namespace ChainLead.Test
             var a = _mockOf.Conditions[@case.AConditions].Objects
                 .Aggregate(_mockOf.Handlers[A].Object, _math.Conditional);
 
-            var b = _mockOf.Conditions[@case.AConditions].Objects
+            var b = _mockOf.Conditions[@case.BConditions].Objects
                 .Aggregate(_mockOf.Handlers[B].Object, _math.Conditional);
 
             _math.JoinFirstWithSecond(a, b)
@@ -496,11 +506,14 @@ namespace ChainLead.Test
             var expectedToCheck = _mockOf.Conditions[@case.CheckExpected];
             var expectedToExecute = _mockOf.Handlers[@case.ExecuteExpected];
 
-            expectedToCheck.Verify__Check(Times.Once);
-            _mockOf.Conditions.Except(expectedToCheck).Verify__Check(Times.Never);
+            Assert.Multiple(() =>
+            {
+                Assert.That(expectedToCheck.EachWasCheckedOnce());
+                Assert.That(_mockOf.Conditions.Except(expectedToCheck).NoOneWasChecked());
 
-            expectedToExecute.Verify__Execute(Times.Once);
-            _mockOf.Handlers.Except(expectedToExecute).Verify__Execute(Times.Never);
+                Assert.That(expectedToExecute.EachWasExecutedOnce());
+                Assert.That(_mockOf.Handlers.Except(expectedToExecute).NoOneWasExecuted());
+            });
         }
 
         [Test]
@@ -508,7 +521,7 @@ namespace ChainLead.Test
             [ValueSource(nameof(Cases6))] Case6 @case,
             [Values(true, false)] bool finalConditionResult)
         {
-            ConditionMock? lastAnd = null;
+            DummyCondition? lastAnd = null;
 
             _mockOf.ConditionMath
                 .Setup(o => o.And(
@@ -516,13 +529,11 @@ namespace ChainLead.Test
                     It.IsAny<ICondition<int>>()))
                 .Returns((ICondition<int> a, ICondition<int> b) =>
                 {
-                    var aMock = Mock.Get(a) as ConditionMock;
-                    var bMock = Mock.Get(b) as ConditionMock;
-
-                    if (aMock != null && bMock != null)
+                    if (Mock.Get(a) is DummyCondition aMock && 
+                        Mock.Get(b) is DummyCondition bMock)
                     {
                         var i = ConditionIndex.Make(aMock.Index.Value + bMock.Index.Value);
-                        var and = new ConditionMock(i);
+                        var and = new DummyCondition(i);
                         lastAnd = and;
 
                         return and.Object;
@@ -549,13 +560,12 @@ namespace ChainLead.Test
             Assert.That(allAnded,
                 Is.EquivalentTo(expected));
 
-            lastAnd.Setup__Check(returns: finalConditionResult);
+            lastAnd.SetResult(finalConditionResult);
 
             ab.Execute(Arg);
 
-            lastAnd.Verify__Check(Times.Once);
-            _mockOf.Handlers[A, B].Verify__Execute(
-                OnceWhen(finalConditionResult));
+            Assert.That(lastAnd.WasCheckedOnce());
+            Assert.That(_mockOf.Handlers[A, B].EachWasExecutedOnceWhen(finalConditionResult).ElseNoOne);
         }
 
         [Test]
@@ -563,7 +573,7 @@ namespace ChainLead.Test
             [Values(false, true)] bool order,
             [Values(false, true)] bool checkResult)
         {
-            _mockOf.Conditions[X].Setup__Check(checkResult);
+            _mockOf.Conditions[X].SetResult(checkResult);
 
             var x = _math.Conditional(
                 _mockOf.Handlers[A].Object,
@@ -577,26 +587,29 @@ namespace ChainLead.Test
 
             z.Execute(Arg);
 
-            _mockOf.Conditions[X].Verify__Check(Times.Once);
-            _mockOf.Handlers[A, B].Verify__Execute(OnceWhen(checkResult));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_mockOf.Conditions[X].WasCheckedOnce());
+                Assert.That(_mockOf.Handlers[A, B].EachWasExecutedOnceWhen(checkResult).ElseNoOne);
+            });
         }
 
         [TestCaseSource(nameof(Cases7))]
         public void CorrectConditionsCascadeTest(Case7 @case)
         {
-            List<MockIndex> execution = [];
+            List<DummyIndex> execution = [];
 
-            _mockOf.Conditions[@case.AConditions].Setup__Check__LoggingInto(execution);
-            _mockOf.Conditions[@case.BConditions].Setup__Check__LoggingInto(execution);
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
+            _mockOf.Conditions[@case.AConditions].AddLoggingInto(execution);
+            _mockOf.Conditions[@case.BConditions].AddLoggingInto(execution);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
 
             _mockOf.Conditions[@case.ChecksSetup.Keys]
-                .Setup__Check(returns: @case.ChecksSetup.Values);
+                   .SetResults(@case.ChecksSetup.Values);
 
             var a = _mockOf.Conditions[@case.AConditions].Objects
                 .Aggregate(_mockOf.Handlers[A].Object, _math.Conditional);
 
-            var b = _mockOf.Conditions[@case.AConditions].Objects
+            var b = _mockOf.Conditions[@case.BConditions].Objects
                 .Aggregate(_mockOf.Handlers[B].Object, _math.Conditional);
 
             var append = AppendFunc<int>(by: @case.AppendType);
@@ -638,7 +651,7 @@ namespace ChainLead.Test
             [Values(true, false)] bool reverseHandlersOrder,
             [Values(true, false)] bool lastConditionCheckResult)
         {
-            List<MockIndex> expectedLog = 
+            List<DummyIndex> expectedLog = 
                 (reverseHandlersOrder, lastConditionCheckResult) switch
                 {
                     (false, false) => [A, X, Y, Z],
@@ -647,10 +660,10 @@ namespace ChainLead.Test
                     (true,  true)  => [X, Y, Z, A, B]
                 };
 
-            List<MockIndex> executionLog = [];
+            List<DummyIndex> executionLog = [];
 
-            _mockOf.Conditions.Setup__Check__LoggingInto(executionLog); 
-            _mockOf.Handlers.Setup__Execute__LoggingInto(executionLog);
+            _mockOf.Conditions.AddLoggingInto(executionLog); 
+            _mockOf.Handlers.AddLoggingInto(executionLog);
 
             var atom = _mockOf.Handlers[A].Object;
             var conditional = _mockOf.Conditions[Z, Y, X].Objects 
@@ -672,12 +685,12 @@ namespace ChainLead.Test
         }
 
         [Test]
-        public void AppendTwoAtomizedConditionalHandlerIsTheSameAsTwoRegularHandlers(
+        public void AppendedTwoAtomizedConditionalHandlers__IsTheSameAs__AppendedTwoRegularHandlers(
             [ValueSource(typeof(Appends), nameof(All))] string appendType,
             [Values(false, true)] bool aBottomCheckResult,
             [Values(false, true)] bool bBottomCheckResult)
         {
-            MockIndex[] expectedLog =
+            DummyIndex[] expectedLog =
                 (aBottomCheckResult, bBottomCheckResult) switch
                 {
                     (false, false) => [U, V, W, X, Y, Z],
@@ -686,13 +699,13 @@ namespace ChainLead.Test
                     (true,  true)  => [U, V, W, A, X, Y, Z, B] 
                 };
 
-            List<MockIndex> execution = [];
+            List<DummyIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Conditions[U, V, W, X, Y, Z].Setup__Check__LoggingInto(execution);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Conditions[U, V, W, X, Y, Z].AddLoggingInto(execution);
 
-            _mockOf.Conditions[W].Setup__Check(returns: aBottomCheckResult);
-            _mockOf.Conditions[Z].Setup__Check(returns: bBottomCheckResult);
+            _mockOf.Conditions[W].SetResult(aBottomCheckResult);
+            _mockOf.Conditions[Z].SetResult(bBottomCheckResult);
 
             var a = _mockOf.Conditions[W, V, U].Objects
                 .Aggregate(_mockOf.Handlers[A].Object, _math.Conditional);
@@ -700,7 +713,6 @@ namespace ChainLead.Test
             var b = _mockOf.Conditions[Z, Y, X].Objects
                 .Aggregate(_mockOf.Handlers[B].Object, _math.Conditional);
 
-            
             var append = AppendFunc<int>(by: appendType);
             var result = append(a, b);
             result.Execute(Arg);
@@ -717,9 +729,7 @@ namespace ChainLead.Test
                 .Setup(o => o.Origin)
                 .Returns(_math.Zero<int>());
 
-            var isZero = _math.IsZero(extended.Object);
-
-            Assert.That(isZero, Is.True);
+            Assert.That(_math.IsZero(extended.Object));
         }
 
         [Test]
@@ -730,16 +740,8 @@ namespace ChainLead.Test
                 .Setup(o => o.Origin)
                 .Returns(_mockOf.Handlers[A].Object);
 
-            var isZero = _math.IsZero(extended.Object);
-
-            Assert.That(isZero, Is.False);
+            Assert.That(_math.IsZero(extended.Object));
         }
-
-        static Func<Times> OnceWhen(bool value) =>
-            value ? Times.Once : Times.Never;
-
-        static IEnumerable<Func<Times>> EachWhen(IEnumerable<bool> value) =>
-            value.Select(OnceWhen);
 
         static bool ParseBool(char mask) => mask == '1';
 

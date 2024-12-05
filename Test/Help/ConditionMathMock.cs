@@ -5,7 +5,7 @@
 
     using static Constants;
 
-    public class ConditionMathMock(ConditionMocksCollection conditions)
+    public class ConditionMathMock(DummyConditionsCollection conditions)
          : Mock<IConditionMath>
     {
         public void Setup__MakeCondition(ConditionIndex i)
@@ -15,10 +15,7 @@
             Setup(o => o.MakeCondition(It.IsAny<Func<int, bool>>()))
            .Returns(conditions[i].Object)
            .Callback((Func<int, bool> f) => predicate = f);
-
-            conditions[i]
-                .Setup(o => o.Check(Arg))
-                .Returns((int x) => predicate!(x));
+            conditions[i].SetReturn(() => predicate!(Arg));
         }
 
         public void Setup__True(ConditionIndex returns) =>

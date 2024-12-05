@@ -9,9 +9,9 @@
 
         public ConditionMathMock ConditionMath { get; }
 
-        public HandlerMocksCollection Handlers { get; }
+        public DummyHandlersCollection Handlers { get; }
 
-        public ConditionMocksCollection Conditions { get; }
+        public DummyConditionsCollection Conditions { get; }
 
         public ChainLeadMocks(
             [AllowNull] IEnumerable<HandlerIndex> handlerIndices = null,
@@ -20,14 +20,14 @@
             handlerIndices ??= ABCDEFGHIJ;
             conditionIndices ??= QRSTUVWXYZ;
 
-            Handlers = new HandlerMocksCollection();
-            Conditions = new ConditionMocksCollection();
+            Handlers = [];
+            Conditions = [];
 
             foreach (var i in handlerIndices)
-                Handlers.Add(new HandlerMock(Handlers, i));
+                Handlers.Add(new DummyHandler(Handlers, i));
 
             foreach (var i in conditionIndices)
-                Conditions.Add(new ConditionMock(i));
+                Conditions.Add(new DummyCondition(i));
 
             HandlerMath = new HandlerMathMock(Handlers, Conditions);
             ConditionMath = new ConditionMathMock(Conditions);

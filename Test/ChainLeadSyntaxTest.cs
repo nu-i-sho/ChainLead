@@ -59,7 +59,7 @@
 
             MakeHandler(func).Execute(Arg);
 
-            Assert.That(funcCalled, Is.True);
+            Assert.That(funcCalled);
         }
 
         [Test]
@@ -72,7 +72,7 @@
 
             func.AsHandler().Execute(Arg);
 
-            Assert.That(funcCalled, Is.True);
+            Assert.That(funcCalled);
         }
 
         [Test]
@@ -80,8 +80,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
 
             _mockOf.Handlers[A].Object
@@ -97,8 +97,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
 
             FirstThenSecond(
@@ -115,8 +115,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
 
             XThen(_mockOf.Handlers[B].Object)
@@ -132,8 +132,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
 
             JoinFirstWithSecond(
@@ -150,8 +150,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
 
             Join(_mockOf.Handlers[A].Object)
@@ -167,8 +167,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
 
             JoinXWith(_mockOf.Handlers[B].Object)
@@ -184,8 +184,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
 
             MergeFirstWithSecond(
@@ -202,8 +202,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
 
             Merge(_mockOf.Handlers[A].Object)
@@ -219,8 +219,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
 
             MergeXWith(_mockOf.Handlers[B].Object)
@@ -236,8 +236,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
 
             PackFirstInSecond(
@@ -254,8 +254,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
 
             Pack(_mockOf.Handlers[A].Object)
@@ -271,8 +271,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
 
             PackXIn(_mockOf.Handlers[B].Object)
@@ -288,8 +288,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
 
             InjectFirstIntoSecond(
@@ -306,8 +306,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
 
             Inject(_mockOf.Handlers[A].Object)
@@ -323,8 +323,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
 
             InjectXInto(_mockOf.Handlers[B].Object)
@@ -340,8 +340,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
 
             FirstCoverSecond(
@@ -358,8 +358,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
 
             Use(_mockOf.Handlers[A].Object)
@@ -375,8 +375,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
 
             XCover(_mockOf.Handlers[B].Object)
@@ -392,8 +392,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
 
             FirstWrapSecond(
@@ -410,8 +410,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
 
             Use(_mockOf.Handlers[A].Object)
@@ -427,8 +427,8 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].Setup__Execute__LoggingInto(execution);
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
+            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
 
             XWrap(_mockOf.Handlers[B].Object)
@@ -444,17 +444,17 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
             
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
 
             _mockOf.Handlers[A].Object
                 .Then(_mockOf.Handlers[B].Object)
-                .Then(_mockOf.Handlers[AB].Object)    
+                .Then(_mockOf.Handlers[C].Object)    
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -466,10 +466,10 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
             
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
@@ -478,7 +478,7 @@
                     FirstThenSecond(
                         _mockOf.Handlers[A].Object,
                         _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[AB].Object)
+                    _mockOf.Handlers[C].Object)
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -490,16 +490,16 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
 
             XThen(_mockOf.Handlers[B].Object)
-                .Then(_mockOf.Handlers[AB].Object)
+                .Then(_mockOf.Handlers[C].Object)
                 .WhereXIs(_mockOf.Handlers[A].Object)
                 .Execute(Arg);
 
@@ -512,10 +512,10 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
@@ -524,7 +524,7 @@
                     JoinFirstWithSecond(
                         _mockOf.Handlers[A].Object,
                         _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[AB].Object)
+                    _mockOf.Handlers[C].Object)
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -536,17 +536,17 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
 
             Join(_mockOf.Handlers[A].Object)
                 .With(_mockOf.Handlers[B].Object)
-                .ThenWith(_mockOf.Handlers[AB].Object)
+                .ThenWith(_mockOf.Handlers[C].Object)
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -558,16 +558,16 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
 
             JoinXWith(_mockOf.Handlers[B].Object)
-                .ThenWith(_mockOf.Handlers[AB].Object)
+                .ThenWith(_mockOf.Handlers[C].Object)
                 .WhereXIs(_mockOf.Handlers[A].Object)
                 .Execute(Arg);
 
@@ -580,10 +580,10 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
@@ -592,7 +592,7 @@
                     MergeFirstWithSecond(
                         _mockOf.Handlers[A].Object,
                         _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[AB].Object)
+                    _mockOf.Handlers[C].Object)
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -604,17 +604,17 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
 
             Merge(_mockOf.Handlers[A].Object)
                 .With(_mockOf.Handlers[B].Object)
-                .ThenWith(_mockOf.Handlers[AB].Object)
+                .ThenWith(_mockOf.Handlers[C].Object)
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -626,16 +626,16 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
 
             MergeXWith(_mockOf.Handlers[B].Object)
-                .ThenWith(_mockOf.Handlers[AB].Object)
+                .ThenWith(_mockOf.Handlers[C].Object)
                 .WhereXIs(_mockOf.Handlers[A].Object)
                 .Execute(Arg);
 
@@ -648,10 +648,10 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
@@ -660,7 +660,7 @@
                     PackFirstInSecond(
                         _mockOf.Handlers[A].Object,
                         _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[AB].Object)
+                    _mockOf.Handlers[C].Object)
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -672,17 +672,17 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
 
             Pack(_mockOf.Handlers[A].Object)
                 .In(_mockOf.Handlers[B].Object)
-                .ThenIn(_mockOf.Handlers[AB].Object)
+                .ThenIn(_mockOf.Handlers[C].Object)
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -694,16 +694,16 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
 
             PackXIn(_mockOf.Handlers[B].Object)
-                .ThenIn(_mockOf.Handlers[AB].Object)
+                .ThenIn(_mockOf.Handlers[C].Object)
                 .WhereXIs(_mockOf.Handlers[A].Object)
                 .Execute(Arg);
 
@@ -716,10 +716,10 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
@@ -728,7 +728,7 @@
                     InjectFirstIntoSecond(
                         _mockOf.Handlers[A].Object,
                         _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[AB].Object)
+                    _mockOf.Handlers[C].Object)
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -740,17 +740,17 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
 
             Inject(_mockOf.Handlers[A].Object)
                 .Into(_mockOf.Handlers[B].Object)
-                .ThenInto(_mockOf.Handlers[AB].Object)
+                .ThenInto(_mockOf.Handlers[C].Object)
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -762,16 +762,16 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
 
             InjectXInto(_mockOf.Handlers[B].Object)
-                .ThenInto(_mockOf.Handlers[AB].Object)
+                .ThenInto(_mockOf.Handlers[C].Object)
                 .WhereXIs(_mockOf.Handlers[A].Object)
                 .Execute(Arg);
 
@@ -784,10 +784,10 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
@@ -796,7 +796,7 @@
                     FirstCoverSecond(
                         _mockOf.Handlers[A].Object,
                         _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[AB].Object)
+                    _mockOf.Handlers[C].Object)
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -808,17 +808,17 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
 
             Use(_mockOf.Handlers[A].Object)
                 .ToCover(_mockOf.Handlers[B].Object)
-                .ThenCover(_mockOf.Handlers[AB].Object)
+                .ThenCover(_mockOf.Handlers[C].Object)
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -830,16 +830,16 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
 
             XCover(_mockOf.Handlers[B].Object)
-                .ThenCover(_mockOf.Handlers[AB].Object)
+                .ThenCover(_mockOf.Handlers[C].Object)
                 .WhereXIs(_mockOf.Handlers[A].Object)
                 .Execute(Arg);
 
@@ -852,10 +852,10 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
@@ -864,7 +864,7 @@
                     FirstWrapSecond(
                         _mockOf.Handlers[A].Object,
                         _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[AB].Object)
+                    _mockOf.Handlers[C].Object)
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -876,17 +876,17 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
 
             Use(_mockOf.Handlers[A].Object)
                 .ToWrap(_mockOf.Handlers[B].Object)
-                .ThenWrap(_mockOf.Handlers[AB].Object)
+                .ThenWrap(_mockOf.Handlers[C].Object)
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -898,16 +898,16 @@
         {
             List<HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, AB].Setup__Execute__LoggingInto(execution);
+            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].Setup__Execute__DelegatingTo(A, B);
-            _mockOf.Handlers[ABC].Setup__Execute__DelegatingTo(AB, C);
+            _mockOf.Handlers[AB].AddDelegationTo(A, B);
+            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
 
             _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
 
             XWrap(_mockOf.Handlers[B].Object)
-                .ThenWrap(_mockOf.Handlers[AB].Object)
+                .ThenWrap(_mockOf.Handlers[C].Object)
                 .WhereXIs(_mockOf.Handlers[A].Object)
                 .Execute(Arg);
 
@@ -948,8 +948,11 @@
 
             _mockOf.ConditionMath.Setup__MakeCondition(X);
 
-            Assert.That(MakeCondition(func).Check(Arg), Is.True);
-            Assert.That(funcCalled, Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(MakeCondition(func).Check(Arg));
+                Assert.That(funcCalled);
+            });
         }
 
         [Test]
@@ -960,8 +963,11 @@
 
             _mockOf.ConditionMath.Setup__MakeCondition(X);
 
-            Assert.That(func.AsCondition().Check(Arg), Is.True);
-            Assert.That(funcCalled, Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(func.AsCondition().Check(Arg));
+                Assert.That(funcCalled);
+            });
         }
 
         [Test]
@@ -972,8 +978,11 @@
 
             _mockOf.ConditionMath.Setup__MakeCondition(X);
 
-            Assert.That(func.AsCondition().Check(Arg), Is.True);
-            Assert.That(funcCalled, Is.True);
+            Assert.Multiple(() =>
+            {
+                Assert.That(func.AsCondition().Check(Arg));
+                Assert.That(funcCalled);
+            });
         }
 
         [Test]
@@ -981,8 +990,7 @@
         {
             _mockOf.ConditionMath.Setup__True(returns: X);
 
-            Assert.That(
-                Condition<int>.True,
+            Assert.That(Condition<int>.True,
                 Is.SameAs(_mockOf.Conditions[X].Object));
         }
 
@@ -991,8 +999,7 @@
         {
             _mockOf.ConditionMath.Setup__False(returns: X);
 
-            Assert.That(
-                Condition<int>.False,
+            Assert.That(Condition<int>.False,
                 Is.SameAs(_mockOf.Conditions[X].Object));
         }
 
