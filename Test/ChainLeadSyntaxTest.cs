@@ -36,7 +36,7 @@
             _mockOf.HandlerMath.Setup__Zero(returns: A);
 
             Assert.That(Handler<int>.Zero,
-                Is.SameAs(_mockOf.Handlers[A].Object));
+                Is.SameAs(_mockOf.Handlers[A]));
         }
 
         [Test]
@@ -45,7 +45,7 @@
         {
             _mockOf.HandlerMath.Setup__IsZero(A, returns: expectedResult);
 
-            Assert.That(_mockOf.Handlers[A].Object.IsZero(), 
+            Assert.That(_mockOf.Handlers[A].IsZero(), 
                 Is.EqualTo(expectedResult));
         }
 
@@ -84,8 +84,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
 
-            _mockOf.Handlers[A].Object
-                .Then(_mockOf.Handlers[B].Object)
+            _mockOf.Handlers[A]
+                .Then(_mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -102,8 +102,8 @@
             _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
 
             FirstThenSecond(
-                   _mockOf.Handlers[A].Object,
-                   _mockOf.Handlers[B].Object)
+                   _mockOf.Handlers[A],
+                   _mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -119,8 +119,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
 
-            XThen(_mockOf.Handlers[B].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            XThen(_mockOf.Handlers[B])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -137,8 +137,8 @@
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
 
             JoinFirstWithSecond(
-                    _mockOf.Handlers[A].Object,
-                    _mockOf.Handlers[B].Object)
+                    _mockOf.Handlers[A],
+                    _mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -154,8 +154,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
 
-            Join(_mockOf.Handlers[A].Object)
-                .With(_mockOf.Handlers[B].Object)
+            Join(_mockOf.Handlers[A])
+                .With(_mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -171,8 +171,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
 
-            JoinXWith(_mockOf.Handlers[B].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            JoinXWith(_mockOf.Handlers[B])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -189,8 +189,8 @@
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
 
             MergeFirstWithSecond(
-                    _mockOf.Handlers[A].Object,
-                    _mockOf.Handlers[B].Object)
+                    _mockOf.Handlers[A],
+                    _mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -206,8 +206,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
 
-            Merge(_mockOf.Handlers[A].Object)
-                .With(_mockOf.Handlers[B].Object)
+            Merge(_mockOf.Handlers[A])
+                .With(_mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -223,8 +223,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
 
-            MergeXWith(_mockOf.Handlers[B].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            MergeXWith(_mockOf.Handlers[B])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -241,8 +241,8 @@
             _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
 
             PackFirstInSecond(
-                    _mockOf.Handlers[A].Object,
-                    _mockOf.Handlers[B].Object)
+                    _mockOf.Handlers[A],
+                    _mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -258,8 +258,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
 
-            Pack(_mockOf.Handlers[A].Object)
-                .In(_mockOf.Handlers[B].Object)
+            Pack(_mockOf.Handlers[A])
+                .In(_mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -275,8 +275,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
 
-            PackXIn(_mockOf.Handlers[B].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            PackXIn(_mockOf.Handlers[B])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -293,8 +293,8 @@
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
 
             InjectFirstIntoSecond(
-                    _mockOf.Handlers[A].Object,
-                    _mockOf.Handlers[B].Object)
+                    _mockOf.Handlers[A],
+                    _mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -310,8 +310,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
 
-            Inject(_mockOf.Handlers[A].Object)
-                .Into(_mockOf.Handlers[B].Object)
+            Inject(_mockOf.Handlers[A])
+                .Into(_mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -327,8 +327,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
 
-            InjectXInto(_mockOf.Handlers[B].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            InjectXInto(_mockOf.Handlers[B])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -345,8 +345,8 @@
             _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
 
             FirstCoverSecond(
-                    _mockOf.Handlers[A].Object,
-                    _mockOf.Handlers[B].Object)
+                    _mockOf.Handlers[A],
+                    _mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -362,8 +362,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
 
-            Use(_mockOf.Handlers[A].Object)
-                .ToCover(_mockOf.Handlers[B].Object)
+            Use(_mockOf.Handlers[A])
+                .ToCover(_mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -379,8 +379,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
 
-            XCover(_mockOf.Handlers[B].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            XCover(_mockOf.Handlers[B])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -397,8 +397,8 @@
             _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
 
             FirstWrapSecond(
-                    _mockOf.Handlers[A].Object,
-                    _mockOf.Handlers[B].Object)
+                    _mockOf.Handlers[A],
+                    _mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -414,8 +414,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
 
-            Use(_mockOf.Handlers[A].Object)
-                .ToWrap(_mockOf.Handlers[B].Object)
+            Use(_mockOf.Handlers[A])
+                .ToWrap(_mockOf.Handlers[B])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -431,8 +431,8 @@
             _mockOf.Handlers[AB].AddDelegationTo(A, B);
             _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
 
-            XWrap(_mockOf.Handlers[B].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            XWrap(_mockOf.Handlers[B])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -452,9 +452,9 @@
             _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
 
-            _mockOf.Handlers[A].Object
-                .Then(_mockOf.Handlers[B].Object)
-                .Then(_mockOf.Handlers[C].Object)    
+            _mockOf.Handlers[A]
+                .Then(_mockOf.Handlers[B])
+                .Then(_mockOf.Handlers[C])    
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -476,9 +476,9 @@
 
             FirstThenSecond(
                     FirstThenSecond(
-                        _mockOf.Handlers[A].Object,
-                        _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[C].Object)
+                        _mockOf.Handlers[A],
+                        _mockOf.Handlers[B]),
+                    _mockOf.Handlers[C])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -498,9 +498,9 @@
             _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
 
-            XThen(_mockOf.Handlers[B].Object)
-                .Then(_mockOf.Handlers[C].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            XThen(_mockOf.Handlers[B])
+                .Then(_mockOf.Handlers[C])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -522,9 +522,9 @@
 
             JoinFirstWithSecond(
                     JoinFirstWithSecond(
-                        _mockOf.Handlers[A].Object,
-                        _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[C].Object)
+                        _mockOf.Handlers[A],
+                        _mockOf.Handlers[B]),
+                    _mockOf.Handlers[C])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -544,9 +544,9 @@
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
 
-            Join(_mockOf.Handlers[A].Object)
-                .With(_mockOf.Handlers[B].Object)
-                .ThenWith(_mockOf.Handlers[C].Object)
+            Join(_mockOf.Handlers[A])
+                .With(_mockOf.Handlers[B])
+                .ThenWith(_mockOf.Handlers[C])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -566,9 +566,9 @@
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
 
-            JoinXWith(_mockOf.Handlers[B].Object)
-                .ThenWith(_mockOf.Handlers[C].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            JoinXWith(_mockOf.Handlers[B])
+                .ThenWith(_mockOf.Handlers[C])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -590,9 +590,9 @@
 
             MergeFirstWithSecond(
                     MergeFirstWithSecond(
-                        _mockOf.Handlers[A].Object,
-                        _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[C].Object)
+                        _mockOf.Handlers[A],
+                        _mockOf.Handlers[B]),
+                    _mockOf.Handlers[C])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -612,9 +612,9 @@
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
 
-            Merge(_mockOf.Handlers[A].Object)
-                .With(_mockOf.Handlers[B].Object)
-                .ThenWith(_mockOf.Handlers[C].Object)
+            Merge(_mockOf.Handlers[A])
+                .With(_mockOf.Handlers[B])
+                .ThenWith(_mockOf.Handlers[C])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -634,9 +634,9 @@
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
 
-            MergeXWith(_mockOf.Handlers[B].Object)
-                .ThenWith(_mockOf.Handlers[C].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            MergeXWith(_mockOf.Handlers[B])
+                .ThenWith(_mockOf.Handlers[C])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -658,9 +658,9 @@
 
             PackFirstInSecond(
                     PackFirstInSecond(
-                        _mockOf.Handlers[A].Object,
-                        _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[C].Object)
+                        _mockOf.Handlers[A],
+                        _mockOf.Handlers[B]),
+                    _mockOf.Handlers[C])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -680,9 +680,9 @@
             _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
 
-            Pack(_mockOf.Handlers[A].Object)
-                .In(_mockOf.Handlers[B].Object)
-                .ThenIn(_mockOf.Handlers[C].Object)
+            Pack(_mockOf.Handlers[A])
+                .In(_mockOf.Handlers[B])
+                .ThenIn(_mockOf.Handlers[C])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -702,9 +702,9 @@
             _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
 
-            PackXIn(_mockOf.Handlers[B].Object)
-                .ThenIn(_mockOf.Handlers[C].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            PackXIn(_mockOf.Handlers[B])
+                .ThenIn(_mockOf.Handlers[C])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -726,9 +726,9 @@
 
             InjectFirstIntoSecond(
                     InjectFirstIntoSecond(
-                        _mockOf.Handlers[A].Object,
-                        _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[C].Object)
+                        _mockOf.Handlers[A],
+                        _mockOf.Handlers[B]),
+                    _mockOf.Handlers[C])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -748,9 +748,9 @@
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
 
-            Inject(_mockOf.Handlers[A].Object)
-                .Into(_mockOf.Handlers[B].Object)
-                .ThenInto(_mockOf.Handlers[C].Object)
+            Inject(_mockOf.Handlers[A])
+                .Into(_mockOf.Handlers[B])
+                .ThenInto(_mockOf.Handlers[C])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -770,9 +770,9 @@
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
 
-            InjectXInto(_mockOf.Handlers[B].Object)
-                .ThenInto(_mockOf.Handlers[C].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            InjectXInto(_mockOf.Handlers[B])
+                .ThenInto(_mockOf.Handlers[C])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -794,9 +794,9 @@
 
             FirstCoverSecond(
                     FirstCoverSecond(
-                        _mockOf.Handlers[A].Object,
-                        _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[C].Object)
+                        _mockOf.Handlers[A],
+                        _mockOf.Handlers[B]),
+                    _mockOf.Handlers[C])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -816,9 +816,9 @@
             _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
 
-            Use(_mockOf.Handlers[A].Object)
-                .ToCover(_mockOf.Handlers[B].Object)
-                .ThenCover(_mockOf.Handlers[C].Object)
+            Use(_mockOf.Handlers[A])
+                .ToCover(_mockOf.Handlers[B])
+                .ThenCover(_mockOf.Handlers[C])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -838,9 +838,9 @@
             _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
 
-            XCover(_mockOf.Handlers[B].Object)
-                .ThenCover(_mockOf.Handlers[C].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            XCover(_mockOf.Handlers[B])
+                .ThenCover(_mockOf.Handlers[C])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -862,9 +862,9 @@
 
             FirstWrapSecond(
                     FirstWrapSecond(
-                        _mockOf.Handlers[A].Object,
-                        _mockOf.Handlers[B].Object),
-                    _mockOf.Handlers[C].Object)
+                        _mockOf.Handlers[A],
+                        _mockOf.Handlers[B]),
+                    _mockOf.Handlers[C])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -884,9 +884,9 @@
             _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
 
-            Use(_mockOf.Handlers[A].Object)
-                .ToWrap(_mockOf.Handlers[B].Object)
-                .ThenWrap(_mockOf.Handlers[C].Object)
+            Use(_mockOf.Handlers[A])
+                .ToWrap(_mockOf.Handlers[B])
+                .ThenWrap(_mockOf.Handlers[C])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -906,9 +906,9 @@
             _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
             _mockOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
 
-            XWrap(_mockOf.Handlers[B].Object)
-                .ThenWrap(_mockOf.Handlers[C].Object)
-                .WhereXIs(_mockOf.Handlers[A].Object)
+            XWrap(_mockOf.Handlers[B])
+                .ThenWrap(_mockOf.Handlers[C])
+                .WhereXIs(_mockOf.Handlers[A])
                 .Execute(Arg);
 
             Assert.That(execution,
@@ -920,11 +920,8 @@
         {
             _mockOf.HandlerMath.Setup__Conditional(A, X, returns: B);
 
-            var handler = _mockOf.Handlers[A].Object
-                .When(_mockOf.Conditions[X].Object);
-
-            Assert.That(handler, 
-                Is.SameAs(_mockOf.Handlers[B].Object));
+            Assert.That(_mockOf.Handlers[A].When(_mockOf.Conditions[X]), 
+                Is.SameAs(_mockOf.Handlers[B]));
         }
 
         [Test]
@@ -933,11 +930,11 @@
             _mockOf.HandlerMath.Setup__Conditional(A, X, returns: B);
 
             var handler = WithConditionThat
-                (_mockOf.Conditions[X].Object)
-                (_mockOf.Handlers[A].Object);
+                (_mockOf.Conditions[X])
+                (_mockOf.Handlers[A]);
 
             Assert.That(handler,
-                Is.SameAs(_mockOf.Handlers[B].Object));
+                Is.SameAs(_mockOf.Handlers[B]));
         }
 
         [Test]
@@ -991,7 +988,7 @@
             _mockOf.ConditionMath.Setup__True(returns: X);
 
             Assert.That(Condition<int>.True,
-                Is.SameAs(_mockOf.Conditions[X].Object));
+                Is.SameAs(_mockOf.Conditions[X]));
         }
 
         [Test]
@@ -1000,7 +997,7 @@
             _mockOf.ConditionMath.Setup__False(returns: X);
 
             Assert.That(Condition<int>.False,
-                Is.SameAs(_mockOf.Conditions[X].Object));
+                Is.SameAs(_mockOf.Conditions[X]));
         }
 
         [Test]
@@ -1009,7 +1006,7 @@
         {
             _mockOf.ConditionMath.Setup__IsPredictableTrue(X, returns: expectedResult);
 
-            Assert.That(_mockOf.Conditions[X].Object.IsPredictableTrue(), 
+            Assert.That(_mockOf.Conditions[X].IsPredictableTrue(), 
                 Is.EqualTo(expectedResult));
         }
 
@@ -1019,7 +1016,7 @@
         {
             _mockOf.ConditionMath.Setup__IsPredictableFalse(X, returns: expectedResult);
 
-            Assert.That(_mockOf.Conditions[X].Object.IsPredictableFalse(),
+            Assert.That(_mockOf.Conditions[X].IsPredictableFalse(),
                 Is.EqualTo(expectedResult));
         }
 
@@ -1028,11 +1025,11 @@
         {
             _mockOf.ConditionMath.Setup__Or(X, Y, returns: XY);
 
-            var aOrB = _mockOf.Conditions[X].Object
-                .Or(_mockOf.Conditions[Y].Object);
+            var aOrB = _mockOf.Conditions[X].Or(
+                       _mockOf.Conditions[Y]);
 
             Assert.That(aOrB,
-                Is.SameAs(_mockOf.Conditions[XY].Object));
+                Is.SameAs(_mockOf.Conditions[XY]));
         }
 
         [Test]
@@ -1040,11 +1037,11 @@
         {
             _mockOf.ConditionMath.Setup__And(X, Y, returns: XY);
 
-            var aAndB = _mockOf.Conditions[X].Object
-                .And(_mockOf.Conditions[Y].Object);
+            var aAndB = _mockOf.Conditions[X].And(
+                        _mockOf.Conditions[Y]);
 
             Assert.That(aAndB,
-                Is.SameAs(_mockOf.Conditions[XY].Object));
+                Is.SameAs(_mockOf.Conditions[XY]));
         }
 
         [Test]
@@ -1052,8 +1049,8 @@
         {
             _mockOf.ConditionMath.Setup__Not(X, returns: Y);
 
-            Assert.That(Not(_mockOf.Conditions[X].Object),
-                Is.SameAs(_mockOf.Conditions[Y].Object));
+            Assert.That(Not(_mockOf.Conditions[X]),
+                Is.SameAs(_mockOf.Conditions[Y]));
         }
 
         [Test]
@@ -1061,8 +1058,8 @@
         {
             _mockOf.HandlerMath.Setup__Atomize(A, returns: B);
 
-            Assert.That(_mockOf.Handlers[A].Object.Atomize(),
-                Is.SameAs(_mockOf.Handlers[B].Object));
+            Assert.That(_mockOf.Handlers[A].Atomize(),
+                Is.SameAs(_mockOf.Handlers[B]));
         }
 
         [Test]

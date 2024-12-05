@@ -4,7 +4,7 @@
     using System.Collections.Generic;
 
     public class DummyHandlersCollection :
-        DummiesCollection<DummyHandler, HandlerIndex, IHandler<int>>
+        DummiesCollection<DummyHandler, HandlerIndex>
     {
         public DummyHandlersCollection() 
             : base() { }

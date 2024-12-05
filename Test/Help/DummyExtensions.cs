@@ -1,68 +1,62 @@
 ﻿namespace ChainLead.Test.Help
 {
-    using ChainLead.Contracts;
     using System.Linq;
     using static ChainLead.Test.Help.DummyHandler;
     
     public static class DummyExtensions
     {
-        public static TDummy Get<TDummy, TIndex, TObject>(
-            this IDummiesCollection<TDummy, TIndex, TObject> dummies, TIndex i)
-                where TDummy : IDummy<TIndex, TObject>
+        public static TDummy Get<TDummy, TIndex>(
+            this IDummiesCollection<TDummy, TIndex> dummies, TIndex i)
+                where TDummy : IDummy<TIndex>
                 where TIndex : DummyIndex =>
                     dummies[i];
-        public static TObject GetObject<TDummy, TIndex, TObject>(
-            this IDummiesCollection<TDummy, TIndex, TObject> dummies, TIndex i)
-                where TDummy : IDummy<TIndex, TObject>
+        
+        public static IDummiesCollection<TDummy, TIndex> Where<TDummy, TIndex>(
+            this IDummiesCollection<TDummy, TIndex> mocks, Func<TDummy, bool> predicate)
+                where TDummy : IDummy<TIndex>
                 where TIndex : DummyIndex =>
-                    dummies[i].Object;
-
-        public static IDummiesCollection<TDummy, TIndex, TObject> Where<TDummy, TIndex, TObject>(
-            this IDummiesCollection<TDummy, TIndex, TObject> mocks, Func<TDummy, bool> predicate)
-                where TDummy : IDummy<TIndex, TObject>
-                where TIndex : DummyIndex =>
-                    new DummiesCollection<TDummy, TIndex, TObject>(
+                    new DummiesCollection<TDummy, TIndex>(
                         mocks.AsEnumerable().Where(predicate));
 
-        public static IDummiesCollection<TDummy, TIndex, TObject> Concat<TDummy, TIndex, TObject>(
-            this IDummiesCollection<TDummy, TIndex, TObject> dummies,
+        public static IDummiesCollection<TDummy, TIndex> Concat<TDummy, TIndex>(
+            this IDummiesCollection<TDummy, TIndex> dummies,
             IEnumerable<TDummy> otherDummies)
-                where TDummy : IDummy<TIndex, TObject>
+                where TDummy : IDummy<TIndex>
                 where TIndex : DummyIndex =>
-                    new DummiesCollection<TDummy, TIndex, TObject>(
+                    new DummiesCollection<TDummy, TIndex>(
                         dummies.Concat(otherDummies));
 
-        public static IDummiesCollection<TDummy, TIndex, TObject> Take<TDummy, TIndex, TObject>(
-            this IDummiesCollection<TDummy, TIndex, TObject> dummies, int count)
-                where TDummy : IDummy<TIndex, TObject>
+        public static IDummiesCollection<TDummy, TIndex> Take<TDummy, TIndex>(
+            this IDummiesCollection<TDummy, TIndex> dummies, int count)
+                where TDummy : IDummy<TIndex>
                 where TIndex : DummyIndex =>
-                    new DummiesCollection<TDummy, TIndex, TObject>(
+                    new DummiesCollection<TDummy, TIndex>(
                         dummies.Take(count));
 
-        public static IDummiesCollection<TDummy, TIndex, TObject> Skip<TDummy, TIndex, TObject>(
-            this IDummiesCollection<TDummy, TIndex, TObject> dummies, int count)
-                where TDummy : IDummy<TIndex, TObject>
+        public static IDummiesCollection<TDummy, TIndex> Skip<TDummy, TIndex>(
+            this IDummiesCollection<TDummy, TIndex> dummies, int count)
+                where TDummy : IDummy<TIndex>
                 where TIndex : DummyIndex =>
-                    new DummiesCollection<TDummy, TIndex, TObject>(
+                    new DummiesCollection<TDummy, TIndex>(
                         dummies.Skip(count));
 
-        public static IDummiesCollection<TDummy, TIndex, TObject> Reverse<TDummy, TIndex, TObject>(
-            this IDummiesCollection<TDummy, TIndex, TObject> dummies)
-                where TDummy : IDummy<TIndex, TObject>
+        public static IDummiesCollection<TDummy, TIndex> Reverse<TDummy, TIndex>(
+            this IDummiesCollection<TDummy, TIndex> dummies)
+                where TDummy : IDummy<TIndex>
                 where TIndex : DummyIndex =>
-                    new DummiesCollection<TDummy, TIndex, TObject>(
+                    new DummiesCollection<TDummy, TIndex>(
                         dummies.Reverse());
 
-        public static IDummiesCollection<TDummy, TIndex, TObject> Except<TDummy, TIndex, TObject>(
-            this IDummiesCollection<TDummy, TIndex, TObject> dummies,
+        public static IDummiesCollection<TDummy, TIndex> Except<TDummy, TIndex>(
+            this IDummiesCollection<TDummy, TIndex> dummies,
             IEnumerable<TDummy> otherDummies)
-                where TDummy : IDummy<TIndex, TObject>
+                where TDummy : IDummy<TIndex>
                 where TIndex : DummyIndex =>
-                    new DummiesCollection<TDummy, TIndex, TObject>(
+                    new DummiesCollection<TDummy, TIndex>(
                         dummies.Except(otherDummies));
 
         public static void SetResults(
-            this IDummiesCollection<DummyCondition, ConditionIndex, ICondition<int>> condition,
+            this IDummiesCollection<DummyCondition, ConditionIndex> condition,
             bool value)
         {
             foreach (var c in condition)
@@ -70,7 +64,7 @@
         }
 
         public static void SetResults(
-            this IDummiesCollection<DummyCondition, ConditionIndex, ICondition<int>> condition,
+            this IDummiesCollection<DummyCondition, ConditionIndex> condition,
             IEnumerable<bool> results)
         {
             foreach (var (c, r) in condition.Zip(results))
@@ -78,7 +72,7 @@
         }
 
         public static void AddLoggingInto(
-            this IDummiesCollection<DummyCondition, ConditionIndex, ICondition<int>> condition,
+            this IDummiesCollection<DummyCondition, ConditionIndex> condition,
             IList<ConditionIndex> acc)
         {
             foreach (var c in condition)
@@ -86,7 +80,7 @@
         }
 
         public static void AddLoggingInto(
-            this IDummiesCollection<DummyCondition, ConditionIndex, ICondition<int>> condition,
+            this IDummiesCollection<DummyCondition, ConditionIndex> condition,
             IList<DummyIndex> acc)
         {
             foreach (var c in condition)
@@ -94,29 +88,29 @@
         }
 
         public static bool EachWasCheckedOnce(
-            this IDummiesCollection<DummyCondition, ConditionIndex, ICondition<int>> condition) =>
+            this IDummiesCollection<DummyCondition, ConditionIndex> condition) =>
                 condition.Select(x => x.WasCheckedOnce())
                     .Aggregate(true, (acc, x) => acc && x);
 
         public static bool NoOneWasChecked(
-            this IDummiesCollection<DummyCondition, ConditionIndex, ICondition<int>> condition) =>
+            this IDummiesCollection<DummyCondition, ConditionIndex> condition) =>
                 condition.Select(x => x.WasCheckedOnce())
                     .Aggregate(true, (acc, x) => acc && x);
 
         public static bool VerifyChecks(
-            this IDummiesCollection<DummyCondition, ConditionIndex, ICondition<int>> condition,
+            this IDummiesCollection<DummyCondition, ConditionIndex> condition,
             bool wasExecutedOnceElseNever) =>
                 condition.Select(x => x.VerifyCheck(wasExecutedOnceElseNever))
                     .Aggregate(true, (acc, x) => acc && x);
 
         public static bool VerifyChecks(
-            this IDummiesCollection<DummyCondition, ConditionIndex, ICondition<int>> condition,
+            this IDummiesCollection<DummyCondition, ConditionIndex> condition,
             IEnumerable<bool> setup) =>
                 condition.Zip(setup, (x, was) => x.VerifyCheck(was))
                     .Aggregate(true, (acc, x) => acc && x);
 
         public static void AddLoggingInto(
-            this IDummiesCollection<DummyHandler, HandlerIndex, IHandler<int>> handlers,
+            this IDummiesCollection<DummyHandler, HandlerIndex> handlers,
             IList<HandlerIndex> acc)
         {
             foreach (var h in handlers)
@@ -124,7 +118,7 @@
         }
 
         public static void AddLoggingInto(
-            this IDummiesCollection<DummyHandler, HandlerIndex, IHandler<int>> handlers,
+            this IDummiesCollection<DummyHandler, HandlerIndex> handlers,
             IList<DummyIndex> acc)
         {
             foreach (var h in handlers)
@@ -132,7 +126,7 @@
         }
 
         public static void AddCallback(
-            this IDummiesCollection<DummyHandler, HandlerIndex, IHandler<int>> handlers,
+            this IDummiesCollection<DummyHandler, HandlerIndex> handlers,
             Action f)
         {
             foreach (var h in handlers)
@@ -140,18 +134,18 @@
         }
 
         public static TimesContinuation EachWasExecuted(
-            this IDummiesCollection<DummyHandler, HandlerIndex, IHandler<int>> handlers,
+            this IDummiesCollection<DummyHandler, HandlerIndex> handlers,
             int times) => new TimesContinuation(
                 handlers.Select(h => h.WasExecuted(times).Times)
                     .Aggregate(true, (acc, x) => acc && x));
 
         public static bool EachWasExecutedOnce(
-            this IDummiesCollection<DummyHandler, HandlerIndex, IHandler<int>> handlers) =>
+            this IDummiesCollection<DummyHandler, HandlerIndex> handlers) =>
                 handlers.Select(h => h.WasExecutedOnce())
                     .Aggregate(true, (acc, x) => acc && x);
 
         public static ElseNoOneContinuation EachWasExecutedOnceWhen(
-            this IDummiesCollection<DummyHandler, HandlerIndex, IHandler<int>> handlers,
+            this IDummiesCollection<DummyHandler, HandlerIndex> handlers,
             bool condition) =>
                 new(handlers.Select(h => h.WasExecutedOnceWhen(condition).ElseNever)
                     .Aggregate(true, (acc, x) => acc && x));
@@ -162,12 +156,12 @@
         }
 
         public static bool NoOneWasExecuted(
-            this IDummiesCollection<DummyHandler, HandlerIndex, IHandler<int>> handlers) =>
+            this IDummiesCollection<DummyHandler, HandlerIndex> handlers) =>
                 handlers.Select(h => h.WasNeverExecuted())
                     .Aggregate(true, (acc, x) => acc && x);
 
         public static bool VerifyExecution(
-            this IDummiesCollection<DummyHandler, HandlerIndex, IHandler<int>> handlers,
+            this IDummiesCollection<DummyHandler, HandlerIndex> handlers,
             IEnumerable<bool> setup) =>
                 handlers.Zip(setup, (h, x) => h.VerifyExecution(x))
                     .Aggregate(true, (acc, x) => acc && x);

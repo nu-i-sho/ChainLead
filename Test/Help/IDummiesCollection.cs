@@ -1,15 +1,13 @@
 ﻿namespace ChainLead.Test.Help
 {
-    public interface IDummiesCollection<TDummy, TIndex, TObject>
+    public interface IDummiesCollection<TDummy, TIndex>
         : IList<TDummy>
-        where TDummy : IDummy<TIndex, TObject>
+        where TDummy : IDummy<TIndex>
         where TIndex : DummyIndex
     {
-        public IEnumerable<TObject> Objects { get; }
-
         public TDummy this[TIndex i] { get; }
 
-        public IDummiesCollection<TDummy, TIndex, TObject> this[
+        public IDummiesCollection<TDummy, TIndex> this[
             TIndex first, 
             TIndex second, 
             params TIndex[] tail] 
@@ -17,7 +15,7 @@
             get; 
         }
         
-        public IDummiesCollection<TDummy, TIndex, TObject> this[
+        public IDummiesCollection<TDummy, TIndex> this[
             IEnumerable<TIndex> indices] 
         { 
             get; 

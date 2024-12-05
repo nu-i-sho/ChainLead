@@ -6,18 +6,17 @@
     public class DummyHandler(
             DummyHandlersCollection handlers,
             HandlerIndex index) : 
-        IDummy<HandlerIndex, IHandler<int>>
+        IDummy<HandlerIndex>,
+        IHandler<int>
     {
-        private readonly Dummy _dummy = new();
-
-        public IHandler<int> Object => _dummy;
-
         public HandlerIndex Index => index;
 
         public string Name => index.View;
         
+        public IHandler<int> Pure => this;
+
         public void AddCallback(Action f) =>
-            _dummy.Callback += f;
+            Callback += f;
 
         public void AddLoggingInto(IList<HandlerIndex> acc) =>
             AddCallback(() => acc.Add(Index));
@@ -29,17 +28,17 @@
                 AddCallback(() =>
                 {
                     foreach (var i in indexes)
-                        handlers[i].Object.Execute(Arg);
+                        handlers[i].Execute(Arg);
                 });
 
         public bool WasExecutedOnce() =>
-            _dummy.CallsCount == 1;
+            CallsCount == 1;
 
         public bool WasNeverExecuted() =>
-            _dummy.CallsCount == 0;
+            CallsCount == 0;
 
         public TimesContinuation WasExecuted(int times) =>
-            new(_dummy.CallsCount == times);
+            new(CallsCount == times);
 
         public class TimesContinuation(bool answer)
         {
@@ -61,22 +60,19 @@
                 ? WasExecutedOnce()
                 : WasNeverExecuted();
 
-        private class Dummy : IHandler<int>
+        private int CallsCount { get; set; } = 0;  
+
+        private Action Callback { get; set; } = () => 
         {
-            public int CallsCount { get; private set; } = 0;  
+            /* INITIALY DO NOTHING */ 
+        };
 
-            public Action Callback { get; set; } = () => 
+        public void Execute(int state)
+        {
+            if (state == Arg)
             {
-                /* INITIALY DO NOTHING */ 
-            };
-
-            public void Execute(int state)
-            {
-                if (state == Arg)
-                {
-                    Callback();
-                    CallsCount++;
-                }
+                Callback();
+                CallsCount++;
             }
         }
     }

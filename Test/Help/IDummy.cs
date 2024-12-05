@@ -1,11 +1,9 @@
 ﻿namespace ChainLead.Test.Help
 {
-    public interface IDummy<TIndex, TObject>
+    public interface IDummy<TIndex>
         where TIndex : DummyIndex
     {
         TIndex Index { get; }
-
-        TObject Object { get; }
 
         string Name { get; }
     }

@@ -3,7 +3,7 @@
     using ChainLead.Contracts;
 
     public class DummyConditionsCollection :
-        DummiesCollection<DummyCondition, ConditionIndex, ICondition<int>>
+        DummiesCollection<DummyCondition, ConditionIndex>
     {
         public DummyConditionsCollection() 
             : base() { }
