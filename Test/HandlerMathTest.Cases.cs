@@ -34,7 +34,8 @@
         {
             public override string ToString()
             {
-                var name = string.Join('-',
+                var name = string.Join(
+                    CaseBlocksSeparator,
                     ViewOf(ChainIndicesWithNullsAsZeros),
                     ViewOf(ExpectedExecution));
                     
@@ -70,7 +71,8 @@
         {
             public override string ToString()
             {
-                var name = string.Join('-',
+                var name = string.Join(
+                    CaseBlocksSeparator,
                     ViewOf(AIsConditional),
                     ViewOf(BIsConditional),
                     ExpectedFinalCondition.Value,
@@ -104,7 +106,8 @@
         {
             public override string ToString()
             {
-                var name = string.Join('-',
+                var name = string.Join(
+                    CaseBlocksSeparator,
                     ViewOf(CheckSetup),
                     ViewOf(CheckExpected),
                     ViewOf(ExecutionExpected));
@@ -182,7 +185,8 @@
 
             public override string ToString()
             {
-                var name = string.Join('-',
+                var name = string.Join(
+                    CaseBlocksSeparator,
                     ViewOf(AConditions),
                     ViewOf(BConditions),
                     ViewOf(ChecksSetup),
@@ -593,7 +597,8 @@
         {
             public override string ToString()
             {
-                var name = string.Join('-',
+                var name = string.Join(
+                    CaseBlocksSeparator,
                     ViewOf(AConditions),
                     ViewOf(BConditions));
 
@@ -654,7 +659,8 @@
         {
             public override string ToString()
             {
-                var name = string.Join('-',
+                var name = string.Join(
+                    CaseBlocksSeparator,
                     ViewOf(AConditions),
                     ViewOf(BConditions),
                     ViewOf(ChecksSetup),

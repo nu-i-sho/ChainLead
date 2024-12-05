@@ -3,8 +3,6 @@ namespace ChainLead.Test
     // DO NOT using ChainLead.Contracts.Syntax;
 
     using ChainLead.Contracts;
-    using ChainLead.Implementation;
-    using ChainLead.Test.HandlersTestData;
     using ChainLead.Test.Help;
 
     using Moq;
@@ -13,23 +11,13 @@ namespace ChainLead.Test
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
+    using static ChainLead.Test.HandlerMathTest;
     using static ChainLead.Test.Help.Constants;
     using static ChainLead.Test.Help.Constants.Appends;
 
-    [TestFixtureSource(nameof(Cases))]
-    public partial class HandlerMathTest(IHandlerMathCallsProviderFactory mathFactory)
+    [TestFixtureSource(nameof(FixtureCases))]
+    public partial class HandlerMathTest(IHandlerMathFactory mathFactory)
     {
-        public static IEnumerable<IHandlerMathCallsProviderFactory> Cases
-        {
-            get
-            {
-                yield return new OriginalHandlerMathCallsProviderFactory();
-                yield return new ChainLeadSyntaxCallsProviderFactory();
-                yield return new ChainLeadSyntaxSeparatedCallsProviderFactory();
-                yield return new ChainLeadSyntaxReverseCallsProviderFactory();
-            }
-        }
-
         public interface IBase;
         public interface IDerived : IBase;
 
@@ -56,69 +44,8 @@ namespace ChainLead.Test
         public void Setup()
         {
             _mockOf = new ChainLeadMocks();
-            MockConditionMath();
             _math = mathFactory.Create(_mockOf.ConditionMath.Object);
         }
-
-        void MockConditionMath()
-        {
-            MockTrue<int>("True");
-            MockFalse<int>("False");
-            MockTrue<IBase>($"True<{nameof(IBase)}>");
-            MockFalse<IBase>($"False<{nameof(IBase)}>");
-            MockTrue<IDerived>($"True<{nameof(IDerived)}>");
-            MockFalse<IDerived>($"False<{nameof(IDerived)}>");
-
-            ICondition<T> MockTrue<T>(string name)
-            {
-                var @true = new Mock<ICondition<T>>() { Name = name };
-
-                _mockOf.ConditionMath
-                    .Setup(o => o.True<T>())
-                    .Returns(@true.Object);
-
-                _mockOf.ConditionMath
-                    .Setup(o => o.IsPredictableTrue(@true.Object))
-                    .Returns(true);
-
-                _mockOf.ConditionMath
-                    .Setup(o => o.And(@true.Object, It.IsAny<ICondition<T>>()))
-                    .Returns((ICondition<T> a, ICondition<T> b) => b);
-
-                _mockOf.ConditionMath
-                    .Setup(o => o.And(It.IsAny<ICondition<T>>(), @true.Object))
-                    .Returns((ICondition<T> a, ICondition<T> b) => a);
-
-                return @true.Object;
-            }
-
-            ICondition<T> MockFalse<T>(string name)
-            {
-                var @false = new Mock<ICondition<T>> { Name = name };
-
-                _mockOf.ConditionMath
-                    .Setup(o => o.False<T>())
-                    .Returns(@false.Object);
-
-                _mockOf.ConditionMath
-                    .Setup(o => o.IsPredictableFalse(@false.Object))
-                    .Returns(true);
-
-                return @false.Object;
-            }
-        }
-
-        [Test]
-        public void ZeroDoesNothing() =>
-            Assert.DoesNotThrow(() => _math.Zero<int>().Execute(Arg));
-
-        [Test]
-        public void ZeroIsZero() =>
-            Assert.That(_math.IsZero(_math.Zero<int>()));
-
-        [Test]
-        public void ZeroForBaseClassIsZeroForDerivedClass() =>
-            Assert.That(_math.IsZero<IDerived>(_math.Zero<IBase>()));
 
         [Test]
         public void ZeroAppendZeroIsZero(
@@ -149,17 +76,6 @@ namespace ChainLead.Test
             var chain = append(_math.Zero<IDerived>(), _math.Zero<IBase>());
             
             Assert.That(_math.IsZero(chain));
-        }
-
-        [Test]
-        public void MadeHandlerExecutesProvidedAction()
-        {
-            int x = 0;
-            var action = new Action<int>(a => x = a);
-            var handler = _math.MakeHandler(action);
-            handler.Execute(Arg);
-
-            Assert.That(x, Is.EqualTo(Arg));
         }
 
         [Test]
@@ -278,92 +194,6 @@ namespace ChainLead.Test
 
             Assert.That(execution,
                 Is.EqualTo(@case.ExpectedExecution));
-        }
-
-        [Test]
-        public void ConditionalZeroIsZero()
-        {
-            var conditionalZero = 
-                _math.Conditional(_math.Zero<int>(), _mockOf.Conditions[X]);
-            
-            Assert.That(_math.IsZero(conditionalZero));
-        }
-
-        [Test]
-        public void WhenConditionReturnsTrue__HandlerIsExecuted()
-        {
-            _mockOf.Conditions[X].SetResult(true);
-            
-            _math.Conditional(
-                    _mockOf.Handlers[A],
-                    _mockOf.Conditions[X])
-                 .Execute(Arg);
-
-            Assert.That(_mockOf.Handlers[A].WasExecutedOnce());
-        }
-
-        [Test]
-        public void WhenConditionReturnsFalse__HandlerIsNotExecuted()
-        {
-            _mockOf.Conditions[X].SetResult(false);
-
-            _math.Conditional(
-                    _mockOf.Handlers[A],
-                    _mockOf.Conditions[X])
-                 .Execute(Arg);
-
-            Assert.That(_mockOf.Handlers[A].WasNeverExecuted());
-        }
-
-        [Test]
-        public void WhenTopConditionReturnsFalse__AllOtherChecksAndExecutionsAreNotCalled()
-        {
-            _mockOf.Conditions[Z].SetResult(false);
-
-            _mockOf.Conditions[X, Y, Z]
-                .Aggregate(_mockOf.Handlers[A].Pure, _math.Conditional)
-                .Execute(Arg);
-
-
-            Assert.That(_mockOf.Conditions[Z].WasCheckedOnce());
-            Assert.That(_mockOf.Conditions[X, Y].NoOneWasChecked());
-            Assert.That(_mockOf.Handlers[A].WasNeverExecuted());
-        }
-
-        [Test]
-        public void ChecksAllConditionsUpToFirstFalse(
-            [Values(0, 1, 2, 5)] int trueCount,
-            [Values(0, 1, 2, 5)] int falseCount)
-        {
-            var trues = _mockOf.Conditions.Take(trueCount);
-            var falses = _mockOf.Conditions.Skip(trueCount).Take(falseCount);
-
-            trues.SetResults(true);
-            falses.SetResults(false);
-
-            var all = falses.Concat(trues);
-            all.Aggregate(_mockOf.Handlers[A].Pure, _math.Conditional)
-               .Execute(Arg);
-
-            var checkedCount = trueCount + int.Min(1, falseCount);
-
-            Assert.That(all.Reverse().Take(checkedCount).EachWasCheckedOnce());
-            Assert.That(all.Reverse().Skip(checkedCount).NoOneWasChecked());
-            Assert.That(_mockOf.Handlers[A].WasExecutedOnceWhen(falseCount == 0).ElseNever);
-        }
-
-        [Test]
-        public void ChecksOrderEqualsConditionsReverseAttachingOrder()
-        {
-            List<ConditionIndex> checksLog = [];
-
-            _mockOf.Conditions[X, Y, Z].AddLoggingInto(checksLog);
-            _mockOf.Conditions[X, Y, Z].SetResults(true);
-            _mockOf.Conditions[X, Y, Z]
-                .Aggregate(_mockOf.Handlers[A].Pure, _math.Conditional)
-                .Execute(Arg);
-
-            Assert.That(checksLog, Is.EqualTo(new[] { Z, Y, X }));
         }
 
         [TestCase("00")]
@@ -490,7 +320,7 @@ namespace ChainLead.Test
         }
 
         [Test]
-        public void MergeFirstWithSecondConjunctsAllConditions(
+        public void MergeFirstWithSecond__ConjunctsAllConditions(
             [ValueSource(nameof(Cases6))] Case6 @case,
             [Values(true, false)] bool finalConditionResult)
         {
@@ -542,7 +372,7 @@ namespace ChainLead.Test
         }
 
         [Test]
-        public void JoinSomeWithSingleConditionalHandlerPutsConditionOnTopOfResult(
+        public void JoinSomeWithSingleConditionalHandler__PutsConditionOnTopOfResult(
             [Values(false, true)] bool order,
             [Values(false, true)] bool checkResult)
         {
@@ -588,31 +418,6 @@ namespace ChainLead.Test
             Assert.That(execution,
                 Is.EqualTo(@case.ExpectedCallsOrder));
         }
-
-        private void AtomizeZeroMakeHandlerThatIsNotZero<T>()
-        {
-            var zero = _math.Zero<T>();
-            zero = _math.Atomize(zero);
-            var isZero = _math.IsZero(zero);
-
-            Assert.That(isZero, Is.False);
-        }
-
-        [Test]
-        public void AtomizeZeroMakeHandlerThatIsNotZero__Int() =>
-            AtomizeZeroMakeHandlerThatIsNotZero<int>();
-
-        [Test]
-        public void AtomizeZeroMakeHandlerThatIsNotZero__String() =>
-            AtomizeZeroMakeHandlerThatIsNotZero<string>();
-
-        [Test]
-        public void AtomizeZeroMakeHandlerThatIsNotZero__Base() =>
-            AtomizeZeroMakeHandlerThatIsNotZero<IBase>();
-
-        [Test]
-        public void AtomizeZeroMakeHandlerThatIsNotZero__Derived() =>
-            AtomizeZeroMakeHandlerThatIsNotZero<IDerived>();
 
         [Test]
         public void AppendWithAtomizedConditionalHandler__IsTheSameAs__WithRegularHandler(
@@ -701,29 +506,6 @@ namespace ChainLead.Test
 
             Assert.That(executionLog,
                 Is.EqualTo(expectedLog));
-        }
-
-        [Test]
-        public void ExtendedZeroIsZero()
-        {
-            var extended = new Mock<IExtendedHandler<int>>();
-            extended
-                .Setup(o => o.Origin)
-                .Returns(_math.Zero<int>());
-
-            Assert.That(_math.IsZero(extended.Object));
-        }
-
-        [Test]
-        public void ExtendedNotZeroIsNotZero()
-        {
-            var extended = new Mock<IExtendedHandler<int>>();
-            extended
-                .Setup(o => o.Origin)
-                .Returns(_mockOf.Handlers[A]);
-
-            Assert.That(_math.IsZero(extended.Object), 
-                Is.False);
         }
 
         static bool NotNull(object? x) => x != null;

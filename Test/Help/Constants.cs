@@ -31,7 +31,6 @@
         public static readonly HandlerIndex[] ABCDEFGHIJ = [A, B, C, D, E, F, G, H, I, J];
         public static readonly ConditionIndex[] QRSTUVWXYZ = [Q, R, S, T, U, V, W, X, Y, Z];
 
-
         public static class Appends
         {
             public const string

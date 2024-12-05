@@ -1065,7 +1065,7 @@
         [Test]
         public void ReverseFunctionTest()
         {
-            string Log(string a, string b) => a + b;
+            static string Log(string a, string b) => a + b;
 
             var result = Reverse<string>(Log)("World!!!", "Hello ");
 
