@@ -1,7 +1,7 @@
-﻿using ChainLead.Contracts;
-
-namespace ChainLead.Test.Help
+﻿namespace ChainLead.Test.Help
 {
+    using ChainLead.Contracts;
+
     public static class Constants
     {
         public const int Arg = 7568;

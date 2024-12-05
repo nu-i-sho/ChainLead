@@ -13,8 +13,6 @@
 
         public string Name => index.View;
         
-        public IHandler<int> Pure => this;
-
         public void AddCallback(Action f) =>
             Callback += f;
 
@@ -59,6 +57,10 @@
             wasExecutedOnceElseNever
                 ? WasExecutedOnce()
                 : WasNeverExecuted();
+
+        public override string ToString() => Name;
+
+        public IHandler<int> Pure => this;
 
         private int CallsCount { get; set; } = 0;  
 

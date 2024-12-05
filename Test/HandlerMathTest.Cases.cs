@@ -64,9 +64,8 @@
         public record Case3(
             bool AIsConditional,
             bool BIsConditional,
-            ConditionIndex ExpectedCondition,
+            ConditionIndex ExpectedFinalCondition,
             bool FinalConditionCheckResult,
-            bool HandlersExecutionExpected,
             string NameForEasyFind = "")
         {
             public override string ToString()
@@ -74,9 +73,8 @@
                 var name = string.Join('-',
                     ViewOf(AIsConditional),
                     ViewOf(BIsConditional),
-                    ExpectedCondition.Value,
-                    ViewOf(FinalConditionCheckResult),
-                    ViewOf(HandlersExecutionExpected));
+                    ExpectedFinalCondition.Value,
+                    ViewOf(FinalConditionCheckResult));
 
                 if (NameForEasyFind != string.Empty)
                     name = $"{NameForEasyFind}: {name}";
@@ -89,12 +87,12 @@
         {
             get
             {
-                yield return new(false, true, Y, false, false, "Sun");
-                yield return new(false, true, Y, true, false, "Moon");
-                yield return new(true, false, X, false, false, "Venus");
-                yield return new(true, false, X, true, true, "Earth");
-                yield return new(true, true, Z, false, false, "Mars");
-                yield return new(true, true, Z, true, true, "Saturn");
+                yield return new(false, true, Y, false, "Sun");
+                yield return new(false, true, Y, true, "Moon");
+                yield return new(true, false, X, false, "Venus");
+                yield return new(true, false, X, true, "Earth");
+                yield return new(true, true, Z, false, "Mars");
+                yield return new(true, true, Z, true, "Saturn");
             }
         }
 
@@ -180,6 +178,8 @@
             HandlerIndex[] ExecuteExpected,
             string NameForEasyFind = "")
         {
+            public static readonly ConditionIndex ZW = new("ZW"); 
+
             public override string ToString()
             {
                 var name = string.Join('-',
@@ -261,7 +261,7 @@
                     BConditions:     [],
                     ChecksSetup:  new() { { Z, true }, { Y, false } },
                     CheckExpected:   [Z, Y],
-                    ExecuteExpected: [],
+                    ExecuteExpected: [B],
                     NameForEasyFind: "Joseph");
 
                 yield return new(
@@ -501,7 +501,7 @@
                     BConditions:     [U, V],
                     ChecksSetup:  new() { { R, true }, { Y, true }, { X, false }, { U, true } },
                     CheckExpected:   [R, Y, X, U],
-                    ExecuteExpected: [A],
+                    ExecuteExpected: [B],
                     NameForEasyFind: "Justin");
 
                 yield return new(
@@ -541,7 +541,7 @@
                     BConditions:     [U, V, W],
                     ChecksSetup:  new() { { R, true }, { Y, true }, { X, false }, { V, false } },
                     CheckExpected:   [R, Y, X, V],
-                    ExecuteExpected: [A],
+                    ExecuteExpected: [],
                     NameForEasyFind: "Gregory");
 
                 yield return new(
@@ -581,7 +581,7 @@
                     BConditions:     [U, V, W],
                     ChecksSetup:  new() { { R, true }, { Y, true }, { X, true }, { V, true }, { U, true } },
                     CheckExpected:   [R, Y, X, V, U],
-                    ExecuteExpected: [B],
+                    ExecuteExpected: [A, B],
                     NameForEasyFind: "Jack");
             }
         }
@@ -900,7 +900,7 @@
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, true } },
-                    ExpectedCallsOrder: [W, V, U, B],
+                    ExpectedCallsOrder: [W, V, U, A, B],
                     NameForEasyFind: "Cynthia");
 
                 yield return new(
@@ -988,7 +988,7 @@
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { Y, false } },
-                    ExpectedCallsOrder: [X, Y],
+                    ExpectedCallsOrder: [Z, Y],
                     NameForEasyFind: "Samantha");
 
                 yield return new(
@@ -996,7 +996,7 @@
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { Y, true }, { X, false } },
-                    ExpectedCallsOrder: [X, Y, X],
+                    ExpectedCallsOrder: [Z, Y, X],
                     NameForEasyFind: "Katherine");
 
                 yield return new(
@@ -1004,7 +1004,7 @@
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { Y, true }, { X, true }, { W, false } },
-                    ExpectedCallsOrder: [X, Y, X, W, B],
+                    ExpectedCallsOrder: [Z, Y, X, W, B],
                     NameForEasyFind: "Christine");
 
                 yield return new(
@@ -1012,7 +1012,7 @@
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { Y, true }, { X, true }, { W, true }, { V, false } },
-                    ExpectedCallsOrder: [X, Y, X, W, V, B],
+                    ExpectedCallsOrder: [Z, Y, X, W, V, B],
                     NameForEasyFind: "Debra");
 
                 yield return new(
@@ -1020,7 +1020,7 @@
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { Y, true }, { X, true }, { W, true }, { V, true }, { U, false } },
-                    ExpectedCallsOrder: [X, Y, X, W, V, U, B],
+                    ExpectedCallsOrder: [Z, Y, X, W, V, U, B],
                     NameForEasyFind: "Rachel");
 
                 yield return new(
@@ -1612,7 +1612,7 @@
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { W, true }, { U, true }, { V, false } },
-                    ExpectedCallsOrder: [W, U, V, A],
+                    ExpectedCallsOrder: [W, U, A, V],
                     NameForEasyFind: "Wayne");
 
                 yield return new(
@@ -1844,7 +1844,7 @@
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, true }, { U, false } },
-                    ExpectedCallsOrder: [V, A, U],
+                    ExpectedCallsOrder: [V, U, B],
                     NameForEasyFind: "Howard");
 
                 yield return new(
@@ -1852,7 +1852,7 @@
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, true }, { U, true } },
-                    ExpectedCallsOrder: [V, A, U, B],
+                    ExpectedCallsOrder: [V, U, A, B],
                     NameForEasyFind: "Horace");
 
                 yield return new(
@@ -2196,7 +2196,7 @@
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, true }, { Y, true }, { X, true } },
-                    ExpectedCallsOrder: [W, V, U, Z, A, Y, X, B],
+                    ExpectedCallsOrder: [W, V, U, A, Z, Y, X, B],
                     NameForEasyFind: "Diamond");
             }
         }

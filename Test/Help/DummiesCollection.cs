@@ -23,6 +23,6 @@
 
         public override string ToString() =>
             this.Select(x => x.ToString())
-                .Aggregate(string.Concat);
+                .Aggregate(string.Empty, string.Concat);
     }
 }

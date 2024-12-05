@@ -1,6 +1,5 @@
 ﻿namespace ChainLead.Test.Help
 {
-    using ChainLead.Contracts;
     using System.Collections.Generic;
 
     public class DummyHandlersCollection :
@@ -11,5 +10,11 @@
 
         public DummyHandlersCollection(IEnumerable<DummyHandler> items)
             : base(items) { }
+
+        public void GenerateMore(HandlerIndex head, params HandlerIndex[] tail)
+        {
+            Add(new DummyHandler(this, head));
+            AddRange(tail.Select(x => new DummyHandler(this, x)));
+        }
     }
 }

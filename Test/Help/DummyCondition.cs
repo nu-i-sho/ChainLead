@@ -37,6 +37,10 @@
                 ? WasCheckedOnce()
                 : WasNeverChecked();
 
+        public override string ToString() => Name;
+
+        public ICondition<int> Pure => this;
+
         public int CallsCount { get; private set; } = 0;
 
         public Action Callback { get; set; } = () =>

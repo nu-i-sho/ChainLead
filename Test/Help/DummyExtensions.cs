@@ -24,28 +24,28 @@
                 where TDummy : IDummy<TIndex>
                 where TIndex : DummyIndex =>
                     new DummiesCollection<TDummy, TIndex>(
-                        dummies.Concat(otherDummies));
+                        dummies.AsEnumerable().Concat(otherDummies));
 
         public static IDummiesCollection<TDummy, TIndex> Take<TDummy, TIndex>(
             this IDummiesCollection<TDummy, TIndex> dummies, int count)
                 where TDummy : IDummy<TIndex>
                 where TIndex : DummyIndex =>
                     new DummiesCollection<TDummy, TIndex>(
-                        dummies.Take(count));
+                        dummies.AsEnumerable().Take(count));
 
         public static IDummiesCollection<TDummy, TIndex> Skip<TDummy, TIndex>(
             this IDummiesCollection<TDummy, TIndex> dummies, int count)
                 where TDummy : IDummy<TIndex>
                 where TIndex : DummyIndex =>
                     new DummiesCollection<TDummy, TIndex>(
-                        dummies.Skip(count));
+                        dummies.AsEnumerable().Skip(count));
 
         public static IDummiesCollection<TDummy, TIndex> Reverse<TDummy, TIndex>(
             this IDummiesCollection<TDummy, TIndex> dummies)
                 where TDummy : IDummy<TIndex>
                 where TIndex : DummyIndex =>
                     new DummiesCollection<TDummy, TIndex>(
-                        dummies.Reverse());
+                        dummies.AsEnumerable().Reverse());
 
         public static IDummiesCollection<TDummy, TIndex> Except<TDummy, TIndex>(
             this IDummiesCollection<TDummy, TIndex> dummies,
@@ -53,7 +53,7 @@
                 where TDummy : IDummy<TIndex>
                 where TIndex : DummyIndex =>
                     new DummiesCollection<TDummy, TIndex>(
-                        dummies.Except(otherDummies));
+                        dummies.AsEnumerable().Except(otherDummies));
 
         public static void SetResults(
             this IDummiesCollection<DummyCondition, ConditionIndex> condition,
@@ -94,7 +94,7 @@
 
         public static bool NoOneWasChecked(
             this IDummiesCollection<DummyCondition, ConditionIndex> condition) =>
-                condition.Select(x => x.WasCheckedOnce())
+                condition.Select(x => x.WasNeverChecked())
                     .Aggregate(true, (acc, x) => acc && x);
 
         public static bool VerifyChecks(
