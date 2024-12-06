@@ -1,7 +1,6 @@
 namespace ChainLead.Test
 {
     using ChainLead.Contracts;
-
     using Moq;
     using NUnit.Framework.Internal;
     using System;
@@ -11,6 +10,7 @@ namespace ChainLead.Test
     using static ChainLead.Test.Cases.HandlerMathTest;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
     using static ChainLead.Test.Dummy.HandlerIndex.Common;
+
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]

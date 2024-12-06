@@ -7,7 +7,7 @@
     using Moq;
 
     [TestFixture]
-    public class MathDiTest
+    public class DiMathTest
     {
         Mock<IServiceCollection> _serviceCollection;
         ServiceDescriptor? _descriptor;

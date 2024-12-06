@@ -18,9 +18,9 @@
         static readonly string[] Jds =
             ["012", "01234", "01234567890"];
 
-        [AllowNull] Mock<IConditionMath> _conditionMath;
-        [AllowNull] IHandlerChainingCallsProvider _math;
-        [AllowNull] List<string> _callsLog;
+        Mock<IConditionMath> _conditionMath;
+        IHandlerChainingCallsProvider _math;
+        List<string> _callsLog;
 
         public static IEnumerable<IHandlerChainingCallsProviderFactory> Cases
         {
@@ -32,9 +32,6 @@
         }
 
         [SetUp]
-        [MemberNotNull(nameof(_conditionMath))]
-        [MemberNotNull(nameof(_math))]
-        [MemberNotNull(nameof(_callsLog))]
         public void Setup()
         {
             _conditionMath = new Mock<IConditionMath>();

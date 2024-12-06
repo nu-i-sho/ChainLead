@@ -6,6 +6,41 @@
 
     public partial class HandlerMathTest
     {
+        public class BlueCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(BlueCases));
+
+        public class RedCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(RedCases));
+
+        public class GreenCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(GreenCases));
+
+        public class OrangeCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(OrangeCases));
+
+        public class YellowCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(YellowCases));
+
+        public class WhiteCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(WhiteCases));
+
+        public class BlackCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(BlackCases));
+
         public record BlueCase(
             Dummy.HandlerIndex[] ChainIndices,
             string NameForEasyFind = "")
@@ -19,9 +54,6 @@
                 return name;
             }
         }
-
-        public class BlueCasesAttribute() 
-            : ValueSourceAttribute(nameof(BlueCases));
 
         public static BlueCase[] BlueCases =>
         [
@@ -48,9 +80,6 @@
                 return name;
             }
         }
-
-        public class RedCasesAttribute() 
-            : ValueSourceAttribute(nameof(RedCases));
 
         public static RedCase[] RedCases =>
         [
@@ -91,9 +120,6 @@
             }
         }
 
-        public class GreenCasesAttribute() 
-            : ValueSourceAttribute(nameof(GreenCases));
-
         public static IEnumerable<GreenCase> GreenCases
         {
             get
@@ -127,9 +153,6 @@
                 return name;
             }
         }
-
-        public class OrangeCasesAttribute() 
-            : ValueSourceAttribute(nameof(OrangeCases));
 
         public static IEnumerable<OrangeCase> OrangeCases
         {
@@ -209,9 +232,6 @@
                 return name;
             }
         }
-
-        public class YellowCasesAttribute()
-            : ValueSourceAttribute(nameof(YellowCases));
 
         public static IEnumerable<YellowCase> YellowCases
         {
@@ -622,9 +642,6 @@
             }
         }
 
-        public class WhiteCasesAttribute()
-            : ValueSourceAttribute(nameof(WhiteCases));
-
         public static IEnumerable<WhiteCase> WhiteCases
         {
             get
@@ -689,10 +706,6 @@
                 return name;
             }
         }
-
-        public class BlackCasesAttribute()
-            : ValueSourceAttribute(nameof(BlackCases));
-
 
         public static IEnumerable<BlackCase> BlackCases
         {
