@@ -3,6 +3,8 @@
     //// DO NOT using ChainLead.Contracts.Syntax;
     using ChainLead.Contracts;
     using System;
+    using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
+    using static System.Net.Mime.MediaTypeNames;
 
     public class HandlerMath(IConditionMath conditionMath)
         : IHandlerMath
@@ -159,6 +161,8 @@
     file sealed class Zero<T> : IZero<T>
     {
         public void Execute(T state) { }
+
+        public override string ToString() => "0";
     }
 
     file interface IAtom<in T> : IHandler<T> { }
@@ -179,6 +183,9 @@
             prev.Execute(state);
             next.Execute(state);
         }
+
+        public override string ToString() =>
+            $"{prev} + {next}";
     }
 
     file sealed class Conditional<T>(
@@ -194,5 +201,8 @@
             if (Condition.Check(state))
                 Handler.Execute(state);
         }
+
+        public override string ToString() =>
+            $"{Condition}({Handler})";
     }
 }
