@@ -1,13 +1,14 @@
 ﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts.Syntax;
-    using System;
 
-    using static ChainLead.Test.Cases.Common;
-    using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
-    using static ChainLead.Test.Dummy.HandlerIndex.Common;
-    using static ChainLead.Test.Dummy.ConditionIndex.Common;
     using NUnit.Framework.Internal;
+    using System;
+    
+    using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
+    using static ChainLead.Test.Cases.Common;
+    using static ChainLead.Test.Dummy.ConditionIndex.Common;
+    using static ChainLead.Test.Dummy.HandlerIndex.Common;
 
     [TestFixture(typeof(int))]
     [TestFixture(typeof(string))]

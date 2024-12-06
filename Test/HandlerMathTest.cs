@@ -1,13 +1,15 @@
 namespace ChainLead.Test
 {
     using ChainLead.Contracts;
+    
     using Moq;
     using NUnit.Framework.Internal;
     using System;
     using System.Linq;
 
     using static ChainLead.Test.Cases.Common;
-    using static ChainLead.Test.Cases.HandlerMathTest;
+    using static ChainLead.Test.Cases.HandlerMathFixtureCases;
+    using static ChainLead.Test.Cases.HandlerMathTestCases;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
     using static ChainLead.Test.Dummy.HandlerIndex.Common;
 
