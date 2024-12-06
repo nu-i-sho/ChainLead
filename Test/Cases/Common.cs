@@ -1,10 +1,15 @@
-﻿namespace ChainLead.Test
+﻿namespace ChainLead.Test.Cases
 {
     using ChainLead.Contracts;
 
-    public static class Utils
+    public static class Common
     {
         public const int MagicId = 7689;
+
+        public class AllAppendsAttribute() 
+            : ValueSourceAttribute(
+                typeof(Appends), 
+                nameof(Appends.All));
 
         public class Appends
         {
@@ -99,7 +104,7 @@
                 public MemberRefStruct MemberRefStruct => new(id + 400);
                 public MemberReadonlyRefStruct MemberReadonlyRefStruct => new(id + 500);
                 public MemberRecord MemberRecord { get; } = new(id + 600);
-                public MemberRecordStruct MemberRecordStruct { get; } = new(id +700);
+                public MemberRecordStruct MemberRecordStruct { get; } = new(id + 700);
                 public MemberReadonlyRecordStruct MemberReadonlyRecordStruct { get; } = new(id);
 
                 public static string Name => "readonly struct";
@@ -170,7 +175,7 @@
                 public int Id { get; } = id;
             }
 
-            public  ref struct MemberRefStruct(int id)
+            public ref struct MemberRefStruct(int id)
             {
                 public int Id { get; set; } = id;
             }

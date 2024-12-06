@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Test
+﻿namespace ChainLead.Test.Cases
 {
     public partial class HandlerMathTest
     {

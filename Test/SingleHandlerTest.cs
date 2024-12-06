@@ -3,14 +3,14 @@
     using ChainLead.Contracts;
     using Moq;
 
-    using static ChainLead.Test.SingleHandlerMathTest;
+    using static ChainLead.Test.Cases.SingleHandlerTest;
     using static ChainLead.Test.Dummy.HandlerIndex.Common;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
-    using static ChainLead.Test.Utils;
-    
+    using static ChainLead.Test.Cases.Common;
+
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
-    public class SingleHandlerMathTest<T>(
+    public class SingleHandlerTest<T>(
         string mathFactoryName)
     {
         Dummy.Container<T> _dummyOf;

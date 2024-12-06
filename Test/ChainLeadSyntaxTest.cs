@@ -3,7 +3,7 @@
     using ChainLead.Contracts.Syntax;
     using System;
 
-    using static ChainLead.Test.Utils;
+    using static ChainLead.Test.Cases.Common;
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
     using static ChainLead.Test.Dummy.HandlerIndex.Common;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
