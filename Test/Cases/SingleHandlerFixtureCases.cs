@@ -6,6 +6,7 @@
     using System;
 
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
+    using static ChainLead.Test.Cases.Common;
     using static ChainLead.Test.Cases.Common.Types;
 
     public static partial class Cases
@@ -14,6 +15,20 @@
         {
             public const string Original = "Original";
             public const string Syntax = "Syntax";
+
+            public class TestFixtureAttribute(Type t, string mathName)
+                : NUnit.Framework.TestFixtureAttribute(t,
+                    GetMathFactory(mathName),
+                    TokensProvider.Get(t, 51427))
+            {
+                static ISingleHandlerMathFactory GetMathFactory(string name) =>
+                    name switch
+                    {
+                        Original => new OriginalMathFactory(),
+                        Syntax => new SyntaxMathFactory(),
+                        _ => throw new ArgumentOutOfRangeException(nameof(name))
+                    };
+            }
 
             public class _I_Attribute() : TestFixtureAttribute(typeof(int), Original);
             public class _II_Attribute() : TestFixtureAttribute(typeof(string), Original);
@@ -32,17 +47,6 @@
             public class _XIV_Attribute() : TestFixtureAttribute(typeof(Record), Syntax);
             public class _XV_Attribute() : TestFixtureAttribute(typeof(RecordStruct), Syntax);
             public class _XVI_Attribute() : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Syntax);
-
-            public static class SingleHandlerMathFactoryProvider
-            {
-                public static ISingleHandlerMathFactory Get(string name) =>
-                    name switch
-                    {
-                        Original => new OriginalMathFactory(),
-                        Syntax => new SyntaxMathFactory(),
-                        _ => throw new ArgumentOutOfRangeException(nameof(name))
-                    };
-            }
 
             public interface ISingleHandlerMathFactory
             {

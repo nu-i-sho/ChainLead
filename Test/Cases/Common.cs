@@ -25,12 +25,12 @@
                 public static readonly string[] All =
                 [
                     FirstThenSecond,
-                PackFirstInSecond,
-                InjectFirstIntoSecond,
-                FirstCoverSecond,
-                FirstWrapSecond,
-                JoinFirstWithSecond,
-                MergeFirstWithSecond
+                    PackFirstInSecond,
+                    InjectFirstIntoSecond,
+                    FirstCoverSecond,
+                    FirstWrapSecond,
+                    JoinFirstWithSecond,
+                    MergeFirstWithSecond
                 ];
 
                 public interface IProvider<TAppend>
@@ -41,19 +41,24 @@
 
             public static class TokensProvider
             {
-                private static readonly Dictionary<Type, Func<int, object>> _tokens = new()
-            {
-                { typeof(int), id => id },
-                { typeof(string), id => id.ToString() },
-                { typeof(Types.Class), id => new Types.Class(id) },
-                { typeof(Types.Struct), id => new Types.Struct(id) },
-                { typeof(Types.ReadonlyStruct), id => new Types.ReadonlyStruct(id) },
-                { typeof(Types.Record), id => new Types.Record(id) },
-                { typeof(Types.RecordStruct), id => new Types.RecordStruct(id) },
-                { typeof(Types.ReadonlyRecordStruct), id => new Types.ReadonlyRecordStruct(id) },
-            };
+                private static Dictionary<Type, Func<int, object>> Tokens { get; } = new()
+                {
+                    { typeof(int), id => id },
+                    { typeof(string), id => id.ToString() },
+                    { typeof(Types.Class), id => new Types.Class(id) },
+                    { typeof(Types.Struct), id => new Types.Struct(id) },
+                    { typeof(Types.ReadonlyStruct), id => new Types.ReadonlyStruct(id) },
+                    { typeof(Types.Record), id => new Types.Record(id) },
+                    { typeof(Types.RecordStruct), id => new Types.RecordStruct(id) },
+                    { typeof(Types.ReadonlyRecordStruct), id => new Types.ReadonlyRecordStruct(id) },
+                };
 
-                public static T Get<T>(int id) => (T)_tokens[typeof(T)](id);
+                public static T Get<T>(int id) => 
+                    (T)Get(typeof(T), id);
+
+                public static object Get(Type t, int id) =>
+                    Tokens[t](id);
+
             }
 
             public static class Types

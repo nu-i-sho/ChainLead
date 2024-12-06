@@ -1,34 +1,24 @@
 ﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts;
-    using ChainLead.Test.HandlersTestData;
     using Moq;
 
+    using static ChainLead.Test.Cases.MultipleHandlersFixtureCases;
     using static System.Linq.Enumerable;
 
-    [TestFixtureSource(nameof(Cases))]
-    public class HandlerChainsTest(IHandlerChainingCallsProviderFactory mathFactory)
+    
+    [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
+    [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
+    public class MultipleHandlersTest<T>(
+        IMultipleHandlersMathFactory mathFactory,
+        T token)
     {
-        const int Arg = 24309;
-
-        static readonly string[] Ids = 
-            ["AB", "ABC", "ABCD", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
-
-        static readonly string[] Jds =
-            ["012", "01234", "01234567890"];
+        static readonly string[] Ids = ["AB", "ABC", "ABCD", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
+        static readonly string[] Jds = ["012", "01234", "01234567890"];
 
         Mock<IConditionMath> _conditionMath;
-        IHandlerChainingCallsProvider _math;
+        IMultipleHandlersMath _math;
         List<string> _callsLog;
-
-        public static IEnumerable<IHandlerChainingCallsProviderFactory> Cases
-        {
-            get
-            {
-                yield return new ChainLeadSyntaxDirectChainingCallsProviderFactory();
-                yield return new ChainLeadSyntaxReversedChainingCallsProviderFactory();
-            }
-        }
 
         [SetUp]
         public void Setup()
@@ -44,7 +34,7 @@
             [ValueSource(nameof(Jds))] string jds)
         {
             var chain = SetupChain(_math.PackChain, ids, jds);
-            chain.Execute(Arg);
+            chain.Execute(token);
 
             var expectedCallsLog = Enumerable.Concat(
                 ids.Reverse()
@@ -66,7 +56,7 @@
             SetupConditionMathAnd();
 
             var chain = SetupChain(_math.JoinChain, ids, jds);
-            chain.Execute(Arg);
+            chain.Execute(token);
 
             var expectedCallsLog = Enumerable.Concat(
                 ids.Select(i => ConditionName(i, jds.Last())),
@@ -85,7 +75,7 @@
             [ValueSource(nameof(Jds))] string jds)
         {
             var chain = SetupChain(_math.InjectChain, ids, jds);
-            chain.Execute(Arg);
+            chain.Execute(token);
 
             var expectedCallsLog = Enumerable.Concat(
                 ids.Reverse()
@@ -116,13 +106,13 @@
                 CoverWrapOrThenAllConditionsTrueTest(_math.ThenChain, ids, jds);
 
         void CoverWrapOrThenAllConditionsTrueTest(
-            Func<IEnumerable<IHandler<int>>, IHandler<int>> append,
+            Func<IEnumerable<IHandler<T>>, IHandler<T>> append,
             string ids,
             string jds)
         {
             var chain = SetupChain(append, ids, jds);
 
-            chain.Execute(Arg);
+            chain.Execute(token);
 
             var expectedCallsLog =
                 ids.SelectMany(i => 
@@ -141,7 +131,7 @@
             SetupConditionMathAnd();
 
             var chain = SetupChain(_math.MergeChain, ids, jds);
-            chain.Execute(Arg);
+            chain.Execute(token);
 
             var expectedCallsLog = Enumerable.Concat(
                 ids.SelectMany(i => 
@@ -152,8 +142,8 @@
             Assert.That(_callsLog, Is.EqualTo(expectedCallsLog));
         }
 
-        IHandler<int> SetupChain(
-            Func<IEnumerable<IHandler<int>>, IHandler<int>> makeChain,
+        IHandler<T> SetupChain(
+            Func<IEnumerable<IHandler<T>>, IHandler<T>> makeChain,
             string ids,
             string jds) => 
                 makeChain(Enumerable.Zip(
@@ -163,12 +153,12 @@
 
         void SetupConditionMathAnd() =>
             _conditionMath
-                .Setup(o => o.And(It.IsAny<ICondition<int>>(), It.IsAny<ICondition<int>>()))
-                .Returns((ICondition<int> a, ICondition<int> b) =>
+                .Setup(o => o.And(It.IsAny<ICondition<T>>(), It.IsAny<ICondition<T>>()))
+                .Returns((ICondition<T> a, ICondition<T> b) =>
                 {
-                    var ab = new Mock<ICondition<int>>();
-                    ab.Setup(o => o.Check(Arg))
-                      .Returns(() => a.Check(Arg) && b.Check(Arg));
+                    var ab = new Mock<ICondition<T>>();
+                    ab.Setup(o => o.Check(token))
+                      .Returns(() => a.Check(token) && b.Check(token));
 
                     return ab.Object;
                 });
@@ -176,13 +166,13 @@
         static string HandlerName(char i) =>
             $"handler[{i}]";
 
-        IHandler<int> CreateHandler(char i)
+        IHandler<T> CreateHandler(char i)
         {
             var name = HandlerName(i);
-            var handler = new Mock<IHandler<int>> { Name = name };
+            var handler = new Mock<IHandler<T>> { Name = name };
 
             handler
-                .Setup(o => o.Execute(Arg))
+                .Setup(o => o.Execute(token))
                 .Callback(() => _callsLog.Add(name));
 
             return handler.Object;
@@ -191,13 +181,13 @@
         static string ConditionName(char i, char j) =>
             $"condition[{i}][{j}]";
 
-        ICondition<int> CreateCondition(char i, char j)
+        ICondition<T> CreateCondition(char i, char j)
         {
             var name = ConditionName(i, j);
-            var condition = new Mock<ICondition<int>> { Name = name };
+            var condition = new Mock<ICondition<T>> { Name = name };
 
             condition
-                .Setup(o => o.Check(Arg)).Returns(true)
+                .Setup(o => o.Check(token)).Returns(true)
                 .Callback(() => _callsLog.Add(name));
 
             return condition.Object;

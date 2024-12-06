@@ -5,8 +5,10 @@
     using ChainLead.Implementation;
 
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
+    using static ChainLead.Test.Cases.Common;
     using static ChainLead.Test.Cases.Common.Appends;
     using static ChainLead.Test.Cases.Common.Types;
+    using static ChainLead.Test.Cases.SingleHandlerFixtureCases;
 
     public static partial class Cases
     {
@@ -16,6 +18,22 @@
             public const string Syntax = "Syntax";
             public const string Separated = "Separated";
             public const string Reversed = "Reversed";
+
+            public class TestFixtureAttribute(Type t, string mathName)
+                : NUnit.Framework.TestFixtureAttribute(t,
+                    GetMathFactory(mathName),
+                    TokensProvider.Get(t, 93824))
+            {
+                public static IHandlerMathFactory GetMathFactory(string name) =>
+                    name switch
+                    {
+                        Original => new OriginalHandlerMathFactory(),
+                        Syntax => new SyntaxHandlerMathFactory(),
+                        Separated => new SeparatedSyntaxHandlerMathFactory(),
+                        Reversed => new ReversedSyntaxHandlerMathFactory(),
+                        _ => throw new ArgumentOutOfRangeException(nameof(name))
+                    };
+            }
 
             public class _I_Attribute() : TestFixtureAttribute(typeof(int), Original);
             public class _II_Attribute() : TestFixtureAttribute(typeof(string), Original);
@@ -53,33 +71,19 @@
             public class _XXXI_Attribute() : TestFixtureAttribute(typeof(RecordStruct), Reversed);
             public class _XXXII_Attribute() : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Reversed);
 
-
-            public static class HandlerMathFactoryProvider
-            {
-                public static IHandlerMathFactory Get(string name) =>
-                    name switch
-                    {
-                        Original => new OriginalHandlerMathFactory(),
-                        Syntax => new SyntaxHandlerMathFactory(),
-                        Separated => new SeparatedSyntaxHandlerMathFactory(),
-                        Reversed => new ReversedSyntaxHandlerMathFactory(),
-                        _ => throw new ArgumentOutOfRangeException(nameof(name))
-                    };
-            }
-
             public class AppendProvider<T>(IHandlerMath math)
                 : IProvider<Func<IHandler<T>, IHandler<T>, IHandler<T>>>
             {
                 public Func<IHandler<T>, IHandler<T>, IHandler<T>> this[string append] =>
                     append switch
                     {
-                        Common.Appends.FirstThenSecond => math.FirstThenSecond,
-                        Common.Appends.PackFirstInSecond => math.PackFirstInSecond,
-                        Common.Appends.InjectFirstIntoSecond => math.InjectFirstIntoSecond,
-                        Common.Appends.FirstCoverSecond => math.FirstCoverSecond,
-                        Common.Appends.FirstWrapSecond => math.FirstWrapSecond,
-                        Common.Appends.JoinFirstWithSecond => math.JoinFirstWithSecond,
-                        Common.Appends.MergeFirstWithSecond => math.MergeFirstWithSecond,
+                        Appends.FirstThenSecond => math.FirstThenSecond,
+                        Appends.PackFirstInSecond => math.PackFirstInSecond,
+                        Appends.InjectFirstIntoSecond => math.InjectFirstIntoSecond,
+                        Appends.FirstCoverSecond => math.FirstCoverSecond,
+                        Appends.FirstWrapSecond => math.FirstWrapSecond,
+                        Appends.JoinFirstWithSecond => math.JoinFirstWithSecond,
+                        Appends.MergeFirstWithSecond => math.MergeFirstWithSecond,
                         _ => throw new ArgumentOutOfRangeException(nameof(append))
                     };
             }
