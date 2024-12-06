@@ -1,18 +1,16 @@
 namespace ChainLead.Test
 {
     using ChainLead.Contracts;
-    using ChainLead.Test.Help;
-
     using Moq;
     using NUnit.Framework.Internal;
     using System;
     using System.Linq;
 
-    using static ChainLead.Test.Utils;
-    using static ChainLead.Test.Utils.Appends;
-    using static ChainLead.Test.HandlerMathTest;
-    using static ChainLead.Test.Help.Dummy.ConditionIndex.Common;
-    using static ChainLead.Test.Help.Dummy.HandlerIndex.Common;
+    using static ChainLead.Test.Cases.Common;
+    using static ChainLead.Test.Cases.HandlerMathTest;
+    using static ChainLead.Test.Dummy.ConditionIndex.Common;
+    using static ChainLead.Test.Dummy.HandlerIndex.Common;
+
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
@@ -44,7 +42,7 @@ namespace ChainLead.Test
 
         [Test]
         public void ZeroAppendZeroIsZero(
-            [ValueSource(typeof(Appends), nameof(All))] string append)
+            [AllAppends] string append)
         {
             var chain = Do[append](
                 _math.Zero<T>(), 
@@ -77,9 +75,8 @@ namespace ChainLead.Test
 
         [Test]
         public void AppendIsNotCommutative(
-            [ValueSource(typeof(Appends), nameof(All))] string append)
+            [AllAppends] string append)
         {
-
             List<Dummy.HandlerIndex> 
                 abExecution = [],
                 baExecution = [],
@@ -104,7 +101,7 @@ namespace ChainLead.Test
 
         [Test]
         public void AppendIsNotIdempotent(
-            [ValueSource(typeof(Appends), nameof(All))] string append,
+            [AllAppends] string append,
             [Values(2, 3, 4, 5, 100)] int count)
         {
             Enumerable
@@ -117,7 +114,7 @@ namespace ChainLead.Test
 
         [Test]
         public void UnconditionalChainIsAssociative(
-            [ValueSource(typeof(Appends), nameof(All))] string append)
+            [AllAppends] string append)
         {
             List<Dummy.HandlerIndex> 
                 ab_cExecution = [],
@@ -129,7 +126,7 @@ namespace ChainLead.Test
             IHandler<T> 
                 a = _dummyOf.Handlers[A],
                 b = _dummyOf.Handlers[B],
-                c = _dummyOf.Handlers[B],
+                c = _dummyOf.Handlers[C],
                 
                 ab_c = Do[append](Do[append](a, b), c),
                 a_bc = Do[append](a, Do[append](b, c));
@@ -148,8 +145,8 @@ namespace ChainLead.Test
 
         [Test]
         public void ChainExecutesHandlersOneByOne(
-            [ValueSource(typeof(Appends), nameof(All))] string append,
-            [ValueSource(typeof(HandlerMathTest), nameof(Cases1))] Case1 @case)
+            [AllAppends] string append,
+            [BlueCases] BlueCase @case)
         {
             List<Dummy.HandlerIndex> execution = [];
 
@@ -168,8 +165,8 @@ namespace ChainLead.Test
 
         [Test]
         public void ChainExecutesHandlersOneByOneAndIgnoresZeros(
-            [ValueSource(typeof(Appends), nameof(All))] string append,
-            [ValueSource(typeof(HandlerMathTest), nameof(Cases2))] Case2 @case)
+            [AllAppends] string append,
+            [RedCases] RedCase @case)
         {
             List<Dummy.HandlerIndex> execution = [];
 
@@ -219,8 +216,9 @@ namespace ChainLead.Test
             Assert.That(handlers.VerifyExecution(setup));
         }
 
-        [TestCaseSource(typeof(HandlerMathTest), nameof(Cases3))]
-        public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(Case3 @case)
+        [Test]
+        public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(
+            [GreenCases] GreenCase @case)
         {
             _dummyOf.ConditionMath.Setup__And(X, Y, returns: Z);
 
@@ -243,8 +241,9 @@ namespace ChainLead.Test
             Assert.That(_dummyOf.Handlers[A, B].EachWasExecutedOnceWhen(@case.FinalConditionCheckResult).ElseNoOne);
         }
 
-        [TestCaseSource(typeof(HandlerMathTest), nameof(Cases4))]
-        public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(Case4 @case)
+        [Test]
+        public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(
+            [OrangeCases] OrangeCase @case)
         {
             Dummy.ConditionIndex 
                 aTop = new("A TOP"),
@@ -279,8 +278,9 @@ namespace ChainLead.Test
             Assert.That(_dummyOf.Handlers[A, B].VerifyExecution(@case.ExecutionExpected));
         }
 
-        [TestCaseSource(typeof(HandlerMathTest), nameof(Cases5))]
-        public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(Case5 @case)
+        [Test]
+        public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(
+            [YellowCases] YellowCase @case)
         {
             _dummyOf.Conditions[@case.ChecksSetup.Keys]
                     .SetResults(@case.ChecksSetup.Values);
@@ -315,7 +315,7 @@ namespace ChainLead.Test
 
         [Test]
         public void MergeFirstWithSecond__ConjunctsAllConditions(
-            [ValueSource(typeof(HandlerMathTest), nameof(Cases6))] Case6 @case,
+            [WhiteCases] WhiteCase @case,
             [Values(true, false)] bool finalConditionResult)
         {
             Dummy.Condition<T>? lastAnd = null;
@@ -389,8 +389,10 @@ namespace ChainLead.Test
             Assert.That(_dummyOf.Handlers[A, B].EachWasExecutedOnceWhen(checkResult).ElseNoOne);
         }
 
-        [TestCaseSource(typeof(HandlerMathTest), nameof(Cases7))]
-        public void CorrectConditionsCascadeTest(Case7 @case)
+
+        [Test]
+        public void CorrectConditionsCascadeTest(
+            [BlackCases] BlackCase @case)
         {
             List<Dummy.Index> execution = [];
 
@@ -415,7 +417,7 @@ namespace ChainLead.Test
 
         [Test]
         public void AppendWithAtomizedConditionalHandler__IsTheSameAs__WithRegularHandler(
-            [ValueSource(typeof(Appends), nameof(All))] string append,
+            [AllAppends] string append,
             [Values(false, true)] bool isFirstArgument,
             [Values(false, true)] bool bottomCheckResult)
         {
@@ -461,7 +463,7 @@ namespace ChainLead.Test
 
         [Test]
         public void AppendedTwoAtomizedConditionalHandlers__IsTheSameAs__AppendedTwoRegularHandlers(
-            [ValueSource(typeof(Appends), nameof(All))] string append,
+            [AllAppends] string append,
             [Values(false, true)] bool aBottomCheckResult,
             [Values(false, true)] bool bBottomCheckResult)
         {

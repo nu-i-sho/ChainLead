@@ -1,14 +1,47 @@
-﻿namespace ChainLead.Test
+﻿namespace ChainLead.Test.Cases
 {
-    using ChainLead.Test.Help;
-
-    using static ChainLead.Test.Utils.Appends;
-    using static ChainLead.Test.Help.Dummy.HandlerIndex.Common;
-    using static ChainLead.Test.Help.Dummy.ConditionIndex.Common;
+    using static ChainLead.Test.Cases.Common.Appends;
+    using static ChainLead.Test.Dummy.HandlerIndex.Common;
+    using static ChainLead.Test.Dummy.ConditionIndex.Common;
 
     public partial class HandlerMathTest
     {
-        public record Case1(
+        public class BlueCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(BlueCases));
+
+        public class RedCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(RedCases));
+
+        public class GreenCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(GreenCases));
+
+        public class OrangeCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(OrangeCases));
+
+        public class YellowCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(YellowCases));
+
+        public class WhiteCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(WhiteCases));
+
+        public class BlackCasesAttribute()
+            : ValueSourceAttribute(
+                typeof(HandlerMathTest),
+                nameof(BlackCases));
+
+        public record BlueCase(
             Dummy.HandlerIndex[] ChainIndices,
             string NameForEasyFind = "")
         {
@@ -22,14 +55,14 @@
             }
         }
 
-        public static Case1[] Cases1 =>
+        public static BlueCase[] BlueCases =>
         [
             new([ A, A ], "1"), new([ A, B ], "2"), new([ A, B, C ], "3"), new([ A, B, C, D, E, F ], "4"),
             new([ A, B, C, D, A, B, B, B, A, B, C, D, E, F, H, I, A, B, C, D, C, C, D], "5"),
             new([ A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A, A], "6")
         ];
 
-        public record Case2(
+        public record RedCase(
             Dummy.HandlerIndex?[] ChainIndicesWithNullsAsZeros,
             Dummy.HandlerIndex[] ExpectedExecution,
             string NameForEasyFind = "")
@@ -48,7 +81,7 @@
             }
         }
 
-        public static Case2[] Cases2 =>
+        public static RedCase[] RedCases =>
         [
             new([null, A], [A], "Sunday"),
             new([A, null], [A], "Monday"),
@@ -64,7 +97,7 @@
                 "Friday")
         ];
 
-        public record Case3(
+        public record GreenCase(
             bool AIsConditional,
             bool BIsConditional,
             Dummy.ConditionIndex ExpectedFinalCondition,
@@ -87,7 +120,7 @@
             }
         }
 
-        public static IEnumerable<Case3> Cases3
+        public static IEnumerable<GreenCase> GreenCases
         {
             get
             {
@@ -100,7 +133,7 @@
             }
         }
 
-        public record Case4(
+        public record OrangeCase(
             bool[] CheckSetup,
             bool[] CheckExpected,
             bool[] ExecutionExpected,
@@ -121,7 +154,7 @@
             }
         }
 
-        public static IEnumerable<Case4> Cases4
+        public static IEnumerable<OrangeCase> OrangeCases
         {
             get
             {
@@ -175,7 +208,7 @@
             }
         }
 
-        public record Case5(
+        public record YellowCase(
             Dummy.ConditionIndex[] AConditions,
             Dummy.ConditionIndex[] BConditions,
             Dictionary<Dummy.ConditionIndex, bool> ChecksSetup,
@@ -200,7 +233,7 @@
             }
         }
 
-        public static IEnumerable<Case5> Cases5
+        public static IEnumerable<YellowCase> YellowCases
         {
             get
             {
@@ -590,7 +623,7 @@
             }
         }
 
-        public record Case6(
+        public record WhiteCase(
             Dummy.ConditionIndex[] AConditions,
             Dummy.ConditionIndex[] BConditions,
             string NameForEasyFind = "")
@@ -609,7 +642,7 @@
             }
         }
 
-        public static IEnumerable<Case6> Cases6
+        public static IEnumerable<WhiteCase> WhiteCases
         {
             get
             {
@@ -649,7 +682,7 @@
             }
         }
 
-        public record Case7(
+        public record BlackCase(
             string Append,
             Dummy.ConditionIndex[] AConditions,
             Dummy.ConditionIndex[] BConditions,
@@ -674,7 +707,7 @@
             }
         }
 
-        public static IEnumerable<Case7> Cases7
+        public static IEnumerable<BlackCase> BlackCases
         {
             get
             {

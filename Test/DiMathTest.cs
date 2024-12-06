@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Test.DI
+﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts;
     using ChainLead.Implementation;
@@ -7,7 +7,7 @@
     using Moq;
 
     [TestFixture]
-    public class MathDiTest
+    public class DiMathTest
     {
         Mock<IServiceCollection> _serviceCollection;
         ServiceDescriptor? _descriptor;
@@ -18,7 +18,7 @@
             _descriptor = null;
 
             _serviceCollection = new Mock<IServiceCollection>();
-            
+
             _serviceCollection
                 .Setup(o => o.Add(It.IsAny<ServiceDescriptor>()))
                 .Callback((ServiceDescriptor descriptor) => _descriptor = descriptor);
@@ -35,7 +35,7 @@
         public void AddConditionMathAddsImplementationFor_IConditionMath()
         {
             _serviceCollection.Object.AddConditionMath();
-            Assert.That(_descriptor!.ServiceType, 
+            Assert.That(_descriptor!.ServiceType,
                 Is.EqualTo(typeof(IConditionMath)));
         }
 

@@ -1,11 +1,12 @@
-﻿namespace ChainLead.Test
+﻿namespace ChainLead.Test.Cases
 {
     using ChainLead.Contracts;
     using ChainLead.Contracts.Syntax;
     using ChainLead.Implementation;
+
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
-    using static ChainLead.Test.Utils.Appends;
-    using static ChainLead.Test.Utils.Types;
+    using static ChainLead.Test.Cases.Common.Appends;
+    using static ChainLead.Test.Cases.Common.Types;
 
     public partial class HandlerMathTest
     {
@@ -70,13 +71,13 @@
             public Func<IHandler<T>, IHandler<T>, IHandler<T>> this[string append] =>
                 append switch
                 {
-                    Utils.Appends.FirstThenSecond => math.FirstThenSecond,
-                    Utils.Appends.PackFirstInSecond => math.PackFirstInSecond,
-                    Utils.Appends.InjectFirstIntoSecond => math.InjectFirstIntoSecond,
-                    Utils.Appends.FirstCoverSecond => math.FirstCoverSecond,
-                    Utils.Appends.FirstWrapSecond => math.FirstWrapSecond,
-                    Utils.Appends.JoinFirstWithSecond => math.JoinFirstWithSecond,
-                    Utils.Appends.MergeFirstWithSecond => math.MergeFirstWithSecond,
+                    Common.Appends.FirstThenSecond => math.FirstThenSecond,
+                    Common.Appends.PackFirstInSecond => math.PackFirstInSecond,
+                    Common.Appends.InjectFirstIntoSecond => math.InjectFirstIntoSecond,
+                    Common.Appends.FirstCoverSecond => math.FirstCoverSecond,
+                    Common.Appends.FirstWrapSecond => math.FirstWrapSecond,
+                    Common.Appends.JoinFirstWithSecond => math.JoinFirstWithSecond,
+                    Common.Appends.MergeFirstWithSecond => math.MergeFirstWithSecond,
                     _ => throw new ArgumentOutOfRangeException(nameof(append))
                 };
         }
@@ -97,7 +98,7 @@
             public override string ToString() => "Original";
 
             class Product(IHandlerMath math)
-                : SingleHandlerMathTest.OriginalMathFactory.Product(math),
+                : SingleHandlerTest.OriginalMathFactory.Product(math),
                 ITestingHandlerMath
             {
                 public IHandler<T> FirstCoverSecond<T>(IHandler<T> a, IHandler<T> b) =>
@@ -132,7 +133,7 @@
             public override string ToString() => "Syntax like FirstThenSecond[a, b]";
 
             class Product(IConditionMath conditionMath) 
-                : SingleHandlerMathTest.SyntaxMathFactory.Product(conditionMath),
+                : SingleHandlerTest.SyntaxMathFactory.Product(conditionMath),
                 ITestingHandlerMath
             {
                 public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
@@ -167,7 +168,7 @@
             public override string ToString() => "Syntax like Pack[a].In[b]";
 
             class Product(IConditionMath conditionMath)
-                : SingleHandlerMathTest.SyntaxMathFactory.Product(conditionMath),
+                : SingleHandlerTest.SyntaxMathFactory.Product(conditionMath),
                 ITestingHandlerMath
             {
                 public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
@@ -202,7 +203,7 @@
             public override string ToString() => "Syntax like PackXIn[a].WhereXIs[b]";
 
             class Product(IConditionMath conditionMath)
-                : SingleHandlerMathTest.SyntaxMathFactory.Product(conditionMath),
+                : SingleHandlerTest.SyntaxMathFactory.Product(conditionMath),
                 ITestingHandlerMath
             {
                 public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>

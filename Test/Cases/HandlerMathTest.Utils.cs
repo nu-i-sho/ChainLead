@@ -1,7 +1,5 @@
-﻿namespace ChainLead.Test
+﻿namespace ChainLead.Test.Cases
 {
-    using ChainLead.Test.Help;
-
     public partial class HandlerMathTest
     {
         const char CaseBlocksSeparator = '•';

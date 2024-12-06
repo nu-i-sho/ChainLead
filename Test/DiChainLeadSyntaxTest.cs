@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Test.DI
+﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts;
     using ChainLead.Contracts.Syntax;
@@ -7,7 +7,7 @@
     using Moq;
 
     [TestFixture]
-    public class ChainLeadSyntaxDiTest
+    public class DiChainLeadSyntaxTest
     {
         Mock<IServiceCollection> _serviceCollection;
         Mock<IServiceProvider> _serviceProvider;
