@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Test.Help
+﻿namespace ChainLead.Test
 {
     public interface IDummy<TIndex>
         where TIndex : Dummy.Index

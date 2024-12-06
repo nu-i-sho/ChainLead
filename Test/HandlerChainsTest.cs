@@ -4,6 +4,7 @@
     using ChainLead.Test.HandlersTestData;
     using Moq;
     using System.Diagnostics.CodeAnalysis;
+
     using static System.Linq.Enumerable;
 
     [TestFixtureSource(nameof(Cases))]

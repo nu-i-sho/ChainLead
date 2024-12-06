@@ -1,26 +1,26 @@
-﻿namespace ChainLead.Test.Help
+﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts;
 
     public static partial class Dummy
     {
         public class Condition<T>(
-                Dummy.ConditionIndex index,
-                T expectedArg) :
-            IDummy<Dummy.ConditionIndex>,
+                ConditionIndex index,
+                T token) :
+            IDummy<ConditionIndex>,
             ICondition<T>
         {
-            public Dummy.ConditionIndex Index => index;
+            public ConditionIndex Index => index;
 
             public string Name => index.View;
 
             public void AddCallback(Action f) =>
                 Callback += f;
 
-            public void AddLoggingInto(IList<Dummy.ConditionIndex> acc) =>
+            public void AddLoggingInto(IList<ConditionIndex> acc) =>
                 AddCallback(() => acc.Add(Index));
 
-            public void AddLoggingInto(IList<Dummy.Index> acc) =>
+            public void AddLoggingInto(IList<Index> acc) =>
                 AddCallback(() => acc.Add(Index));
 
             public void SetResult(bool value) =>
@@ -53,9 +53,9 @@
 
             public Func<bool> Return { get; set; } = () => false;
 
-            public bool Check(T state)
+            public bool Check(T x)
             {
-                if (state?.Equals(state) ?? false)
+                if (x?.Equals(token) ?? false)
                 {
                     Callback();
                     CallsCount++;

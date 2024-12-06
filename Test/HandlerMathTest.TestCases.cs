@@ -1,10 +1,8 @@
 ﻿namespace ChainLead.Test
 {
-    using ChainLead.Test.Help;
-
     using static ChainLead.Test.Utils.Appends;
-    using static ChainLead.Test.Help.Dummy.HandlerIndex.Common;
-    using static ChainLead.Test.Help.Dummy.ConditionIndex.Common;
+    using static ChainLead.Test.Dummy.HandlerIndex.Common;
+    using static ChainLead.Test.Dummy.ConditionIndex.Common;
 
     public partial class HandlerMathTest
     {

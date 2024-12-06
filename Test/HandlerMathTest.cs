@@ -1,7 +1,6 @@
 namespace ChainLead.Test
 {
     using ChainLead.Contracts;
-    using ChainLead.Test.Help;
 
     using Moq;
     using NUnit.Framework.Internal;
@@ -11,8 +10,8 @@ namespace ChainLead.Test
     using static ChainLead.Test.Utils;
     using static ChainLead.Test.Utils.Appends;
     using static ChainLead.Test.HandlerMathTest;
-    using static ChainLead.Test.Help.Dummy.ConditionIndex.Common;
-    using static ChainLead.Test.Help.Dummy.HandlerIndex.Common;
+    using static ChainLead.Test.Dummy.ConditionIndex.Common;
+    using static ChainLead.Test.Dummy.HandlerIndex.Common;
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
@@ -129,7 +128,7 @@ namespace ChainLead.Test
             IHandler<T> 
                 a = _dummyOf.Handlers[A],
                 b = _dummyOf.Handlers[B],
-                c = _dummyOf.Handlers[B],
+                c = _dummyOf.Handlers[C],
                 
                 ab_c = Do[append](Do[append](a, b), c),
                 a_bc = Do[append](a, Do[append](b, c));

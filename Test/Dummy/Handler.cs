@@ -1,35 +1,35 @@
-﻿using ChainLead.Contracts;
-
-namespace ChainLead.Test.Help
+﻿namespace ChainLead.Test
 {
+    using ChainLead.Contracts;
+
     public static partial class Dummy
     {
         public class Handler<T>(
-                Dummy.HandlerCollection<T> handlers,
-                Dummy.HandlerIndex index,
-                T tokenArg) :
-            IDummy<Dummy.HandlerIndex>,
+                HandlerCollection<T> handlers,
+                HandlerIndex index,
+                T token) :
+            IDummy<HandlerIndex>,
             IHandler<T>
         {
-            public Dummy.HandlerIndex Index => index;
+            public HandlerIndex Index => index;
 
             public string Name => index.View;
 
             public void AddCallback(Action f) =>
                 Callback += f;
 
-            public void AddLoggingInto(IList<Dummy.HandlerIndex> acc) =>
+            public void AddLoggingInto(IList<HandlerIndex> acc) =>
                 AddCallback(() => acc.Add(Index));
 
             public void AddLoggingInto(IList<Index> acc) =>
                 AddCallback(() => acc.Add(Index));
 
-            public void AddDelegationTo(params Dummy.HandlerIndex[] indexes) =>
-                    AddCallback(() =>
-                    {
-                        foreach (var i in indexes)
-                            handlers[i].Execute(tokenArg);
-                    });
+            public void AddDelegationTo(params HandlerIndex[] indexes) =>
+                AddCallback(() =>
+                {
+                    foreach (var i in indexes)
+                        handlers[i].Execute(token);
+                });
 
             public bool WasExecutedOnce() =>
                 CallsCount == 1;
@@ -73,7 +73,7 @@ namespace ChainLead.Test.Help
 
             public void Execute(T state)
             {
-                if (state?.Equals(tokenArg) ?? false)
+                if (state?.Equals(token) ?? false)
                 {
                     Callback();
                     CallsCount++;

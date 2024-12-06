@@ -1,11 +1,11 @@
-﻿namespace ChainLead.Test.Help
+﻿namespace ChainLead.Test
 {
     public static partial class Dummy
     {
         public class Collection<TDummy, TIndex>
-            : List<TDummy>, Dummy.ICollection<TDummy, TIndex>
+            : List<TDummy>, ICollection<TDummy, TIndex>
                 where TDummy : IDummy<TIndex>
-                where TIndex : Dummy.Index
+                where TIndex : Index
         {
             public Collection()
                 : base() { }

@@ -1,12 +1,11 @@
 ﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts;
-    using ChainLead.Test.Help;
     using Moq;
 
     using static ChainLead.Test.SingleHandlerMathTest;
-    using static ChainLead.Test.Help.Dummy.HandlerIndex.Common;
-    using static ChainLead.Test.Help.Dummy.ConditionIndex.Common;
+    using static ChainLead.Test.Dummy.HandlerIndex.Common;
+    using static ChainLead.Test.Dummy.ConditionIndex.Common;
     using static ChainLead.Test.Utils;
     
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
