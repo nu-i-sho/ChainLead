@@ -16,15 +16,15 @@
         static readonly string[] Ids = ["AB", "ABC", "ABCD", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
         static readonly string[] Jds = ["012", "01234", "01234567890"];
 
-        Mock<IConditionMath> _conditionMath;
+        Dummy.Container<T> _dummyOf;
         IMultipleHandlersMath _math;
-        List<string> _callsLog;
+        List<Dummy.Index> _callsLog;
 
         [SetUp]
         public void Setup()
         {
-            _conditionMath = new Mock<IConditionMath>();
-            _math = mathFactory.Create(_conditionMath.Object);
+            _dummyOf = new Dummy.Container<T>(token, [], []);
+            _math = mathFactory.Create(_dummyOf.ConditionMath.Object);
             _callsLog = [];
         }
 
@@ -37,15 +37,13 @@
             chain.Execute(token);
 
             var expectedCallsLog = Enumerable.Concat(
-                ids.Reverse()
-                   .Select(i => ConditionName(i, jds.Last())),
-                ids.SelectMany(i =>
-                        jds.Reverse()
-                           .Skip(1)
-                           .Select(j => ConditionName(i, j))
-                           .Concat([HandlerName(i)])));
+                ids.Reverse().Select(i => Index(i, jds.Last())),
+                ids.SelectMany(i => jds.Reverse().Skip(1)
+                       .Select(j => Index(i, j))
+                       .Concat([Index(i)])));
 
-            Assert.That(_callsLog, Is.EqualTo(expectedCallsLog));
+            Assert.That(_callsLog, 
+                Is.EqualTo(expectedCallsLog));
         }
 
         [Test]
@@ -59,14 +57,13 @@
             chain.Execute(token);
 
             var expectedCallsLog = Enumerable.Concat(
-                ids.Select(i => ConditionName(i, jds.Last())),
-                ids.SelectMany(i =>
-                        jds.Reverse()
-                           .Skip(1)
-                           .Select(j => ConditionName(i, j))
-                           .Concat([HandlerName(i)])));
+                ids.Select(i => Index(i, jds.Last())),
+                ids.SelectMany(i => jds.Reverse().Skip(1)
+                       .Select(j => Index(i, j))
+                       .Concat([Index(i)])));
 
-            Assert.That(_callsLog, Is.EqualTo(expectedCallsLog));
+            Assert.That(_callsLog, 
+                Is.EqualTo(expectedCallsLog));
         }
 
         [Test]
@@ -78,13 +75,12 @@
             chain.Execute(token);
 
             var expectedCallsLog = Enumerable.Concat(
-                ids.Reverse()
-                   .SelectMany(i => 
-                        jds.Reverse()
-                           .Select(j => ConditionName(i, j))),
-                ids.Select(HandlerName));
+                ids.Reverse().SelectMany(i => jds.Reverse()
+                                 .Select(j => Index(i, j))),
+                ids.Select(Index));
 
-            Assert.That(_callsLog, Is.EqualTo(expectedCallsLog));
+            Assert.That(_callsLog, 
+                Is.EqualTo(expectedCallsLog));
         }
 
         [Test]
@@ -116,11 +112,11 @@
 
             var expectedCallsLog =
                 ids.SelectMany(i => 
-                        jds.Reverse()
-                           .Select(j => ConditionName(i, j))
-                           .Concat([HandlerName(i)]));
+                    jds.Reverse().Select(j => Index(i, j))
+                       .Concat([Index(i)]));
 
-            Assert.That(_callsLog, Is.EqualTo(expectedCallsLog));
+            Assert.That(_callsLog, 
+                Is.EqualTo(expectedCallsLog));
         }
 
         [Test]
@@ -134,25 +130,42 @@
             chain.Execute(token);
 
             var expectedCallsLog = Enumerable.Concat(
-                ids.SelectMany(i => 
-                        jds.Reverse()
-                           .Select(j => ConditionName(i, j))),
-                ids.Select(HandlerName));
+                ids.SelectMany(i => jds.Reverse()
+                       .Select(j => Index(i, j))),
+                ids.Select(Index));
 
-            Assert.That(_callsLog, Is.EqualTo(expectedCallsLog));
+            Assert.That(_callsLog, 
+                Is.EqualTo(expectedCallsLog));
         }
 
         IHandler<T> SetupChain(
             Func<IEnumerable<IHandler<T>>, IHandler<T>> makeChain,
             string ids,
-            string jds) => 
-                makeChain(Enumerable.Zip(
-                    ids.Select(CreateHandler),
-                    ids.Select(i => jds.Select(j => CreateCondition(i, j))),
-                    (handler, conditions) => conditions.Aggregate(handler, _math.Conditional)));
+            string jds)
+        {
+            List<IHandler<T>> handlers = new(); 
+            foreach(var (handlerIndex, conditionIndices) in 
+                Enumerable.Zip(
+                    ids.Select(HandlerIndex),
+                    ids.Select(i => jds.Select(j => ConditionIndex(i, j)))))
+            {
+                _dummyOf.Handlers.GenerateMore(handlerIndex);
+                _dummyOf.Conditions.GenerateMore(conditionIndices);
+
+                handlers.Add(_dummyOf.Conditions[conditionIndices]
+                  .Aggregate(_dummyOf.Handlers[handlerIndex].Pure,
+                             _math.Conditional));
+            }
+
+            _dummyOf.Handlers.AddLoggingInto(_callsLog);
+            _dummyOf.Conditions.AddLoggingInto(_callsLog);
+            _dummyOf.Conditions.SetResults(true);
+
+            return makeChain(handlers);
+        }
 
         void SetupConditionMathAnd() =>
-            _conditionMath
+            _dummyOf.ConditionMath
                 .Setup(o => o.And(It.IsAny<ICondition<T>>(), It.IsAny<ICondition<T>>()))
                 .Returns((ICondition<T> a, ICondition<T> b) =>
                 {
@@ -163,34 +176,14 @@
                     return ab.Object;
                 });
 
-        static string HandlerName(char i) =>
-            $"handler[{i}]";
+        static Dummy.HandlerIndex HandlerIndex(char i) =>
+            new($"h[{i}]");
 
-        IHandler<T> CreateHandler(char i)
-        {
-            var name = HandlerName(i);
-            var handler = new Mock<IHandler<T>> { Name = name };
+        static Dummy.ConditionIndex ConditionIndex(char i, char j) =>
+            new($"c[{i}][{j}]");
 
-            handler
-                .Setup(o => o.Execute(token))
-                .Callback(() => _callsLog.Add(name));
+        static Dummy.Index Index(char i) => HandlerIndex(i);
 
-            return handler.Object;
-        }
-
-        static string ConditionName(char i, char j) =>
-            $"condition[{i}][{j}]";
-
-        ICondition<T> CreateCondition(char i, char j)
-        {
-            var name = ConditionName(i, j);
-            var condition = new Mock<ICondition<T>> { Name = name };
-
-            condition
-                .Setup(o => o.Check(token)).Returns(true)
-                .Callback(() => _callsLog.Add(name));
-
-            return condition.Object;
-        }
+        static Dummy.Index Index(char i, char j) => ConditionIndex(i, j);
     }
 }
