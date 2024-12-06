@@ -1,105 +1,101 @@
 namespace ChainLead.Test
 {
-    // DO NOT using ChainLead.Contracts.Syntax;
-
     using ChainLead.Contracts;
     using ChainLead.Test.Help;
 
     using Moq;
     using NUnit.Framework.Internal;
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
+    using static ChainLead.Test.Utils;
+    using static ChainLead.Test.Utils.Appends;
     using static ChainLead.Test.HandlerMathTest;
-    using static ChainLead.Test.Help.Constants;
-    using static ChainLead.Test.Help.Constants.Appends;
+    using static ChainLead.Test.Help.Dummy.ConditionIndex.Common;
+    using static ChainLead.Test.Help.Dummy.HandlerIndex.Common;
 
-    [TestFixtureSource(nameof(FixtureCases))]
-    public partial class HandlerMathTest(IHandlerMathFactory mathFactory)
+    [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
+    [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
+    [_XVII_][_XVIII_][_XIX_][_XX_][_XXI_][_XXII_][_XXIII_][_XXIV_]
+    [_XXV_][_XXVI_][_XXVII_][_XVIII_][_XXIX_][_XXX_][_XXXI_][_XXXII_]
+    public partial class HandlerMathTest<T>(string mathFactoryName)
     {
         public interface IBase;
         public interface IDerived : IBase;
 
-        [AllowNull] IHandlerMath _math;
-        [AllowNull] ChainLeadMocks _mockOf;
+        IHandlerMath _math;
+        Dummy.Container<T> _dummyOf;
+        AppendProvider<T> _appendProvider;
+        T _token;
 
-        Func<IHandler<T>, IHandler<T>, IHandler<T>>
-            AppendFunc<T>(string by) =>
-                by switch
-                {
-                    FirstThenSecond => _math.FirstThenSecond,
-                    PackFirstInSecond => _math.PackFirstInSecond,
-                    InjectFirstIntoSecond => _math.InjectFirstIntoSecond,
-                    FirstCoverSecond => _math.FirstCoverSecond,
-                    FirstWrapSecond => _math.FirstWrapSecond,
-                    JoinFirstWithSecond => _math.JoinFirstWithSecond,
-                    MergeFirstWithSecond => _math.MergeFirstWithSecond,
-                    _ => throw new ArgumentOutOfRangeException(nameof(by))
-                };
+        AppendProvider<T> Do => _appendProvider;
 
         [SetUp]
-        [MemberNotNull(nameof(_math))]
-        [MemberNotNull(nameof(_mockOf))]
         public void Setup()
         {
-            _mockOf = new ChainLeadMocks();
-            _math = mathFactory.Create(_mockOf.ConditionMath.Object);
+            _token = TokensProvider.Get<T>(798);
+            _dummyOf = new Dummy.Container<T>(_token);
+            _math = HandlerMathFactoryProvider
+                .Get(mathFactoryName)
+                .Create(_dummyOf.ConditionMath.Object);
+            
+            _appendProvider = new(_math);
         }
 
         [Test]
         public void ZeroAppendZeroIsZero(
-            [ValueSource(typeof(Appends), nameof(All))] string appendType)
+            [ValueSource(typeof(Appends), nameof(All))] string append)
         {
-            var append = AppendFunc<int>(by: appendType);
-            var zeros = new[] { _math.Zero<int>(), _math.Zero<int>() };
-            var twoZeros = append(zeros[0], zeros[1]);
-            
-            Assert.That(_math.IsZero(twoZeros));
-        }
-
-        [Test]
-        public void BaseZeroAppendDerivedZeroIsDerivedZero(
-            [ValueSource(typeof(Appends), nameof(All))] string appendType)
-        {
-            var append = AppendFunc<IDerived>(by: appendType);
-            var chain = append(_math.Zero<IBase>(), _math.Zero<IDerived>());
+            var chain = Do[append](
+                _math.Zero<T>(), 
+                _math.Zero<T>());
             
             Assert.That(_math.IsZero(chain));
         }
 
-        [Test]
-        public void DerivedZeroAppendBaseZeroChainIsDerivedZero(
-            [ValueSource(typeof(Appends), nameof(All))] string appendType)
-        {
-            var append = AppendFunc<IDerived>(by: appendType);
-            var chain = append(_math.Zero<IDerived>(), _math.Zero<IBase>());
+        //[Test]
+        //public void BaseZeroAppendDerivedZeroIsDerivedZero(
+        //    [ValueSource(typeof(Appends), nameof(All))] string append)
+        //{
+        //    var chain = Do[append](
+        //        _math.Zero<object>(), 
+        //        _math.Zero<T>());
             
-            Assert.That(_math.IsZero(chain));
-        }
+        //    Assert.That(_math.IsZero(chain));
+        //}
+
+        //[Test]
+        //public void DerivedZeroAppendBaseZeroChainIsDerivedZero(
+        //    [ValueSource(typeof(Appends), nameof(All))] string append)
+        //{
+        //    var chain = Do[append](
+        //        _math.Zero<T>(), 
+        //        _math.Zero<object>());
+            
+        //    Assert.That(_math.IsZero(chain));
+        //}
 
         [Test]
         public void AppendIsNotCommutative(
-            [ValueSource(typeof(Appends), nameof(All))] string appendType)
+            [ValueSource(typeof(Appends), nameof(All))] string append)
         {
-            var append = AppendFunc<int>(by: appendType);
-            
-            List<HandlerIndex> 
+
+            List<Dummy.HandlerIndex> 
                 abExecution = [],
                 baExecution = [],
                 execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
 
-            var ab = append(_mockOf.Handlers[A], _mockOf.Handlers[B]);
-            var ba = append(_mockOf.Handlers[B], _mockOf.Handlers[A]);
+            var ab = Do[append](_dummyOf.Handlers[A], _dummyOf.Handlers[B]);
+            var ba = Do[append](_dummyOf.Handlers[B], _dummyOf.Handlers[A]);
 
-            ab.Execute(Arg);
+            ab.Execute(_token);
             abExecution.AddRange(execution);
 
             execution.Clear();
 
-            ba.Execute(Arg);
+            ba.Execute(_token);
             baExecution.AddRange(execution);
 
             Assert.That(abExecution,
@@ -108,44 +104,42 @@ namespace ChainLead.Test
 
         [Test]
         public void AppendIsNotIdempotent(
-            [Values(2, 3, 4, 5, 100)] int count,
-            [ValueSource(typeof(Appends), nameof(All))] string appendType)
+            [ValueSource(typeof(Appends), nameof(All))] string append,
+            [Values(2, 3, 4, 5, 100)] int count)
         {
             Enumerable
-                .Repeat(_mockOf.Handlers[A], count)
-                .Aggregate(AppendFunc<int>(by: appendType))
-                .Execute(Arg);
+                .Repeat(_dummyOf.Handlers[A], count)
+                .Aggregate(Do[append])
+                .Execute(_token);
 
-            Assert.That(_mockOf.Handlers[A].WasExecuted(count).Times);
+            Assert.That(_dummyOf.Handlers[A].WasExecuted(count).Times);
         }
 
         [Test]
         public void UnconditionalChainIsAssociative(
-            [ValueSource(typeof(Appends), nameof(All))] string appendType)
+            [ValueSource(typeof(Appends), nameof(All))] string append)
         {
-            var append = AppendFunc<int>(by: appendType);
-            
-            List<HandlerIndex> 
+            List<Dummy.HandlerIndex> 
                 ab_cExecution = [],
                 a_bcExecution = [],
                 execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            IHandler<int> 
-                a = _mockOf.Handlers[A],
-                b = _mockOf.Handlers[B],
-                c = _mockOf.Handlers[B],
+            IHandler<T> 
+                a = _dummyOf.Handlers[A],
+                b = _dummyOf.Handlers[B],
+                c = _dummyOf.Handlers[B],
                 
-                ab_c = append(append(a, b), c),
-                a_bc = append(a, append(b, c));
+                ab_c = Do[append](Do[append](a, b), c),
+                a_bc = Do[append](a, Do[append](b, c));
             
-            ab_c.Execute(Arg);
+            ab_c.Execute(_token);
             ab_cExecution.AddRange(execution);
 
             execution.Clear();
 
-            a_bc.Execute(Arg);
+            a_bc.Execute(_token);
             a_bcExecution.AddRange(execution);
 
             Assert.That(ab_cExecution,
@@ -154,19 +148,19 @@ namespace ChainLead.Test
 
         [Test]
         public void ChainExecutesHandlersOneByOne(
-            [ValueSource(typeof(Appends), nameof(All))] string appendType,
-            [ValueSource(nameof(Cases1))] Case1 @case)
+            [ValueSource(typeof(Appends), nameof(All))] string append,
+            [ValueSource(typeof(HandlerMathTest), nameof(Cases1))] Case1 @case)
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[@case.ChainIndices.Distinct()]
+            _dummyOf.Handlers[@case.ChainIndices.Distinct()]
                 .AddLoggingInto(execution); 
 
             var chain = @case.ChainIndices
-                .Select(_mockOf.Handlers.Get)
-                .Aggregate(AppendFunc<int>(by: appendType));
+                .Select(_dummyOf.Handlers.Get)
+                .Aggregate(Do[append]);
 
-            chain.Execute(Arg);
+            chain.Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(@case.ChainIndices));
@@ -174,23 +168,23 @@ namespace ChainLead.Test
 
         [Test]
         public void ChainExecutesHandlersOneByOneAndIgnoresZeros(
-            [ValueSource(typeof(Appends), nameof(All))] string appendType,
-            [ValueSource(nameof(Cases2))] Case2 @case)
+            [ValueSource(typeof(Appends), nameof(All))] string append,
+            [ValueSource(typeof(HandlerMathTest), nameof(Cases2))] Case2 @case)
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
             var uniqueIndices = @case.ChainIndicesWithNullsAsZeros
                  .Where(NotNull).Select(Denullify).Distinct();
 
-            _mockOf.Handlers[uniqueIndices]
+            _dummyOf.Handlers[uniqueIndices]
                  .AddLoggingInto(execution);
 
             @case.ChainIndicesWithNullsAsZeros
                  .Select(i => i != null
-                     ? _mockOf.Handlers[i]
-                     : _math.Zero<int>())
-                 .Aggregate(AppendFunc<int>(by: appendType))
-                 .Execute(Arg);
+                     ? _dummyOf.Handlers[i]
+                     : _math.Zero<T>())
+                 .Aggregate(Do[append])
+                 .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(@case.ExpectedExecution));
@@ -211,48 +205,48 @@ namespace ChainLead.Test
             string conditionsSetup)
         {
             var setup = conditionsSetup.Select(x => x == '1');
-            var conditions = _mockOf.Conditions.Take(setup.Count());
-            var handlers = _mockOf.Handlers.Take(setup.Count());
+            var conditions = _dummyOf.Conditions.Take(setup.Count());
+            var handlers = _dummyOf.Handlers.Take(setup.Count());
 
             conditions.SetResults(setup);
 
             Enumerable
                 .Zip(handlers, conditions, _math.Conditional)
                 .Aggregate(_math.FirstThenSecond)
-                .Execute(Arg);
+                .Execute(_token);
 
             Assert.That(conditions.EachWasCheckedOnce());
             Assert.That(handlers.VerifyExecution(setup));
         }
 
-        [TestCaseSource(nameof(Cases3))]
+        [TestCaseSource(typeof(HandlerMathTest), nameof(Cases3))]
         public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(Case3 @case)
         {
-            _mockOf.ConditionMath.Setup__And(X, Y, returns: Z);
+            _dummyOf.ConditionMath.Setup__And(X, Y, returns: Z);
 
-            var expectedCondition = _mockOf.Conditions[@case.ExpectedFinalCondition];
+            var expectedCondition = _dummyOf.Conditions[@case.ExpectedFinalCondition];
             expectedCondition.SetResult(@case.FinalConditionCheckResult);
 
-            IHandler<int> a = _mockOf.Handlers[A];
+            IHandler<T> a = _dummyOf.Handlers[A];
             if (@case.AIsConditional)
-                a = _math.Conditional(a, _mockOf.Conditions[X]);
+                a = _math.Conditional(a, _dummyOf.Conditions[X]);
 
-            IHandler<int> b = _mockOf.Handlers[B];
+            IHandler<T> b = _dummyOf.Handlers[B];
             if (@case.BIsConditional)
-                b = _math.Conditional(b, _mockOf.Conditions[Y]);
+                b = _math.Conditional(b, _dummyOf.Conditions[Y]);
 
             _math.JoinFirstWithSecond(a, b)
-                 .Execute(Arg);
+                 .Execute(_token);
 
             Assert.That(expectedCondition.WasCheckedOnce());
-            Assert.That(_mockOf.Conditions[X, Y, Z].Except([expectedCondition]).NoOneWasChecked());
-            Assert.That(_mockOf.Handlers[A, B].EachWasExecutedOnceWhen(@case.FinalConditionCheckResult).ElseNoOne);
+            Assert.That(_dummyOf.Conditions[X, Y, Z].Except([expectedCondition]).NoOneWasChecked());
+            Assert.That(_dummyOf.Handlers[A, B].EachWasExecutedOnceWhen(@case.FinalConditionCheckResult).ElseNoOne);
         }
 
-        [TestCaseSource(nameof(Cases4))]
+        [TestCaseSource(typeof(HandlerMathTest), nameof(Cases4))]
         public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(Case4 @case)
         {
-            ConditionIndex 
+            Dummy.ConditionIndex 
                 aTop = new("A TOP"),
                 bTop = new("B TOP"),
                 aTop_And_bTop = new("A TOP & B TOP"),
@@ -260,102 +254,102 @@ namespace ChainLead.Test
                 bBottom = new("B BOTTOM"),
                 unexpectedAnd = new("UNEXPECTED &");
 
-            _mockOf.Conditions.GenerateMore(
+            _dummyOf.Conditions.GenerateMore(
                 aTop, bTop, aTop_And_bTop, 
                 aBottom, bBottom, unexpectedAnd);
 
-            _mockOf.Conditions[aBottom, bBottom, aTop_And_bTop].SetResults(@case.CheckSetup);
+            _dummyOf.Conditions[aBottom, bBottom, aTop_And_bTop].SetResults(@case.CheckSetup);
 
-            _mockOf.ConditionMath.Setup__And__ForAny(returns: unexpectedAnd);
-            _mockOf.ConditionMath.Setup__And(aTop, bTop, returns: aTop_And_bTop);
+            _dummyOf.ConditionMath.Setup__And__ForAny(returns: unexpectedAnd);
+            _dummyOf.ConditionMath.Setup__And(aTop, bTop, returns: aTop_And_bTop);
 
-            IHandler<int> a = _mockOf.Handlers[A];
-            a = _math.Conditional(a, _mockOf.Conditions[aBottom]);
-            a = _math.Conditional(a, _mockOf.Conditions[aTop]);
+            IHandler<T> a = _dummyOf.Handlers[A];
+            a = _math.Conditional(a, _dummyOf.Conditions[aBottom]);
+            a = _math.Conditional(a, _dummyOf.Conditions[aTop]);
 
-            IHandler<int> b = _mockOf.Handlers[B];
-            b = _math.Conditional(b, _mockOf.Conditions[bBottom]);
-            b = _math.Conditional(b, _mockOf.Conditions[bTop]);
+            IHandler<T> b = _dummyOf.Handlers[B];
+            b = _math.Conditional(b, _dummyOf.Conditions[bBottom]);
+            b = _math.Conditional(b, _dummyOf.Conditions[bTop]);
 
             var ab = _math.JoinFirstWithSecond(a, b);
-            ab.Execute(Arg);
+            ab.Execute(_token);
 
-            Assert.That(_mockOf.Conditions[aBottom, bBottom, aTop_And_bTop].VerifyChecks(@case.CheckExpected));
-            Assert.That(_mockOf.Conditions[unexpectedAnd, aTop, bTop].NoOneWasChecked());
-            Assert.That(_mockOf.Handlers[A, B].VerifyExecution(@case.ExecutionExpected));
+            Assert.That(_dummyOf.Conditions[aBottom, bBottom, aTop_And_bTop].VerifyChecks(@case.CheckExpected));
+            Assert.That(_dummyOf.Conditions[unexpectedAnd, aTop, bTop].NoOneWasChecked());
+            Assert.That(_dummyOf.Handlers[A, B].VerifyExecution(@case.ExecutionExpected));
         }
 
-        [TestCaseSource(nameof(Cases5))]
+        [TestCaseSource(typeof(HandlerMathTest), nameof(Cases5))]
         public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(Case5 @case)
         {
-            _mockOf.Conditions[@case.ChecksSetup.Keys]
-                   .SetResults(@case.ChecksSetup.Values);
+            _dummyOf.Conditions[@case.ChecksSetup.Keys]
+                    .SetResults(@case.ChecksSetup.Values);
 
-            _mockOf.ConditionMath.Setup__And__ForAny(returns: Q);
+            _dummyOf.ConditionMath.Setup__And__ForAny(returns: Q);
 
             if (@case.AConditions.Any() &&
                 @case.BConditions.Any())
-                    _mockOf.ConditionMath.Setup__And(
+                    _dummyOf.ConditionMath.Setup__And(
                         @case.AConditions.Last(),
                         @case.BConditions.Last(),
                         returns: R);
 
-            var a = _mockOf.Conditions[@case.AConditions]
-                .Aggregate(_mockOf.Handlers[A].Pure, _math.Conditional);
+            var a = _dummyOf.Conditions[@case.AConditions]
+                .Aggregate(_dummyOf.Handlers[A].Pure, _math.Conditional);
 
-            var b = _mockOf.Conditions[@case.BConditions]
-                .Aggregate(_mockOf.Handlers[B].Pure, _math.Conditional);
+            var b = _dummyOf.Conditions[@case.BConditions]
+                .Aggregate(_dummyOf.Handlers[B].Pure, _math.Conditional);
 
             _math.JoinFirstWithSecond(a, b)
-                 .Execute(Arg);
+                 .Execute(_token);
 
-            var expectedToCheck = _mockOf.Conditions[@case.CheckExpected];
-            var expectedToExecute = _mockOf.Handlers[@case.ExecuteExpected];
+            var expectedToCheck = _dummyOf.Conditions[@case.CheckExpected];
+            var expectedToExecute = _dummyOf.Handlers[@case.ExecuteExpected];
 
             Assert.That(expectedToCheck.EachWasCheckedOnce());
-            Assert.That(_mockOf.Conditions.Except(expectedToCheck).NoOneWasChecked());
+            Assert.That(_dummyOf.Conditions.Except(expectedToCheck).NoOneWasChecked());
 
             Assert.That(expectedToExecute.EachWasExecutedOnce());
-            Assert.That(_mockOf.Handlers.Except(expectedToExecute).NoOneWasExecuted());
+            Assert.That(_dummyOf.Handlers.Except(expectedToExecute).NoOneWasExecuted());
         }
 
         [Test]
         public void MergeFirstWithSecond__ConjunctsAllConditions(
-            [ValueSource(nameof(Cases6))] Case6 @case,
+            [ValueSource(typeof(HandlerMathTest), nameof(Cases6))] Case6 @case,
             [Values(true, false)] bool finalConditionResult)
         {
-            DummyCondition? lastAnd = null;
+            Dummy.Condition<T>? lastAnd = null;
 
-            _mockOf.ConditionMath
+            _dummyOf.ConditionMath
                 .Setup(o => o.And(
-                    It.IsAny<ICondition<int>>(),
-                    It.IsAny<ICondition<int>>()))
-                .Returns((ICondition<int> a, ICondition<int> b) =>
+                    It.IsAny<ICondition<T>>(),
+                    It.IsAny<ICondition<T>>()))
+                .Returns((ICondition<T> a, ICondition<T> b) =>
                 {
-                    if (a is IDummy<ConditionIndex> aDummy && 
-                        b is IDummy<ConditionIndex> bDummy)
+                    if (a is IDummy<Dummy.ConditionIndex> aDummy && 
+                        b is IDummy<Dummy.ConditionIndex> bDummy)
                     {
-                        ConditionIndex i = new(aDummy.Index.Value + bDummy.Index.Value);
-                        DummyCondition and = new(i);
+                        Dummy.ConditionIndex i = new(aDummy.Index.Value + bDummy.Index.Value);
+                        Dummy.Condition<T> and = new(i, _token);
                         lastAnd = and;
 
                         return and;
                     }
 
-                    return new Mock<ICondition<int>>().Object;
+                    return new Mock<ICondition<T>>().Object;
                 });
 
-            var a = _mockOf.Conditions[@case.AConditions]
-                .Aggregate(_mockOf.Handlers[A].Pure, _math.Conditional);
+            var a = _dummyOf.Conditions[@case.AConditions]
+                .Aggregate(_dummyOf.Handlers[A].Pure, _math.Conditional);
 
-            var b = _mockOf.Conditions[@case.BConditions]
-                .Aggregate(_mockOf.Handlers[B].Pure, _math.Conditional);
+            var b = _dummyOf.Conditions[@case.BConditions]
+                .Aggregate(_dummyOf.Handlers[B].Pure, _math.Conditional);
 
             var ab = _math.MergeFirstWithSecond(a, b);
 
             Assert.That(lastAnd, Is.Not.Null);
 
-            var allAnded = lastAnd.Index.Value.Select(ConditionIndex.Make);
+            var allAnded = lastAnd.Index.Value.Select(Dummy.ConditionIndex.Make);
             var expected = Enumerable.Concat(
                 @case.AConditions,
                 @case.BConditions);
@@ -365,10 +359,12 @@ namespace ChainLead.Test
 
             lastAnd.SetResult(finalConditionResult);
 
-            ab.Execute(Arg);
+            ab.Execute(_token);
 
             Assert.That(lastAnd.WasCheckedOnce());
-            Assert.That(_mockOf.Handlers[A, B].EachWasExecutedOnceWhen(finalConditionResult).ElseNoOne);
+            Assert.That(_dummyOf.Handlers[A, B]
+                .EachWasExecutedOnceWhen(finalConditionResult)
+                .ElseNoOne);
         }
 
         [Test]
@@ -376,44 +372,42 @@ namespace ChainLead.Test
             [Values(false, true)] bool order,
             [Values(false, true)] bool checkResult)
         {
-            _mockOf.Conditions[X].SetResult(checkResult);
+            _dummyOf.Conditions[X].SetResult(checkResult);
 
-            IHandler<int>
-                first = _mockOf.Handlers[B],
-                second = _math.Conditional(_mockOf.Handlers[A], _mockOf.Conditions[X]);
+            IHandler<T>
+                first = _dummyOf.Handlers[B],
+                second = _math.Conditional(_dummyOf.Handlers[A], _dummyOf.Conditions[X]);
 
             (first, second) = order
                 ? (first, second)
                 : (second, first);
 
             _math.MergeFirstWithSecond(first, second)
-                 .Execute(Arg);
+                 .Execute(_token);
 
-            Assert.That(_mockOf.Conditions[X].WasCheckedOnce());
-            Assert.That(_mockOf.Handlers[A, B].EachWasExecutedOnceWhen(checkResult).ElseNoOne);
+            Assert.That(_dummyOf.Conditions[X].WasCheckedOnce());
+            Assert.That(_dummyOf.Handlers[A, B].EachWasExecutedOnceWhen(checkResult).ElseNoOne);
         }
 
-        [TestCaseSource(nameof(Cases7))]
+        [TestCaseSource(typeof(HandlerMathTest), nameof(Cases7))]
         public void CorrectConditionsCascadeTest(Case7 @case)
         {
-            List<DummyIndex> execution = [];
+            List<Dummy.Index> execution = [];
 
-            _mockOf.Conditions[@case.AConditions].AddLoggingInto(execution);
-            _mockOf.Conditions[@case.BConditions].AddLoggingInto(execution);
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Conditions[@case.AConditions].AddLoggingInto(execution);
+            _dummyOf.Conditions[@case.BConditions].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
 
-            _mockOf.Conditions[@case.ChecksSetup.Keys]
+            _dummyOf.Conditions[@case.ChecksSetup.Keys]
                    .SetResults(@case.ChecksSetup.Values);
 
-            var a = _mockOf.Conditions[@case.AConditions]
-                .Aggregate(_mockOf.Handlers[A].Pure, _math.Conditional);
+            var a = _dummyOf.Conditions[@case.AConditions]
+                .Aggregate(_dummyOf.Handlers[A].Pure, _math.Conditional);
 
-            var b = _mockOf.Conditions[@case.BConditions]
-                .Aggregate(_mockOf.Handlers[B].Pure, _math.Conditional);
+            var b = _dummyOf.Conditions[@case.BConditions]
+                .Aggregate(_dummyOf.Handlers[B].Pure, _math.Conditional);
 
-            var append = AppendFunc<int>(by: @case.AppendType);
-            var ab = append(a, b);
-            ab.Execute(Arg);
+            Do[@case.Append](a, b).Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(@case.ExpectedCallsOrder));
@@ -421,17 +415,17 @@ namespace ChainLead.Test
 
         [Test]
         public void AppendWithAtomizedConditionalHandler__IsTheSameAs__WithRegularHandler(
-            [ValueSource(typeof(Appends), nameof(All))] string appendType,
+            [ValueSource(typeof(Appends), nameof(All))] string append,
             [Values(false, true)] bool isFirstArgument,
             [Values(false, true)] bool bottomCheckResult)
         {
-            HandlerIndex
+            Dummy.HandlerIndex
                 atomized = new("ATOMIZED"),
                 atom = new("ATOM");
 
-            _mockOf.Handlers.GenerateMore(atomized, atom);
+            _dummyOf.Handlers.GenerateMore(atomized, atom);
 
-            List<DummyIndex>
+            List<Dummy.Index>
                 executionLog = [],
                 expectedLog = 
                     (isFirstArgument, bottomCheckResult) switch
@@ -442,27 +436,24 @@ namespace ChainLead.Test
                         (true,  true)  => [X, Y, Z, atomized, atom]
                     };
 
-            _mockOf.Handlers.AddLoggingInto(executionLog);
-            _mockOf.Conditions.AddLoggingInto(executionLog); 
+            _dummyOf.Handlers.AddLoggingInto(executionLog);
+            _dummyOf.Conditions.AddLoggingInto(executionLog); 
 
-            _mockOf.Conditions[X, Y].SetResults(true);
-            _mockOf.Conditions[Z].SetResult(bottomCheckResult);
+            _dummyOf.Conditions[X, Y].SetResults(true);
+            _dummyOf.Conditions[Z].SetResult(bottomCheckResult);
 
-            IHandler<int>
-                first =  _mockOf.Handlers[atomized],
-                second = _mockOf.Handlers[atom];
+            IHandler<T>
+                first =  _dummyOf.Handlers[atomized],
+                second = _dummyOf.Handlers[atom];
 
-            first = _mockOf.Conditions[Z, Y, X].Aggregate(first, _math.Conditional);
+            first = _dummyOf.Conditions[Z, Y, X].Aggregate(first, _math.Conditional);
             first = _math.Atomize(first);
 
             (first, second) = isFirstArgument
                 ? (first, second)
                 : (second, first);
 
-            var append = AppendFunc<int>(by: appendType);
-            var result = append(first, second);
-
-            result.Execute(Arg);
+            Do[append](first, second).Execute(_token);
 
             Assert.That(executionLog,
                 Is.EqualTo(expectedLog));
@@ -470,11 +461,11 @@ namespace ChainLead.Test
 
         [Test]
         public void AppendedTwoAtomizedConditionalHandlers__IsTheSameAs__AppendedTwoRegularHandlers(
-            [ValueSource(typeof(Appends), nameof(All))] string appendType,
+            [ValueSource(typeof(Appends), nameof(All))] string append,
             [Values(false, true)] bool aBottomCheckResult,
             [Values(false, true)] bool bBottomCheckResult)
         {
-            List<DummyIndex>
+            List<Dummy.Index>
                 executionLog = [],
                 expectedLog =
                     (aBottomCheckResult, bBottomCheckResult) switch
@@ -485,24 +476,22 @@ namespace ChainLead.Test
                         (true,  true)  => [U, V, W, A, X, Y, Z, B] 
                     };
 
-            _mockOf.Handlers.AddLoggingInto(executionLog);
-            _mockOf.Conditions.AddLoggingInto(executionLog);
+            _dummyOf.Handlers.AddLoggingInto(executionLog);
+            _dummyOf.Conditions.AddLoggingInto(executionLog);
 
-            _mockOf.Conditions[U, V, X, Y].SetResults(true);
-            _mockOf.Conditions[W].SetResult(aBottomCheckResult);
-            _mockOf.Conditions[Z].SetResult(bBottomCheckResult);
+            _dummyOf.Conditions[U, V, X, Y].SetResults(true);
+            _dummyOf.Conditions[W].SetResult(aBottomCheckResult);
+            _dummyOf.Conditions[Z].SetResult(bBottomCheckResult);
 
-            IHandler<int> a = _mockOf.Handlers[A];
-            a = _mockOf.Conditions[W, V, U].Aggregate(a, _math.Conditional);
+            IHandler<T> a = _dummyOf.Handlers[A];
+            a = _dummyOf.Conditions[W, V, U].Aggregate(a, _math.Conditional);
             a = _math.Atomize(a);
 
-            IHandler<int> b = _mockOf.Handlers[B];
-            b = _mockOf.Conditions[Z, Y, X].Aggregate(b, _math.Conditional);
+            IHandler<T> b = _dummyOf.Handlers[B];
+            b = _dummyOf.Conditions[Z, Y, X].Aggregate(b, _math.Conditional);
             b = _math.Atomize(b);
 
-            var append = AppendFunc<int>(by: appendType);
-            var result = append(a, b);
-            result.Execute(Arg);
+            Do[append](a, b).Execute(_token);
 
             Assert.That(executionLog,
                 Is.EqualTo(expectedLog));

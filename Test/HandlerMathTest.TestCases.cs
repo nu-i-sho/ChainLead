@@ -1,13 +1,15 @@
 ﻿namespace ChainLead.Test
 {
     using ChainLead.Test.Help;
-    using static ChainLead.Test.Help.Constants;
-    using static ChainLead.Test.Help.Constants.Appends;
+
+    using static ChainLead.Test.Utils.Appends;
+    using static ChainLead.Test.Help.Dummy.HandlerIndex.Common;
+    using static ChainLead.Test.Help.Dummy.ConditionIndex.Common;
 
     public partial class HandlerMathTest
     {
         public record Case1(
-            HandlerIndex[] ChainIndices,
+            Dummy.HandlerIndex[] ChainIndices,
             string NameForEasyFind = "")
         {
             public override string ToString()
@@ -28,8 +30,8 @@
         ];
 
         public record Case2(
-            HandlerIndex?[] ChainIndicesWithNullsAsZeros,
-            HandlerIndex[] ExpectedExecution,
+            Dummy.HandlerIndex?[] ChainIndicesWithNullsAsZeros,
+            Dummy.HandlerIndex[] ExpectedExecution,
             string NameForEasyFind = "")
         {
             public override string ToString()
@@ -65,7 +67,7 @@
         public record Case3(
             bool AIsConditional,
             bool BIsConditional,
-            ConditionIndex ExpectedFinalCondition,
+            Dummy.ConditionIndex ExpectedFinalCondition,
             bool FinalConditionCheckResult,
             string NameForEasyFind = "")
         {
@@ -174,15 +176,13 @@
         }
 
         public record Case5(
-            ConditionIndex[] AConditions,
-            ConditionIndex[] BConditions,
-            Dictionary<ConditionIndex, bool> ChecksSetup,
-            ConditionIndex[] CheckExpected,
-            HandlerIndex[] ExecuteExpected,
+            Dummy.ConditionIndex[] AConditions,
+            Dummy.ConditionIndex[] BConditions,
+            Dictionary<Dummy.ConditionIndex, bool> ChecksSetup,
+            Dummy.ConditionIndex[] CheckExpected,
+            Dummy.HandlerIndex[] ExecuteExpected,
             string NameForEasyFind = "")
         {
-            public static readonly ConditionIndex ZW = new("ZW"); 
-
             public override string ToString()
             {
                 var name = string.Join(
@@ -591,8 +591,8 @@
         }
 
         public record Case6(
-            ConditionIndex[] AConditions,
-            ConditionIndex[] BConditions,
+            Dummy.ConditionIndex[] AConditions,
+            Dummy.ConditionIndex[] BConditions,
             string NameForEasyFind = "")
         {
             public override string ToString()
@@ -650,17 +650,18 @@
         }
 
         public record Case7(
-            string AppendType,
-            ConditionIndex[] AConditions,
-            ConditionIndex[] BConditions,
-            Dictionary<ConditionIndex, bool> ChecksSetup,
-            DummyIndex[] ExpectedCallsOrder,
+            string Append,
+            Dummy.ConditionIndex[] AConditions,
+            Dummy.ConditionIndex[] BConditions,
+            Dictionary<Dummy.ConditionIndex, bool> ChecksSetup,
+            Dummy.Index[] ExpectedCallsOrder,
             string NameForEasyFind = "")
         {
             public override string ToString()
             {
                 var name = string.Join(
                     CaseBlocksSeparator,
+                    Append,
                     ViewOf(AConditions),
                     ViewOf(BConditions),
                     ViewOf(ChecksSetup),
@@ -678,7 +679,7 @@
             get
             {
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [],
                     BConditions: [],
                     ChecksSetup: [],
@@ -686,7 +687,7 @@
                     NameForEasyFind: "Mary");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U],
                     BConditions: [],
                     ChecksSetup: new() { { U, false } },
@@ -694,7 +695,7 @@
                     NameForEasyFind: "Patricia");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U],
                     BConditions: [],
                     ChecksSetup: new() { { U, true } },
@@ -702,7 +703,7 @@
                     NameForEasyFind: "Jennifer");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [],
                     BConditions: [U],
                     ChecksSetup: new() { { U, false } },
@@ -710,7 +711,7 @@
                     NameForEasyFind: "Linda");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [],
                     BConditions: [U],
                     ChecksSetup: new() { { U, true } },
@@ -718,7 +719,7 @@
                     NameForEasyFind: "Elizabeth");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, false } },
@@ -726,7 +727,7 @@
                     NameForEasyFind: "Barbara");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, true }, { U, false } },
@@ -734,7 +735,7 @@
                     NameForEasyFind: "Susan");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, true }, { U, true } },
@@ -742,7 +743,7 @@
                     NameForEasyFind: "Jessica");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [],
                     BConditions: [U, V],
                     ChecksSetup: new() { { V, false } },
@@ -750,7 +751,7 @@
                     NameForEasyFind: "Karen");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [],
                     BConditions: [U, V],
                     ChecksSetup: new() { { V, true }, { U, false } },
@@ -758,7 +759,7 @@
                     NameForEasyFind: "Sarah");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [],
                     BConditions: [U, V],
                     ChecksSetup: new() { { V, true }, { U, true } },
@@ -766,7 +767,7 @@
                     NameForEasyFind: "Lisa");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, false } },
@@ -774,7 +775,7 @@
                     NameForEasyFind: "Nancy");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, false } },
@@ -782,7 +783,7 @@
                     NameForEasyFind: "Sandra");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -790,7 +791,7 @@
                     NameForEasyFind: "Betty");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -798,7 +799,7 @@
                     NameForEasyFind: "Ashley");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -806,7 +807,7 @@
                     NameForEasyFind: "Emily");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -814,7 +815,7 @@
                     NameForEasyFind: "Kimberly");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -822,7 +823,7 @@
                     NameForEasyFind: "Margaret");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -830,7 +831,7 @@
                     NameForEasyFind: "Donna");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, false } },
@@ -838,7 +839,7 @@
                     NameForEasyFind: "Michelle");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, false } },
@@ -846,7 +847,7 @@
                     NameForEasyFind: "Carol");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U],
                     BConditions: [V],
                     ChecksSetup: new() { { V, false } },
@@ -854,7 +855,7 @@
                     NameForEasyFind: "Amanda");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U],
                     BConditions: [V],
                     ChecksSetup: new() { { V, true }, { U, false } },
@@ -862,7 +863,7 @@
                     NameForEasyFind: "Melissa");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U],
                     BConditions: [V],
                     ChecksSetup: new() { { V, true }, { U, true } },
@@ -870,7 +871,7 @@
                     NameForEasyFind: "Deborah");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { W, false } },
@@ -878,7 +879,7 @@
                     NameForEasyFind: "Stephanie");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { W, false } },
@@ -886,7 +887,7 @@
                     NameForEasyFind: "Rebecca");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { W, true }, { V, false } },
@@ -894,7 +895,7 @@
                     NameForEasyFind: "Sharon");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, false } },
@@ -902,7 +903,7 @@
                     NameForEasyFind: "Laura");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, true } },
@@ -910,7 +911,7 @@
                     NameForEasyFind: "Cynthia");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { W, false } },
@@ -918,7 +919,7 @@
                     NameForEasyFind: "Dorothy");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { W, true }, { V, false } },
@@ -926,7 +927,7 @@
                     NameForEasyFind: "Amy");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, false } },
@@ -934,7 +935,7 @@
                     NameForEasyFind: "Kathleen");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, true } },
@@ -942,7 +943,7 @@
                     NameForEasyFind: "Angela");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { X, false } },
@@ -950,7 +951,7 @@
                     NameForEasyFind: "Shirley");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { X, true }, { W, false } },
@@ -958,7 +959,7 @@
                     NameForEasyFind: "Emma");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -966,7 +967,7 @@
                     NameForEasyFind: "Brenda");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -974,7 +975,7 @@
                     NameForEasyFind: "Pamela");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -982,7 +983,7 @@
                     NameForEasyFind: "Nicole");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, false } },
@@ -990,7 +991,7 @@
                     NameForEasyFind: "Anna");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { Y, false } },
@@ -998,7 +999,7 @@
                     NameForEasyFind: "Samantha");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { Y, true }, { X, false } },
@@ -1006,7 +1007,7 @@
                     NameForEasyFind: "Katherine");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { Y, true }, { X, true }, { W, false } },
@@ -1014,7 +1015,7 @@
                     NameForEasyFind: "Christine");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { Y, true }, { X, true }, { W, true }, { V, false } },
@@ -1022,7 +1023,7 @@
                     NameForEasyFind: "Debra");
 
                 yield return new(
-                    AppendType: InjectFirstIntoSecond,
+                    Append: InjectFirstIntoSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { Y, true }, { X, true }, { W, true }, { V, true }, { U, false } },
@@ -1030,7 +1031,7 @@
                     NameForEasyFind: "Rachel");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [],
                     BConditions: [],
                     ChecksSetup: [],
@@ -1038,7 +1039,7 @@
                     NameForEasyFind: "Carolyn");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U],
                     BConditions: [],
                     ChecksSetup: new() { { U, false } },
@@ -1046,7 +1047,7 @@
                     NameForEasyFind: "Janet");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U],
                     BConditions: [],
                     ChecksSetup: new() { { U, true } },
@@ -1054,7 +1055,7 @@
                     NameForEasyFind: "Maria");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [],
                     BConditions: [U],
                     ChecksSetup: new() { { U, false } },
@@ -1062,7 +1063,7 @@
                     NameForEasyFind: "Olivia");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [],
                     BConditions: [U],
                     ChecksSetup: new() { { U, true } },
@@ -1070,7 +1071,7 @@
                     NameForEasyFind: "Heather");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [],
                     BConditions: [U, V],
                     ChecksSetup: new() { { V, false } },
@@ -1078,7 +1079,7 @@
                     NameForEasyFind: "Helen");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [],
                     BConditions: [U, V],
                     ChecksSetup: new() { { V, true }, { U, false } },
@@ -1086,7 +1087,7 @@
                     NameForEasyFind: "Catherine");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [],
                     BConditions: [U, V],
                     ChecksSetup: new() { { V, true }, { U, true } },
@@ -1094,7 +1095,7 @@
                     NameForEasyFind: "Diane");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, false } },
@@ -1102,7 +1103,7 @@
                     NameForEasyFind: "Julie");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, true }, { U, false } },
@@ -1110,7 +1111,7 @@
                     NameForEasyFind: "Victoria");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, true }, { U, true } },
@@ -1118,7 +1119,7 @@
                     NameForEasyFind: "Joyce");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, false } },
@@ -1126,7 +1127,7 @@
                     NameForEasyFind: "Lauren");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, false } },
@@ -1134,7 +1135,7 @@
                     NameForEasyFind: "Kelly");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -1142,7 +1143,7 @@
                     NameForEasyFind: "Christina");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false }, },
@@ -1150,7 +1151,7 @@
                     NameForEasyFind: "Ruth");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true }, },
@@ -1158,7 +1159,7 @@
                     NameForEasyFind: "Joan");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true }, },
@@ -1166,7 +1167,7 @@
                     NameForEasyFind: "Virginia");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false }, },
@@ -1174,7 +1175,7 @@
                     NameForEasyFind: "Judith");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -1182,7 +1183,7 @@
                     NameForEasyFind: "Evelyn");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, false } },
@@ -1190,7 +1191,7 @@
                     NameForEasyFind: "Hannah");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, false } },
@@ -1198,7 +1199,7 @@
                     NameForEasyFind: "Andrea");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U],
                     BConditions: [V],
                     ChecksSetup: new() { { U, false } },
@@ -1206,7 +1207,7 @@
                     NameForEasyFind: "Megan");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U],
                     BConditions: [V],
                     ChecksSetup: new() { { U, true }, { V, false } },
@@ -1214,7 +1215,7 @@
                     NameForEasyFind: "Cheryl");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U],
                     BConditions: [V],
                     ChecksSetup: new() { { U, true }, { V, true } },
@@ -1222,7 +1223,7 @@
                     NameForEasyFind: "Jacqueline");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { V, false } },
@@ -1230,7 +1231,7 @@
                     NameForEasyFind: "Madison");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { V, true }, { U, false } },
@@ -1238,7 +1239,7 @@
                     NameForEasyFind: "Teresa");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { V, true }, { U, true }, { W, false } },
@@ -1246,7 +1247,7 @@
                     NameForEasyFind: "Abigail");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { V, true }, { U, true }, { W, true } },
@@ -1254,7 +1255,7 @@
                     NameForEasyFind: "Sophia");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { U, false } },
@@ -1262,7 +1263,7 @@
                     NameForEasyFind: "Martha");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { U, true }, { W, false } },
@@ -1270,7 +1271,7 @@
                     NameForEasyFind: "Sara");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { U, true }, { W, true }, { V, false } },
@@ -1278,7 +1279,7 @@
                     NameForEasyFind: "Gloria");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { U, true }, { W, true }, { V, true } },
@@ -1286,7 +1287,7 @@
                     NameForEasyFind: "Janice");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { V, false } },
@@ -1294,7 +1295,7 @@
                     NameForEasyFind: "Kathryn");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { V, true }, { U, false } },
@@ -1302,7 +1303,7 @@
                     NameForEasyFind: "Ann");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { V, true }, { U, true }, { X, false } },
@@ -1310,7 +1311,7 @@
                     NameForEasyFind: "Isabella");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { V, true }, { U, true }, { X, true }, { W, false } },
@@ -1318,7 +1319,7 @@
                     NameForEasyFind: "Judy");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { V, true }, { U, true }, { X, true }, { W, true } },
@@ -1326,7 +1327,7 @@
                     NameForEasyFind: "Charlotte");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, false } },
@@ -1334,7 +1335,7 @@
                     NameForEasyFind: "Julia");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, false } },
@@ -1342,7 +1343,7 @@
                     NameForEasyFind: "Grace");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, false } },
@@ -1350,7 +1351,7 @@
                     NameForEasyFind: "Amber");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, false } },
@@ -1358,7 +1359,7 @@
                     NameForEasyFind: "Alice");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, true }, { Y, false } },
@@ -1366,7 +1367,7 @@
                     NameForEasyFind: "Jean");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, true }, { Y, true }, { X, false } },
@@ -1374,7 +1375,7 @@
                     NameForEasyFind: "Denise");
 
                 yield return new(
-                    AppendType: FirstWrapSecond,
+                    Append: FirstWrapSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, true }, { Y, true }, { X, true } },
@@ -1382,7 +1383,7 @@
                     NameForEasyFind: "Frances");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [],
                     BConditions: [],
                     ChecksSetup: [],
@@ -1390,7 +1391,7 @@
                     NameForEasyFind: "Danielle");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U],
                     BConditions: [],
                     ChecksSetup: new() { { U, false } },
@@ -1398,7 +1399,7 @@
                     NameForEasyFind: "Danielle");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U],
                     BConditions: [],
                     ChecksSetup: new() { { U, true } },
@@ -1406,7 +1407,7 @@
                     NameForEasyFind: "Natalie");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [],
                     BConditions: [U],
                     ChecksSetup: new() { { U, false } },
@@ -1414,7 +1415,7 @@
                     NameForEasyFind: "Beverly");
 
                 yield return new(
-                AppendType: PackFirstInSecond,
+                Append: PackFirstInSecond,
                     AConditions: [],
                     BConditions: [U],
                     ChecksSetup: new() { { U, true } },
@@ -1422,7 +1423,7 @@
                     NameForEasyFind: "Diana");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, false } },
@@ -1430,7 +1431,7 @@
                     NameForEasyFind: "Brittany");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, true }, { U, false } },
@@ -1438,7 +1439,7 @@
                     NameForEasyFind: "Theresa");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, true }, { U, true } },
@@ -1446,7 +1447,7 @@
                     NameForEasyFind: "Kayla");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [],
                     BConditions: [U, V],
                     ChecksSetup: new() { { V, false } },
@@ -1454,7 +1455,7 @@
                     NameForEasyFind: "Alexis");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [],
                     BConditions: [U, V],
                     ChecksSetup: new() { { V, true }, { U, false } },
@@ -1462,7 +1463,7 @@
                     NameForEasyFind: "Doris");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [],
                     BConditions: [U, V],
                     ChecksSetup: new() { { V, true }, { U, true } },
@@ -1470,7 +1471,7 @@
                     NameForEasyFind: "Lori");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, false } },
@@ -1478,7 +1479,7 @@
                     NameForEasyFind: "Tiffany");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, false } },
@@ -1486,7 +1487,7 @@
                     NameForEasyFind: "Carl");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -1494,7 +1495,7 @@
                     NameForEasyFind: "Dylan");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -1502,7 +1503,7 @@
                     NameForEasyFind: "Harold");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -1510,7 +1511,7 @@
                     NameForEasyFind: "Jesse");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -1518,7 +1519,7 @@
                     NameForEasyFind: "Bryan");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -1526,7 +1527,7 @@
                     NameForEasyFind: "Lawrence");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -1534,7 +1535,7 @@
                     NameForEasyFind: "Arthur");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, false } },
@@ -1542,7 +1543,7 @@
                     NameForEasyFind: "Gabriel");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, false } },
@@ -1550,7 +1551,7 @@
                     NameForEasyFind: "Bruce");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U],
                     BConditions: [V],
                     ChecksSetup: new() { { V, false } },
@@ -1558,7 +1559,7 @@
                     NameForEasyFind: "Logan");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U],
                     BConditions: [V],
                     ChecksSetup: new() { { V, true }, { U, false } },
@@ -1566,7 +1567,7 @@
                     NameForEasyFind: "Billy");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U],
                     BConditions: [V],
                     ChecksSetup: new() { { V, true }, { U, true } },
@@ -1574,7 +1575,7 @@
                     NameForEasyFind: "Joe");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { W, false } },
@@ -1582,7 +1583,7 @@
                     NameForEasyFind: "Alan");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { W, true }, { V, false } },
@@ -1590,7 +1591,7 @@
                     NameForEasyFind: "Juan");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, false } },
@@ -1598,7 +1599,7 @@
                     NameForEasyFind: "Elijah");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, true } },
@@ -1606,7 +1607,7 @@
                     NameForEasyFind: "Willie");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { W, true }, { U, true }, { V, true } },
@@ -1614,7 +1615,7 @@
                     NameForEasyFind: "Albert");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { W, true }, { U, true }, { V, false } },
@@ -1622,7 +1623,7 @@
                     NameForEasyFind: "Wayne");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { W, true }, { U, false }, { V, false } },
@@ -1630,7 +1631,7 @@
                     NameForEasyFind: "Randy");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { W, true }, { U, false }, { V, true } },
@@ -1638,7 +1639,7 @@
                     NameForEasyFind: "Mason");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { W, false } },
@@ -1646,7 +1647,7 @@
                     NameForEasyFind: "Vincent");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { X, false } },
@@ -1654,7 +1655,7 @@
                     NameForEasyFind: "Liam");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { X, true }, { V, false }, { W, false } },
@@ -1662,7 +1663,7 @@
                     NameForEasyFind: "Roy");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { X, true }, { V, false }, { W, true } },
@@ -1670,7 +1671,7 @@
                     NameForEasyFind: "Bobby");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { X, true }, { V, true }, { U, false }, { W, false } },
@@ -1678,7 +1679,7 @@
                     NameForEasyFind: "Caleb");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { X, true }, { V, true }, { U, false }, { W, true } },
@@ -1686,7 +1687,7 @@
                     NameForEasyFind: "Bradley");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { X, true }, { V, true }, { U, true }, { W, false } },
@@ -1694,7 +1695,7 @@
                     NameForEasyFind: "Russell");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { X, true }, { V, true }, { U, true }, { W, true } },
@@ -1702,7 +1703,7 @@
                     NameForEasyFind: "Lucas");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, false } },
@@ -1710,7 +1711,7 @@
                     NameForEasyFind: "Zekiel");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { W, false }, { Y, false } },
@@ -1718,7 +1719,7 @@
                     NameForEasyFind: "Yuri");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { W, false }, { Y, true }, { X, false } },
@@ -1726,7 +1727,7 @@
                     NameForEasyFind: "Tyde");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { W, false }, { Y, true }, { X, true } },
@@ -1734,7 +1735,7 @@
                     NameForEasyFind: "Turner");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { W, true }, { V, false }, { Y, false } },
@@ -1742,7 +1743,7 @@
                     NameForEasyFind: "Trevor");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { W, true }, { V, true }, { U, false }, { Y, false } },
@@ -1750,7 +1751,7 @@
                     NameForEasyFind: "Stuart");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { W, true }, { V, true }, { U, true }, { Y, false } },
@@ -1758,7 +1759,7 @@
                     NameForEasyFind: "Stewart");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { W, true }, { V, false }, { Y, true }, { X, false } },
@@ -1766,7 +1767,7 @@
                     NameForEasyFind: "Royston");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { W, true }, { V, true }, { U, false }, { Y, true }, { X, false } },
@@ -1774,7 +1775,7 @@
                     NameForEasyFind: "Rodney");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { W, true }, { V, true }, { U, true }, { Y, true }, { X, false } },
@@ -1782,7 +1783,7 @@
                     NameForEasyFind: "Norman");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { W, true }, { V, true }, { U, false }, { Y, true }, { X, true } },
@@ -1790,7 +1791,7 @@
                     NameForEasyFind: "Nigel");
 
                 yield return new(
-                    AppendType: PackFirstInSecond,
+                    Append: PackFirstInSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { Z, true }, { W, true }, { V, true }, { U, true }, { Y, true }, { X, true } },
@@ -1798,7 +1799,7 @@
                     NameForEasyFind: "Neymar");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [],
                     BConditions: [],
                     ChecksSetup: [],
@@ -1806,7 +1807,7 @@
                     NameForEasyFind: "Neville");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U],
                     BConditions: [],
                     ChecksSetup: new() { { U, false } },
@@ -1814,7 +1815,7 @@
                     NameForEasyFind: "Melvyn");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U],
                     BConditions: [],
                     ChecksSetup: new() { { U, true } },
@@ -1822,7 +1823,7 @@
                     NameForEasyFind: "Leslie");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [],
                     BConditions: [U],
                     ChecksSetup: new() { { U, false } },
@@ -1830,7 +1831,7 @@
                     NameForEasyFind: "Kobe");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [],
                     BConditions: [U],
                     ChecksSetup: new() { { U, true } },
@@ -1838,7 +1839,7 @@
                     NameForEasyFind: "Iain");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, false } },
@@ -1846,7 +1847,7 @@
                     NameForEasyFind: "Huxon");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, true }, { U, false } },
@@ -1854,7 +1855,7 @@
                     NameForEasyFind: "Howard");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [],
                     ChecksSetup: new() { { V, true }, { U, true } },
@@ -1862,7 +1863,7 @@
                     NameForEasyFind: "Horace");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [],
                     BConditions: [U, V],
                     ChecksSetup: new() { { V, false } },
@@ -1870,7 +1871,7 @@
                     NameForEasyFind: "Graham");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [],
                     BConditions: [U, V],
                     ChecksSetup: new() { { V, true }, { U, false } },
@@ -1878,7 +1879,7 @@
                     NameForEasyFind: "Gordon");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [],
                     BConditions: [U, V],
                     ChecksSetup: new() { { V, true }, { U, true } },
@@ -1886,7 +1887,7 @@
                     NameForEasyFind: "Glenn");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, false } },
@@ -1894,7 +1895,7 @@
                     NameForEasyFind: "Gary");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, false } },
@@ -1902,7 +1903,7 @@
                     NameForEasyFind: "Finch");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -1910,7 +1911,7 @@
                     NameForEasyFind: "Esteban");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -1918,7 +1919,7 @@
                     NameForEasyFind: "Elison");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W, X],
                     BConditions: [],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -1926,7 +1927,7 @@
                     NameForEasyFind: "Duran");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -1934,7 +1935,7 @@
                     NameForEasyFind: "Drake");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -1942,7 +1943,7 @@
                     NameForEasyFind: "Cyril");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -1950,7 +1951,7 @@
                     NameForEasyFind: "Corby");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, true }, { W, false } },
@@ -1958,7 +1959,7 @@
                     NameForEasyFind: "Clifford");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [],
                     BConditions: [U, V, W, X],
                     ChecksSetup: new() { { X, false } },
@@ -1966,7 +1967,7 @@
                     NameForEasyFind: "Claude");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U],
                     BConditions: [V],
                     ChecksSetup: new() { { U, false } },
@@ -1974,7 +1975,7 @@
                     NameForEasyFind: "Clarence");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U],
                     BConditions: [V],
                     ChecksSetup: new() { { U, true }, { V, false } },
@@ -1982,7 +1983,7 @@
                     NameForEasyFind: "Chad");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U],
                     BConditions: [V],
                     ChecksSetup: new() { { U, true }, { V, true } },
@@ -1990,7 +1991,7 @@
                     NameForEasyFind: "Cecil");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { V, false } },
@@ -1998,7 +1999,7 @@
                     NameForEasyFind: "Bill");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { V, true }, { U, false }, { W, false } },
@@ -2006,7 +2007,7 @@
                     NameForEasyFind: "Arlyn");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { V, true }, { U, true }, { W, false } },
@@ -2014,7 +2015,7 @@
                     NameForEasyFind: "Ashton");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { V, true }, { U, false }, { W, true } },
@@ -2022,7 +2023,7 @@
                     NameForEasyFind: "Barry");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [W],
                     ChecksSetup: new() { { V, true }, { U, true }, { W, true } },
@@ -2030,7 +2031,7 @@
                     NameForEasyFind: "Ajax");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { U, false } },
@@ -2038,7 +2039,7 @@
                     NameForEasyFind: "Sonnet");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { U, true }, { W, false } },
@@ -2046,7 +2047,7 @@
                     NameForEasyFind: "Winslow");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { U, true }, { W, true }, { V, false } },
@@ -2054,7 +2055,7 @@
                     NameForEasyFind: "Quinton");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U],
                     BConditions: [V, W],
                     ChecksSetup: new() { { U, true }, { W, true }, { V, true } },
@@ -2062,7 +2063,7 @@
                     NameForEasyFind: "Polly");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { V, false } },
@@ -2070,7 +2071,7 @@
                     NameForEasyFind: "Prudence");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { V, true }, { U, false }, { X, false } },
@@ -2078,7 +2079,7 @@
                     NameForEasyFind: "Ellison");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { V, true }, { U, true }, { X, false } },
@@ -2086,7 +2087,7 @@
                     NameForEasyFind: "Flynn");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { V, true }, { U, false }, { X, true }, { W, false } },
@@ -2094,7 +2095,7 @@
                     NameForEasyFind: "Florence");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { V, true }, { U, false }, { X, true }, { W, true } },
@@ -2102,7 +2103,7 @@
                     NameForEasyFind: "Magnus");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V],
                     BConditions: [W, X],
                     ChecksSetup: new() { { V, true }, { U, true }, { X, true }, { W, true } },
@@ -2110,7 +2111,7 @@
                     NameForEasyFind: "Clementine");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, false } },
@@ -2118,7 +2119,7 @@
                     NameForEasyFind: "Allegra");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, false }, { Z, false }, },
@@ -2126,7 +2127,7 @@
                     NameForEasyFind: "Donte");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, false }, { Z, false }, },
@@ -2134,7 +2135,7 @@
                     NameForEasyFind: "Rogan");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, false }, },
@@ -2142,7 +2143,7 @@
                     NameForEasyFind: "Yousef");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, false }, { Z, true }, { Y, false } },
@@ -2150,7 +2151,7 @@
                     NameForEasyFind: "Marla");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, false }, { Z, true }, { Y, true }, { X, false } },
@@ -2158,7 +2159,7 @@
                     NameForEasyFind: "Mikel");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, false }, { Z, true }, { Y, true }, { X, true } },
@@ -2166,7 +2167,7 @@
                     NameForEasyFind: "Ares");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, false }, { Z, true }, { Y, false } },
@@ -2174,7 +2175,7 @@
                     NameForEasyFind: "Stephano");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, true }, { Y, false } },
@@ -2182,7 +2183,7 @@
                     NameForEasyFind: "Niccola");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, false }, { Z, true }, { Y, true }, { X, false } },
@@ -2190,7 +2191,7 @@
                     NameForEasyFind: "Apollo");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, false }, { Z, true }, { Y, true }, { X, true } },
@@ -2198,7 +2199,7 @@
                     NameForEasyFind: "Booker");
 
                 yield return new(
-                    AppendType: FirstCoverSecond,
+                    Append: FirstCoverSecond,
                     AConditions: [U, V, W],
                     BConditions: [X, Y, Z],
                     ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, true }, { Y, true }, { X, true } },

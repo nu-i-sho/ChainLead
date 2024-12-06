@@ -1,7 +1,7 @@
 ﻿namespace ChainLead.Test.Help
 {
     public interface IDummy<TIndex>
-        where TIndex : DummyIndex
+        where TIndex : Dummy.Index
     {
         TIndex Index { get; }
 

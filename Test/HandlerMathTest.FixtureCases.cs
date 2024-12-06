@@ -4,19 +4,81 @@
     using ChainLead.Contracts.Syntax;
     using ChainLead.Implementation;
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
-    using static ChainLead.Test.Help.Constants;
+    using static ChainLead.Test.Utils.Appends;
+    using static ChainLead.Test.Utils.Types;
 
     public partial class HandlerMathTest
     {
-        public static IEnumerable<IHandlerMathFactory> FixtureCases
+        public const string Original = "Original";
+        public const string Syntax = "Syntax";
+        public const string Separated = "Separated";
+        public const string Reversed = "Reversed";
+
+        public class _I_Attribute()      : TestFixtureAttribute(typeof(int), Original);
+        public class _II_Attribute()     : TestFixtureAttribute(typeof(string), Original);
+        public class _III_Attribute()    : TestFixtureAttribute(typeof(Class), Original);
+        public class _IV_Attribute()     : TestFixtureAttribute(typeof(Struct), Original);
+        public class _V_Attribute()      : TestFixtureAttribute(typeof(ReadonlyStruct), Original);
+        public class _VI_Attribute()     : TestFixtureAttribute(typeof(Record), Original);
+        public class _VII_Attribute()    : TestFixtureAttribute(typeof(RecordStruct), Original);
+        public class _VIII_Attribute()   : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Original);
+
+        public class _IX_Attribute()     : TestFixtureAttribute(typeof(int), Syntax);
+        public class _X_Attribute()      : TestFixtureAttribute(typeof(string), Syntax);
+        public class _XI_Attribute()     : TestFixtureAttribute(typeof(Class), Syntax);
+        public class _XII_Attribute()    : TestFixtureAttribute(typeof(Struct), Syntax);
+        public class _XIII_Attribute()   : TestFixtureAttribute(typeof(ReadonlyStruct), Syntax);
+        public class _XIV_Attribute()    : TestFixtureAttribute(typeof(Record), Syntax);
+        public class _XV_Attribute()     : TestFixtureAttribute(typeof(RecordStruct), Syntax);
+        public class _XVI_Attribute()    : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Syntax);
+
+        public class _XVII_Attribute()   : TestFixtureAttribute(typeof(int), Separated);
+        public class _XVIII_Attribute()  : TestFixtureAttribute(typeof(string), Separated);
+        public class _XIX_Attribute()    : TestFixtureAttribute(typeof(Class), Separated);
+        public class _XX_Attribute()     : TestFixtureAttribute(typeof(Struct), Separated);
+        public class _XXI_Attribute()    : TestFixtureAttribute(typeof(ReadonlyStruct), Separated);
+        public class _XXII_Attribute()   : TestFixtureAttribute(typeof(Record), Separated);
+        public class _XXIII_Attribute()  : TestFixtureAttribute(typeof(RecordStruct), Separated);
+        public class _XXIV_Attribute()   : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Separated);
+
+        public class _XXV_Attribute()    : TestFixtureAttribute(typeof(int), Reversed);
+        public class _XXVI_Attribute()   : TestFixtureAttribute(typeof(string), Reversed);
+        public class _XXVII_Attribute()  : TestFixtureAttribute(typeof(Class), Reversed);
+        public class _XXVIII_Attribute() : TestFixtureAttribute(typeof(Struct), Reversed);
+        public class _XXIX_Attribute()   : TestFixtureAttribute(typeof(ReadonlyStruct), Reversed);
+        public class _XXX_Attribute()    : TestFixtureAttribute(typeof(Record), Reversed);
+        public class _XXXI_Attribute()   : TestFixtureAttribute(typeof(RecordStruct), Reversed);
+        public class _XXXII_Attribute()  : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Reversed);
+
+
+        public static class HandlerMathFactoryProvider
         {
-            get
-            {
-                yield return new OriginalHandlerMathFactory();
-                yield return new SyntaxHandlerMathFactory();
-                yield return new SeparatedSyntaxHandlerMathFactory();
-                yield return new ReversedSyntaxHandlerMathFactory();
-            }
+            public static IHandlerMathFactory Get(string name) =>
+                name switch
+                {
+                    Original => new OriginalHandlerMathFactory(),
+                    Syntax => new SyntaxHandlerMathFactory(),
+                    Separated => new SeparatedSyntaxHandlerMathFactory(),
+                    Reversed => new ReversedSyntaxHandlerMathFactory(),
+                    _ => throw new ArgumentOutOfRangeException(nameof(name))
+                };
+        }
+
+        public class AppendProvider<T>(IHandlerMath math)
+            : IProvider<Func<IHandler<T>, IHandler<T>, IHandler<T>>>
+        {
+            public Func<IHandler<T>, IHandler<T>, IHandler<T>> this[string append] =>
+                append switch
+                {
+                    Utils.Appends.FirstThenSecond => math.FirstThenSecond,
+                    Utils.Appends.PackFirstInSecond => math.PackFirstInSecond,
+                    Utils.Appends.InjectFirstIntoSecond => math.InjectFirstIntoSecond,
+                    Utils.Appends.FirstCoverSecond => math.FirstCoverSecond,
+                    Utils.Appends.FirstWrapSecond => math.FirstWrapSecond,
+                    Utils.Appends.JoinFirstWithSecond => math.JoinFirstWithSecond,
+                    Utils.Appends.MergeFirstWithSecond => math.MergeFirstWithSecond,
+                    _ => throw new ArgumentOutOfRangeException(nameof(append))
+                };
         }
 
         public interface IHandlerMathFactory

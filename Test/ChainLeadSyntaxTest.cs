@@ -4,48 +4,56 @@
     using ChainLead.Test.Help;
     using System;
 
-    using static ChainLead.Test.Help.Constants;
+    using static ChainLead.Test.Utils;
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
+    using static ChainLead.Test.Help.Dummy.HandlerIndex.Common;
+    using static ChainLead.Test.Help.Dummy.ConditionIndex.Common;
+    using NUnit.Framework.Internal;
 
-    [TestFixture]
-    public class ChainLeadSyntaxTest
+    [TestFixture(typeof(int))]
+    [TestFixture(typeof(string))]
+    [TestFixture(typeof(Types.Class))]
+    [TestFixture(typeof(Types.Struct))]
+    [TestFixture(typeof(Types.ReadonlyStruct))]
+    [TestFixture(typeof(Types.Record))]
+    [TestFixture(typeof(Types.RecordStruct))]
+    [TestFixture(typeof(Types.ReadonlyRecordStruct))]
+    public class ChainLeadSyntaxTest<T>
     {
-        private static readonly HandlerIndex
-            AB = HandlerIndex.Make("AB"),
-            ABC = HandlerIndex.Make("ABC");
+        private static readonly Dummy.HandlerIndex AB = new("AB"), ABC = new("ABC");
+        private static readonly Dummy.ConditionIndex XY = new("XY");
 
-        private static readonly ConditionIndex
-            XY = ConditionIndex.Make("XY");
-
-        ChainLeadMocks _mockOf;
+        Dummy.Container<T> _dummyOf;
+        T _token; 
 
         [SetUp]
         public void Setup()
         {
-            _mockOf = new ChainLeadMocks([A, B, C, AB, ABC], [X, Y, XY]);
+            _token = TokensProvider.Get<T>(765049);
+            _dummyOf = new(_token, [A, B, C, AB, ABC], [X, Y, XY]);
 
             ChainLeadSyntax.Configure(
-                _mockOf.HandlerMath.Object,
-                _mockOf.ConditionMath.Object);
+                _dummyOf.HandlerMath.Object,
+                _dummyOf.ConditionMath.Object);
         }
 
 
         [Test]
         public void Zero_Test()
         {
-            _mockOf.HandlerMath.Setup__Zero(returns: A);
+            _dummyOf.HandlerMath.Setup__Zero(returns: A);
 
-            Assert.That(Handler<int>.Zero,
-                Is.SameAs(_mockOf.Handlers[A]));
+            Assert.That(Handler<T>.Zero,
+                Is.SameAs(_dummyOf.Handlers[A]));
         }
 
         [Test]
         public void IsZero_Test(
             [Values(false, true)] bool expectedResult)
         {
-            _mockOf.HandlerMath.Setup__IsZero(A, returns: expectedResult);
+            _dummyOf.HandlerMath.Setup__IsZero(A, returns: expectedResult);
 
-            Assert.That(_mockOf.Handlers[A].IsZero(), 
+            Assert.That(_dummyOf.Handlers[A].IsZero(), 
                 Is.EqualTo(expectedResult));
         }
 
@@ -53,11 +61,11 @@
         public void MakeHandler__Test()
         {
             bool funcCalled = false;
-            Action<int> func = _ => funcCalled = true;
+            Action<T> func = _ => funcCalled = true;
 
-            _mockOf.HandlerMath.Setup__MakeHandler(A);
+            _dummyOf.HandlerMath.Setup__MakeHandler(A);
 
-            MakeHandler(func).Execute(Arg);
+            MakeHandler(func).Execute(_token);
 
             Assert.That(funcCalled);
         }
@@ -66,11 +74,11 @@
         public void AsHandler__Test()
         {
             bool funcCalled = false;
-            Action<int> func = _ => funcCalled = true;
+            Action<T> func = _ => funcCalled = true;
 
-            _mockOf.HandlerMath.Setup__MakeHandler(A);
+            _dummyOf.HandlerMath.Setup__MakeHandler(A);
 
-            func.AsHandler().Execute(Arg);
+            func.AsHandler().Execute(_token);
 
             Assert.That(funcCalled);
         }
@@ -78,15 +86,15 @@
         [Test]
         public void A_Then_B_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
 
-            _mockOf.Handlers[A]
-                .Then(_mockOf.Handlers[B])
-                .Execute(Arg);
+            _dummyOf.Handlers[A]
+                .Then(_dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -95,16 +103,16 @@
         [Test]
         public void FirstThenSecond_AB_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
 
             FirstThenSecond(
-                   _mockOf.Handlers[A],
-                   _mockOf.Handlers[B])
-                .Execute(Arg);
+                   _dummyOf.Handlers[A],
+                   _dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -113,15 +121,15 @@
         [Test]
         public void XThen_B_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
 
-            XThen(_mockOf.Handlers[B])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            XThen(_dummyOf.Handlers[B])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -130,16 +138,16 @@
         [Test]
         public void JoinFirstWithSecond_AB_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
 
             JoinFirstWithSecond(
-                    _mockOf.Handlers[A],
-                    _mockOf.Handlers[B])
-                .Execute(Arg);
+                    _dummyOf.Handlers[A],
+                    _dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -148,15 +156,15 @@
         [Test]
         public void Join_A_With_B_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
 
-            Join(_mockOf.Handlers[A])
-                .With(_mockOf.Handlers[B])
-                .Execute(Arg);
+            Join(_dummyOf.Handlers[A])
+                .With(_dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -165,15 +173,15 @@
         [Test]
         public void JoinXWith_B_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
 
-            JoinXWith(_mockOf.Handlers[B])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            JoinXWith(_dummyOf.Handlers[B])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -182,16 +190,16 @@
         [Test]
         public void MergeFirstWithSecond_AB_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
 
             MergeFirstWithSecond(
-                    _mockOf.Handlers[A],
-                    _mockOf.Handlers[B])
-                .Execute(Arg);
+                    _dummyOf.Handlers[A],
+                    _dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -200,15 +208,15 @@
         [Test]
         public void Merge_A_With_B_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
 
-            Merge(_mockOf.Handlers[A])
-                .With(_mockOf.Handlers[B])
-                .Execute(Arg);
+            Merge(_dummyOf.Handlers[A])
+                .With(_dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -217,15 +225,15 @@
         [Test]
         public void MergeXWith_B_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
 
-            MergeXWith(_mockOf.Handlers[B])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            MergeXWith(_dummyOf.Handlers[B])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -234,16 +242,16 @@
         [Test]
         public void PackFirstInSecond_AB_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
 
             PackFirstInSecond(
-                    _mockOf.Handlers[A],
-                    _mockOf.Handlers[B])
-                .Execute(Arg);
+                    _dummyOf.Handlers[A],
+                    _dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -252,15 +260,15 @@
         [Test]
         public void Pack_A_In_B_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
 
-            Pack(_mockOf.Handlers[A])
-                .In(_mockOf.Handlers[B])
-                .Execute(Arg);
+            Pack(_dummyOf.Handlers[A])
+                .In(_dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -269,15 +277,15 @@
         [Test]
         public void PackXIn_B_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
 
-            PackXIn(_mockOf.Handlers[B])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            PackXIn(_dummyOf.Handlers[B])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -286,16 +294,16 @@
         [Test]
         public void InjectFirstIntoSecond_AB_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
 
             InjectFirstIntoSecond(
-                    _mockOf.Handlers[A],
-                    _mockOf.Handlers[B])
-                .Execute(Arg);
+                    _dummyOf.Handlers[A],
+                    _dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -304,15 +312,15 @@
         [Test]
         public void Inject_A_Into_B_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
 
-            Inject(_mockOf.Handlers[A])
-                .Into(_mockOf.Handlers[B])
-                .Execute(Arg);
+            Inject(_dummyOf.Handlers[A])
+                .Into(_dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -321,15 +329,15 @@
         [Test]
         public void InjectXInto_B_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
 
-            InjectXInto(_mockOf.Handlers[B])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            InjectXInto(_dummyOf.Handlers[B])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -338,16 +346,16 @@
         [Test]
         public void FirstCoverSecond_AB_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
 
             FirstCoverSecond(
-                    _mockOf.Handlers[A],
-                    _mockOf.Handlers[B])
-                .Execute(Arg);
+                    _dummyOf.Handlers[A],
+                    _dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -356,15 +364,15 @@
         [Test]
         public void Use_A_ToCover_B_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
 
-            Use(_mockOf.Handlers[A])
-                .ToCover(_mockOf.Handlers[B])
-                .Execute(Arg);
+            Use(_dummyOf.Handlers[A])
+                .ToCover(_dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -373,15 +381,15 @@
         [Test]
         public void XCover_B_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
 
-            XCover(_mockOf.Handlers[B])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            XCover(_dummyOf.Handlers[B])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -390,16 +398,16 @@
         [Test]
         public void FirstWrapSecond_AB_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
 
             FirstWrapSecond(
-                    _mockOf.Handlers[A],
-                    _mockOf.Handlers[B])
-                .Execute(Arg);
+                    _dummyOf.Handlers[A],
+                    _dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -408,15 +416,15 @@
         [Test]
         public void Use_A_ToWrap_B_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
 
-            Use(_mockOf.Handlers[A])
-                .ToWrap(_mockOf.Handlers[B])
-                .Execute(Arg);
+            Use(_dummyOf.Handlers[A])
+                .ToWrap(_dummyOf.Handlers[B])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -425,15 +433,15 @@
         [Test]
         public void XWrap_B_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B].AddLoggingInto(execution);
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
+            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
 
-            XWrap(_mockOf.Handlers[B])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            XWrap(_dummyOf.Handlers[B])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -442,20 +450,20 @@
         [Test]
         public void A_Then_B_Then_C_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
             
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
 
-            _mockOf.Handlers[A]
-                .Then(_mockOf.Handlers[B])
-                .Then(_mockOf.Handlers[C])    
-                .Execute(Arg);
+            _dummyOf.Handlers[A]
+                .Then(_dummyOf.Handlers[B])
+                .Then(_dummyOf.Handlers[C])    
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -464,22 +472,22 @@
         [Test]
         public void FirstThenSecond_ABC_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
             
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
 
             FirstThenSecond(
                     FirstThenSecond(
-                        _mockOf.Handlers[A],
-                        _mockOf.Handlers[B]),
-                    _mockOf.Handlers[C])
-                .Execute(Arg);
+                        _dummyOf.Handlers[A],
+                        _dummyOf.Handlers[B]),
+                    _dummyOf.Handlers[C])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -488,20 +496,20 @@
         [Test]
         public void XThen_B_Then_C_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
 
-            XThen(_mockOf.Handlers[B])
-                .Then(_mockOf.Handlers[C])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            XThen(_dummyOf.Handlers[B])
+                .Then(_dummyOf.Handlers[C])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -510,22 +518,22 @@
         [Test]
         public void JoinFirstWithSecond_ABC_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
 
             JoinFirstWithSecond(
                     JoinFirstWithSecond(
-                        _mockOf.Handlers[A],
-                        _mockOf.Handlers[B]),
-                    _mockOf.Handlers[C])
-                .Execute(Arg);
+                        _dummyOf.Handlers[A],
+                        _dummyOf.Handlers[B]),
+                    _dummyOf.Handlers[C])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -534,20 +542,20 @@
         [Test]
         public void Join_A_With_B_ThenWith_C_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
 
-            Join(_mockOf.Handlers[A])
-                .With(_mockOf.Handlers[B])
-                .ThenWith(_mockOf.Handlers[C])
-                .Execute(Arg);
+            Join(_dummyOf.Handlers[A])
+                .With(_dummyOf.Handlers[B])
+                .ThenWith(_dummyOf.Handlers[C])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -556,20 +564,20 @@
         [Test]
         public void JoinXWith_B_ThenWith_C_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
 
-            JoinXWith(_mockOf.Handlers[B])
-                .ThenWith(_mockOf.Handlers[C])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            JoinXWith(_dummyOf.Handlers[B])
+                .ThenWith(_dummyOf.Handlers[C])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -578,22 +586,22 @@
         [Test]
         public void MergeFirstWithSecond_ABC_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
 
             MergeFirstWithSecond(
                     MergeFirstWithSecond(
-                        _mockOf.Handlers[A],
-                        _mockOf.Handlers[B]),
-                    _mockOf.Handlers[C])
-                .Execute(Arg);
+                        _dummyOf.Handlers[A],
+                        _dummyOf.Handlers[B]),
+                    _dummyOf.Handlers[C])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -602,20 +610,20 @@
         [Test]
         public void Merge_A_With_B_ThenWith_C_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
 
-            Merge(_mockOf.Handlers[A])
-                .With(_mockOf.Handlers[B])
-                .ThenWith(_mockOf.Handlers[C])
-                .Execute(Arg);
+            Merge(_dummyOf.Handlers[A])
+                .With(_dummyOf.Handlers[B])
+                .ThenWith(_dummyOf.Handlers[C])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -624,20 +632,20 @@
         [Test]
         public void MergeXWith_B_ThenWith_C_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
 
-            MergeXWith(_mockOf.Handlers[B])
-                .ThenWith(_mockOf.Handlers[C])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            MergeXWith(_dummyOf.Handlers[B])
+                .ThenWith(_dummyOf.Handlers[C])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -646,22 +654,22 @@
         [Test]
         public void PackFirstInSecond_ABC_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
 
             PackFirstInSecond(
                     PackFirstInSecond(
-                        _mockOf.Handlers[A],
-                        _mockOf.Handlers[B]),
-                    _mockOf.Handlers[C])
-                .Execute(Arg);
+                        _dummyOf.Handlers[A],
+                        _dummyOf.Handlers[B]),
+                    _dummyOf.Handlers[C])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -670,20 +678,20 @@
         [Test]
         public void Pack_A_In_B_ThenIn_C_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
 
-            Pack(_mockOf.Handlers[A])
-                .In(_mockOf.Handlers[B])
-                .ThenIn(_mockOf.Handlers[C])
-                .Execute(Arg);
+            Pack(_dummyOf.Handlers[A])
+                .In(_dummyOf.Handlers[B])
+                .ThenIn(_dummyOf.Handlers[C])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -692,20 +700,20 @@
         [Test]
         public void PackXIn_B_ThenIn_C_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
 
-            PackXIn(_mockOf.Handlers[B])
-                .ThenIn(_mockOf.Handlers[C])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            PackXIn(_dummyOf.Handlers[B])
+                .ThenIn(_dummyOf.Handlers[C])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -714,22 +722,22 @@
         [Test]
         public void InjectFirstIntoSecond_ABC_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
 
             InjectFirstIntoSecond(
                     InjectFirstIntoSecond(
-                        _mockOf.Handlers[A],
-                        _mockOf.Handlers[B]),
-                    _mockOf.Handlers[C])
-                .Execute(Arg);
+                        _dummyOf.Handlers[A],
+                        _dummyOf.Handlers[B]),
+                    _dummyOf.Handlers[C])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -738,20 +746,20 @@
         [Test]
         public void Inject_A_Into_B_ThenInto_C_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
 
-            Inject(_mockOf.Handlers[A])
-                .Into(_mockOf.Handlers[B])
-                .ThenInto(_mockOf.Handlers[C])
-                .Execute(Arg);
+            Inject(_dummyOf.Handlers[A])
+                .Into(_dummyOf.Handlers[B])
+                .ThenInto(_dummyOf.Handlers[C])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -760,20 +768,20 @@
         [Test]
         public void InjectXInto_B_ThenInto_C_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
 
-            InjectXInto(_mockOf.Handlers[B])
-                .ThenInto(_mockOf.Handlers[C])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            InjectXInto(_dummyOf.Handlers[B])
+                .ThenInto(_dummyOf.Handlers[C])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -782,22 +790,22 @@
         [Test]
         public void FirstCoverSecond_ABC_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
 
             FirstCoverSecond(
                     FirstCoverSecond(
-                        _mockOf.Handlers[A],
-                        _mockOf.Handlers[B]),
-                    _mockOf.Handlers[C])
-                .Execute(Arg);
+                        _dummyOf.Handlers[A],
+                        _dummyOf.Handlers[B]),
+                    _dummyOf.Handlers[C])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -806,20 +814,20 @@
         [Test]
         public void Use_A_ToCover_B_ThenCover_C_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
 
-            Use(_mockOf.Handlers[A])
-                .ToCover(_mockOf.Handlers[B])
-                .ThenCover(_mockOf.Handlers[C])
-                .Execute(Arg);
+            Use(_dummyOf.Handlers[A])
+                .ToCover(_dummyOf.Handlers[B])
+                .ThenCover(_dummyOf.Handlers[C])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -828,20 +836,20 @@
         [Test]
         public void XCover_B_ThenCover_C_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
 
-            XCover(_mockOf.Handlers[B])
-                .ThenCover(_mockOf.Handlers[C])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            XCover(_dummyOf.Handlers[B])
+                .ThenCover(_dummyOf.Handlers[C])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -850,22 +858,22 @@
         [Test]
         public void FirstWrapSecond_ABC_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
 
             FirstWrapSecond(
                     FirstWrapSecond(
-                        _mockOf.Handlers[A],
-                        _mockOf.Handlers[B]),
-                    _mockOf.Handlers[C])
-                .Execute(Arg);
+                        _dummyOf.Handlers[A],
+                        _dummyOf.Handlers[B]),
+                    _dummyOf.Handlers[C])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -874,20 +882,20 @@
         [Test]
         public void Use_A_ToWrap_B_ThenWrap_C_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
 
-            Use(_mockOf.Handlers[A])
-                .ToWrap(_mockOf.Handlers[B])
-                .ThenWrap(_mockOf.Handlers[C])
-                .Execute(Arg);
+            Use(_dummyOf.Handlers[A])
+                .ToWrap(_dummyOf.Handlers[B])
+                .ThenWrap(_dummyOf.Handlers[C])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -896,20 +904,20 @@
         [Test]
         public void XWrap_B_ThenWrap_C_WhereXIs_A_Test()
         {
-            List<HandlerIndex> execution = [];
+            List<Dummy.HandlerIndex> execution = [];
 
-            _mockOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _mockOf.Handlers[AB].AddDelegationTo(A, B);
-            _mockOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
+            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _mockOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
-            _mockOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
 
-            XWrap(_mockOf.Handlers[B])
-                .ThenWrap(_mockOf.Handlers[C])
-                .WhereXIs(_mockOf.Handlers[A])
-                .Execute(Arg);
+            XWrap(_dummyOf.Handlers[B])
+                .ThenWrap(_dummyOf.Handlers[C])
+                .WhereXIs(_dummyOf.Handlers[A])
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -918,36 +926,36 @@
         [Test]
         public void When_Test()
         {
-            _mockOf.HandlerMath.Setup__Conditional(A, X, returns: B);
+            _dummyOf.HandlerMath.Setup__Conditional(A, X, returns: B);
 
-            Assert.That(_mockOf.Handlers[A].When(_mockOf.Conditions[X]), 
-                Is.SameAs(_mockOf.Handlers[B]));
+            Assert.That(_dummyOf.Handlers[A].When(_dummyOf.Conditions[X]), 
+                Is.SameAs(_dummyOf.Handlers[B]));
         }
 
         [Test]
         public void WithConditionThat_Test()
         {
-            _mockOf.HandlerMath.Setup__Conditional(A, X, returns: B);
+            _dummyOf.HandlerMath.Setup__Conditional(A, X, returns: B);
 
             var handler = WithConditionThat
-                (_mockOf.Conditions[X])
-                (_mockOf.Handlers[A]);
+                (_dummyOf.Conditions[X])
+                (_dummyOf.Handlers[A]);
 
             Assert.That(handler,
-                Is.SameAs(_mockOf.Handlers[B]));
+                Is.SameAs(_dummyOf.Handlers[B]));
         }
 
         [Test]
         public void MakeCondition__Test()
         {
             bool funcCalled = false;
-            Func<int, bool> func = _ => funcCalled = true;
+            Func<T, bool> func = _ => funcCalled = true;
 
-            _mockOf.ConditionMath.Setup__MakeCondition(X);
+            _dummyOf.ConditionMath.Setup__MakeCondition(X);
 
             Assert.Multiple(() =>
             {
-                Assert.That(MakeCondition(func).Check(Arg));
+                Assert.That(MakeCondition(func).Check(_token));
                 Assert.That(funcCalled);
             });
         }
@@ -956,13 +964,13 @@
         public void AsCondition__Test()
         {
             bool funcCalled = false;
-            Func<int, bool> func = _ => funcCalled = true;
+            Func<T, bool> func = _ => funcCalled = true;
 
-            _mockOf.ConditionMath.Setup__MakeCondition(X);
+            _dummyOf.ConditionMath.Setup__MakeCondition(X);
 
             Assert.Multiple(() =>
             {
-                Assert.That(func.AsCondition().Check(Arg));
+                Assert.That(func.AsCondition().Check(_token));
                 Assert.That(funcCalled);
             });
         }
@@ -971,13 +979,13 @@
         public void AsCondition2__Test()
         {
             bool funcCalled = false;
-            Predicate<int> func = _ => funcCalled = true;
+            Predicate<T> func = _ => funcCalled = true;
 
-            _mockOf.ConditionMath.Setup__MakeCondition(X);
+            _dummyOf.ConditionMath.Setup__MakeCondition(X);
 
             Assert.Multiple(() =>
             {
-                Assert.That(func.AsCondition().Check(Arg));
+                Assert.That(func.AsCondition().Check(_token));
                 Assert.That(funcCalled);
             });
         }
@@ -985,28 +993,28 @@
         [Test]
         public void True_Test()
         {
-            _mockOf.ConditionMath.Setup__True(returns: X);
+            _dummyOf.ConditionMath.Setup__True(returns: X);
 
-            Assert.That(Condition<int>.True,
-                Is.SameAs(_mockOf.Conditions[X]));
+            Assert.That(Condition<T>.True,
+                Is.SameAs(_dummyOf.Conditions[X]));
         }
 
         [Test]
         public void False_Test()
         {
-            _mockOf.ConditionMath.Setup__False(returns: X);
+            _dummyOf.ConditionMath.Setup__False(returns: X);
 
-            Assert.That(Condition<int>.False,
-                Is.SameAs(_mockOf.Conditions[X]));
+            Assert.That(Condition<T>.False,
+                Is.SameAs(_dummyOf.Conditions[X]));
         }
 
         [Test]
         public void IsPredictableTrue_Test(
             [Values(false, true)] bool expectedResult)
         {
-            _mockOf.ConditionMath.Setup__IsPredictableTrue(X, returns: expectedResult);
+            _dummyOf.ConditionMath.Setup__IsPredictableTrue(X, returns: expectedResult);
 
-            Assert.That(_mockOf.Conditions[X].IsPredictableTrue(), 
+            Assert.That(_dummyOf.Conditions[X].IsPredictableTrue(), 
                 Is.EqualTo(expectedResult));
         }
 
@@ -1014,52 +1022,52 @@
         public void IsPredictableFalse_Test(
             [Values(false, true)] bool expectedResult)
         {
-            _mockOf.ConditionMath.Setup__IsPredictableFalse(X, returns: expectedResult);
+            _dummyOf.ConditionMath.Setup__IsPredictableFalse(X, returns: expectedResult);
 
-            Assert.That(_mockOf.Conditions[X].IsPredictableFalse(),
+            Assert.That(_dummyOf.Conditions[X].IsPredictableFalse(),
                 Is.EqualTo(expectedResult));
         }
 
         [Test]
         public void Or_Test()
         {
-            _mockOf.ConditionMath.Setup__Or(X, Y, returns: XY);
+            _dummyOf.ConditionMath.Setup__Or(X, Y, returns: XY);
 
-            var aOrB = _mockOf.Conditions[X].Or(
-                       _mockOf.Conditions[Y]);
+            var aOrB = _dummyOf.Conditions[X].Or(
+                       _dummyOf.Conditions[Y]);
 
             Assert.That(aOrB,
-                Is.SameAs(_mockOf.Conditions[XY]));
+                Is.SameAs(_dummyOf.Conditions[XY]));
         }
 
         [Test]
         public void And_Test()
         {
-            _mockOf.ConditionMath.Setup__And(X, Y, returns: XY);
+            _dummyOf.ConditionMath.Setup__And(X, Y, returns: XY);
 
-            var aAndB = _mockOf.Conditions[X].And(
-                        _mockOf.Conditions[Y]);
+            var aAndB = _dummyOf.Conditions[X].And(
+                        _dummyOf.Conditions[Y]);
 
             Assert.That(aAndB,
-                Is.SameAs(_mockOf.Conditions[XY]));
+                Is.SameAs(_dummyOf.Conditions[XY]));
         }
 
         [Test]
         public void Not_Test()
         {
-            _mockOf.ConditionMath.Setup__Not(X, returns: Y);
+            _dummyOf.ConditionMath.Setup__Not(X, returns: Y);
 
-            Assert.That(Not(_mockOf.Conditions[X]),
-                Is.SameAs(_mockOf.Conditions[Y]));
+            Assert.That(Not(_dummyOf.Conditions[X]),
+                Is.SameAs(_dummyOf.Conditions[Y]));
         }
 
         [Test]
         public void AtomizeTest()
         {
-            _mockOf.HandlerMath.Setup__Atomize(A, returns: B);
+            _dummyOf.HandlerMath.Setup__Atomize(A, returns: B);
 
-            Assert.That(_mockOf.Handlers[A].Atomize(),
-                Is.SameAs(_mockOf.Handlers[B]));
+            Assert.That(_dummyOf.Handlers[A].Atomize(),
+                Is.SameAs(_dummyOf.Handlers[B]));
         }
 
         [Test]
