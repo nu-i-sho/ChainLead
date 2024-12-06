@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Test.DI
+﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts;
     using ChainLead.Contracts.Syntax;
