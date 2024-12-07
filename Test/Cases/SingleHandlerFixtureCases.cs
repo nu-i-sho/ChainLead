@@ -17,9 +17,7 @@
             public const string Syntax = "Syntax";
 
             public class TestFixtureAttribute(Type t, string mathName)
-                : NUnit.Framework.TestFixtureAttribute(t,
-                    GetMathFactory(mathName),
-                    TokensProvider.Get(t, 51427))
+                : NUnit.Framework.TestFixtureAttribute(t, GetMathFactory(mathName))
             {
                 static ISingleHandlerMathFactory GetMathFactory(string name) =>
                     name switch

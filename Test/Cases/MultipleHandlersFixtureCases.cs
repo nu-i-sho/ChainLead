@@ -15,9 +15,7 @@
             public const string Direct = "Direct";
             public const string Reverse = "Reverse";
             public class TestFixtureAttribute(Type t, string mathName)
-                : NUnit.Framework.TestFixtureAttribute(t,
-                    GetMathFactory(mathName),
-                    TokensProvider.Get(t, 28532))
+                : NUnit.Framework.TestFixtureAttribute(t, GetMathFactory(mathName))
             {
                 static IMultipleHandlersMathFactory GetMathFactory(string name) =>
                     name switch

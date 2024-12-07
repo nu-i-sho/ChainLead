@@ -3,6 +3,7 @@
     using ChainLead.Contracts;
     using Moq;
 
+    using static ChainLead.Test.Cases.Common;
     using static ChainLead.Test.Cases.MultipleHandlersFixtureCases;
     using static System.Linq.Enumerable;
 
@@ -10,8 +11,7 @@
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
     public class MultipleHandlersTest<T>(
-        IMultipleHandlersMathFactory mathFactory,
-        T token)
+        IMultipleHandlersMathFactory mathFactory)
     {
         static readonly string[] Ids = ["AB", "ABC", "ABCD", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
         static readonly string[] Jds = ["012", "01234", "01234567890"];
@@ -19,11 +19,13 @@
         Dummy.Container<T> _dummyOf;
         IMultipleHandlersMath _math;
         List<Dummy.Index> _callsLog;
+        T _token;
 
         [SetUp]
         public void Setup()
         {
-            _dummyOf = new Dummy.Container<T>(token, [], []);
+            _token = TokensProvider.GetRandom<T>();
+            _dummyOf = new Dummy.Container<T>(_token, [], []);
             _math = mathFactory.Create(_dummyOf.ConditionMath.Object);
             _callsLog = [];
         }
@@ -34,7 +36,7 @@
             [ValueSource(nameof(Jds))] string jds)
         {
             var chain = SetupChain(_math.PackChain, ids, jds);
-            chain.Execute(token);
+            chain.Execute(_token);
 
             var expectedCallsLog = Enumerable.Concat(
                 ids.Reverse().Select(i => Index(i, jds.Last())),
@@ -54,7 +56,7 @@
             SetupConditionMathAnd();
 
             var chain = SetupChain(_math.JoinChain, ids, jds);
-            chain.Execute(token);
+            chain.Execute(_token);
 
             var expectedCallsLog = Enumerable.Concat(
                 ids.Select(i => Index(i, jds.Last())),
@@ -72,11 +74,12 @@
             [ValueSource(nameof(Jds))] string jds)
         {
             var chain = SetupChain(_math.InjectChain, ids, jds);
-            chain.Execute(token);
+            chain.Execute(_token);
 
             var expectedCallsLog = Enumerable.Concat(
-                ids.Reverse().SelectMany(i => jds.Reverse()
-                                 .Select(j => Index(i, j))),
+                ids.Reverse()
+                    .SelectMany(i => jds.Reverse()
+                        .Select(j => Index(i, j))),
                 ids.Select(Index));
 
             Assert.That(_callsLog, 
@@ -108,7 +111,7 @@
         {
             var chain = SetupChain(append, ids, jds);
 
-            chain.Execute(token);
+            chain.Execute(_token);
 
             var expectedCallsLog =
                 ids.SelectMany(i => 
@@ -127,7 +130,7 @@
             SetupConditionMathAnd();
 
             var chain = SetupChain(_math.MergeChain, ids, jds);
-            chain.Execute(token);
+            chain.Execute(_token);
 
             var expectedCallsLog = Enumerable.Concat(
                 ids.SelectMany(i => jds.Reverse()
@@ -143,18 +146,20 @@
             string ids,
             string jds)
         {
-            List<IHandler<T>> handlers = new(); 
-            foreach(var (handlerIndex, conditionIndices) in 
-                Enumerable.Zip(
-                    ids.Select(HandlerIndex),
-                    ids.Select(i => jds.Select(j => ConditionIndex(i, j)))))
+            List<IHandler<T>> handlers = new();
+
+            foreach(var i in ids) 
             {
+                var handlerIndex = HandlerIndex(i);
+                var conditionIndices = jds.Select(j => ConditionIndex(i, j));
+
                 _dummyOf.Handlers.GenerateMore(handlerIndex);
                 _dummyOf.Conditions.GenerateMore(conditionIndices);
 
-                handlers.Add(_dummyOf.Conditions[conditionIndices]
-                  .Aggregate(_dummyOf.Handlers[handlerIndex].Pure,
-                             _math.Conditional));
+                var handler = _dummyOf.Conditions[conditionIndices]
+                     .Aggregate(_dummyOf.Handlers[handlerIndex].Pure, _math.Conditional);
+
+                handlers.Add(handler);
             }
 
             _dummyOf.Handlers.AddLoggingInto(_callsLog);
@@ -170,17 +175,17 @@
                 .Returns((ICondition<T> a, ICondition<T> b) =>
                 {
                     var ab = new Mock<ICondition<T>>();
-                    ab.Setup(o => o.Check(token))
-                      .Returns(() => a.Check(token) && b.Check(token));
+                    ab.Setup(o => o.Check(_token))
+                      .Returns(() => a.Check(_token) && b.Check(_token));
 
                     return ab.Object;
                 });
 
         static Dummy.HandlerIndex HandlerIndex(char i) =>
-            new($"h[{i}]");
+            new($"[{i}]");
 
         static Dummy.ConditionIndex ConditionIndex(char i, char j) =>
-            new($"c[{i}][{j}]");
+            new($"[{i}][{j}]");
 
         static Dummy.Index Index(char i) => HandlerIndex(i);
 

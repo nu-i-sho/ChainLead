@@ -1,18 +1,11 @@
 ﻿namespace ChainLead.Test
 {
-    using static ChainLead.Test.Cases.Common;
     using static ChainLead.Test.Cases.Common.Types;
 
     public static partial class Cases
     {
         public static class ChainLeadSyntaxFixtureCases
         {
-            const int TokenId = 51427;
-
-            public class TestFixtureAttribute(Type t)
-                : NUnit.Framework.TestFixtureAttribute(t,
-                    TokensProvider.Get(t, TokenId));
-
             public class _I_Attribute() : TestFixtureAttribute(typeof(int));
             public class _II_Attribute() : TestFixtureAttribute(typeof(string));
             public class _III_Attribute() : TestFixtureAttribute(typeof(Class));

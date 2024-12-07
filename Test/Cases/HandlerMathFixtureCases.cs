@@ -20,11 +20,9 @@
             public const string Reversed = "Reversed";
 
             public class TestFixtureAttribute(Type t, string mathName)
-                : NUnit.Framework.TestFixtureAttribute(t,
-                    GetMathFactory(mathName),
-                    TokensProvider.Get(t, 93824))
+                : NUnit.Framework.TestFixtureAttribute(t, GetMathFactory(mathName))
             {
-                public static IHandlerMathFactory GetMathFactory(string name) =>
+                static IHandlerMathFactory GetMathFactory(string name) =>
                     name switch
                     {
                         Original => new OriginalHandlerMathFactory(),
@@ -70,23 +68,6 @@
             public class _XXX_Attribute() : TestFixtureAttribute(typeof(Record), Reversed);
             public class _XXXI_Attribute() : TestFixtureAttribute(typeof(RecordStruct), Reversed);
             public class _XXXII_Attribute() : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Reversed);
-
-            public class AppendProvider<T>(IHandlerMath math)
-                : IProvider<Func<IHandler<T>, IHandler<T>, IHandler<T>>>
-            {
-                public Func<IHandler<T>, IHandler<T>, IHandler<T>> this[string append] =>
-                    append switch
-                    {
-                        Appends.FirstThenSecond => math.FirstThenSecond,
-                        Appends.PackFirstInSecond => math.PackFirstInSecond,
-                        Appends.InjectFirstIntoSecond => math.InjectFirstIntoSecond,
-                        Appends.FirstCoverSecond => math.FirstCoverSecond,
-                        Appends.FirstWrapSecond => math.FirstWrapSecond,
-                        Appends.JoinFirstWithSecond => math.JoinFirstWithSecond,
-                        Appends.MergeFirstWithSecond => math.MergeFirstWithSecond,
-                        _ => throw new ArgumentOutOfRangeException(nameof(append))
-                    };
-            }
 
             public interface IHandlerMathFactory
             {

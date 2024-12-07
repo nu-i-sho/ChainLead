@@ -3,6 +3,7 @@
     using ChainLead.Contracts;
     using Moq;
 
+    using static ChainLead.Test.Cases.Common;
     using static ChainLead.Test.Cases.SingleHandlerFixtureCases;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
     using static ChainLead.Test.Dummy.HandlerIndex.Common;
@@ -10,22 +11,23 @@
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
     public class SingleHandlerTest<T>(
-        ISingleHandlerMathFactory mathFactory,
-        T token)
+        ISingleHandlerMathFactory mathFactory)
     {
         Dummy.Container<T> _dummyOf;
         ISingleHandlerMath _math;
+        T _token;
 
         [SetUp]
         public void Setup()
         {
-            _dummyOf = new(token);
+            _token = TokensProvider.GetRandom<T>();
+            _dummyOf = new(_token);
             _math = mathFactory.Create(_dummyOf.ConditionMath.Object);
         }
 
         [Test]
         public void ZeroDoesNothing() =>
-            Assert.DoesNotThrow(() => _math.Zero<T>().Execute(token));
+            Assert.DoesNotThrow(() => _math.Zero<T>().Execute(_token));
 
         [Test]
         public void ZeroIsZero() =>
@@ -37,10 +39,10 @@
             T? x = default;
             var action = new Action<T>(a => x = a);
             var handler = _math.MakeHandler(action);
-            handler.Execute(token);
+            handler.Execute(_token);
 
             Assert.That(x, 
-                Is.EqualTo(token));
+                Is.EqualTo(_token));
         }
 
         [Test]
@@ -60,7 +62,7 @@
             _math.Conditional(
                     _dummyOf.Handlers[A],
                     _dummyOf.Conditions[X])
-                 .Execute(token);
+                 .Execute(_token);
 
             Assert.That(_dummyOf.Handlers[A].WasExecutedOnce());
         }
@@ -73,7 +75,7 @@
             _math.Conditional(
                     _dummyOf.Handlers[A],
                     _dummyOf.Conditions[X])
-                 .Execute(token);
+                 .Execute(_token);
 
             Assert.That(_dummyOf.Handlers[A].WasNeverExecuted());
         }
@@ -85,7 +87,7 @@
 
             _dummyOf.Conditions[X, Y, Z]
                 .Aggregate(_dummyOf.Handlers[A].Pure, _math.Conditional)
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(_dummyOf.Conditions[Z].WasCheckedOnce());
             Assert.That(_dummyOf.Conditions[X, Y].NoOneWasChecked());
@@ -105,7 +107,7 @@
 
             var all = falses.Concat(trues);
             all.Aggregate(_dummyOf.Handlers[A].Pure, _math.Conditional)
-               .Execute(token);
+               .Execute(_token);
 
             var checkedCount = trueCount + int.Min(1, falseCount);
 
@@ -123,7 +125,7 @@
             _dummyOf.Conditions[X, Y, Z].SetResults(true);
             _dummyOf.Conditions[X, Y, Z]
                 .Aggregate(_dummyOf.Handlers[A].Pure, _math.Conditional)
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(checksLog, 
                 Is.EqualTo(new[] { Z, Y, X }));

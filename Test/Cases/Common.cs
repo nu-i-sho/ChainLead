@@ -32,16 +32,11 @@
                     JoinFirstWithSecond,
                     MergeFirstWithSecond
                 ];
-
-                public interface IProvider<TAppend>
-                {
-                    TAppend this[string key] { get; }
-                }
             }
 
             public static class TokensProvider
             {
-                private static Dictionary<Type, Func<int, object>> Tokens { get; } = new()
+                static readonly Dictionary<Type, Func<int, object>> _tokens = new()
                 {
                     { typeof(int), id => id },
                     { typeof(string), id => id.ToString() },
@@ -53,11 +48,13 @@
                     { typeof(Types.ReadonlyRecordStruct), id => new Types.ReadonlyRecordStruct(id) },
                 };
 
-                public static T Get<T>(int id) => 
-                    (T)Get(typeof(T), id);
+                static readonly Random _randon = new Random(); 
 
-                public static object Get(Type t, int id) =>
-                    Tokens[t](id);
+                public static T Get<T>(int id) => 
+                    (T)_tokens[typeof(T)](id);
+
+                public static T GetRandom<T>() =>
+                    Get<T>(Math.Abs(_randon.Next()));
 
             }
 

@@ -7,22 +7,25 @@
     
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
     using static ChainLead.Test.Cases.ChainLeadSyntaxFixtureCases;
+    using static ChainLead.Test.Cases.Common;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
     using static ChainLead.Test.Dummy.HandlerIndex.Common;
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
-    public class ChainLeadSyntaxTest<T>(T token)
+    public class ChainLeadSyntaxTest<T>
     {
-        private static readonly Dummy.HandlerIndex AB = new("AB");
-        private static readonly Dummy.HandlerIndex ABC = new("ABC");
-        private static readonly Dummy.ConditionIndex XY = new("XY");
+        readonly Dummy.HandlerIndex AB = new("AB");
+        readonly Dummy.HandlerIndex ABC = new("ABC");
+        readonly Dummy.ConditionIndex XY = new("XY");
 
         Dummy.Container<T> _dummyOf;
+        T _token;
 
         [SetUp]
         public void Setup()
         {
-            _dummyOf = new(token, [A, B, C, AB, ABC], [X, Y, XY]);
+            _token = TokensProvider.GetRandom<T>();
+            _dummyOf = new(_token, [A, B, C, AB, ABC], [X, Y, XY]);
 
             ChainLeadSyntax.Configure(
                 _dummyOf.HandlerMath.Object,
@@ -57,7 +60,7 @@
 
             _dummyOf.HandlerMath.Setup__MakeHandler(A);
 
-            MakeHandler(func).Execute(token);
+            MakeHandler(func).Execute(_token);
 
             Assert.That(funcCalled);
         }
@@ -70,7 +73,7 @@
 
             _dummyOf.HandlerMath.Setup__MakeHandler(A);
 
-            func.AsHandler().Execute(token);
+            func.AsHandler().Execute(_token);
 
             Assert.That(funcCalled);
         }
@@ -86,7 +89,7 @@
 
             _dummyOf.Handlers[A]
                 .Then(_dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -104,7 +107,7 @@
             FirstThenSecond(
                    _dummyOf.Handlers[A],
                    _dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -121,7 +124,7 @@
 
             XThen(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -139,7 +142,7 @@
             JoinFirstWithSecond(
                     _dummyOf.Handlers[A],
                     _dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -156,7 +159,7 @@
 
             Join(_dummyOf.Handlers[A])
                 .With(_dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -173,7 +176,7 @@
 
             JoinXWith(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -191,7 +194,7 @@
             MergeFirstWithSecond(
                     _dummyOf.Handlers[A],
                     _dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -208,7 +211,7 @@
 
             Merge(_dummyOf.Handlers[A])
                 .With(_dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -225,7 +228,7 @@
 
             MergeXWith(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -243,7 +246,7 @@
             PackFirstInSecond(
                     _dummyOf.Handlers[A],
                     _dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -260,7 +263,7 @@
 
             Pack(_dummyOf.Handlers[A])
                 .In(_dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -277,7 +280,7 @@
 
             PackXIn(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -295,7 +298,7 @@
             InjectFirstIntoSecond(
                     _dummyOf.Handlers[A],
                     _dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -312,7 +315,7 @@
 
             Inject(_dummyOf.Handlers[A])
                 .Into(_dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -329,7 +332,7 @@
 
             InjectXInto(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -347,7 +350,7 @@
             FirstCoverSecond(
                     _dummyOf.Handlers[A],
                     _dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -364,7 +367,7 @@
 
             Use(_dummyOf.Handlers[A])
                 .ToCover(_dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -381,7 +384,7 @@
 
             XCover(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -399,7 +402,7 @@
             FirstWrapSecond(
                     _dummyOf.Handlers[A],
                     _dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -416,7 +419,7 @@
 
             Use(_dummyOf.Handlers[A])
                 .ToWrap(_dummyOf.Handlers[B])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -433,7 +436,7 @@
 
             XWrap(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B }));
@@ -455,7 +458,7 @@
             _dummyOf.Handlers[A]
                 .Then(_dummyOf.Handlers[B])
                 .Then(_dummyOf.Handlers[C])    
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -479,7 +482,7 @@
                         _dummyOf.Handlers[A],
                         _dummyOf.Handlers[B]),
                     _dummyOf.Handlers[C])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -501,7 +504,7 @@
             XThen(_dummyOf.Handlers[B])
                 .Then(_dummyOf.Handlers[C])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -525,7 +528,7 @@
                         _dummyOf.Handlers[A],
                         _dummyOf.Handlers[B]),
                     _dummyOf.Handlers[C])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -547,7 +550,7 @@
             Join(_dummyOf.Handlers[A])
                 .With(_dummyOf.Handlers[B])
                 .ThenWith(_dummyOf.Handlers[C])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -569,7 +572,7 @@
             JoinXWith(_dummyOf.Handlers[B])
                 .ThenWith(_dummyOf.Handlers[C])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -593,7 +596,7 @@
                         _dummyOf.Handlers[A],
                         _dummyOf.Handlers[B]),
                     _dummyOf.Handlers[C])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -615,7 +618,7 @@
             Merge(_dummyOf.Handlers[A])
                 .With(_dummyOf.Handlers[B])
                 .ThenWith(_dummyOf.Handlers[C])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -637,7 +640,7 @@
             MergeXWith(_dummyOf.Handlers[B])
                 .ThenWith(_dummyOf.Handlers[C])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -661,7 +664,7 @@
                         _dummyOf.Handlers[A],
                         _dummyOf.Handlers[B]),
                     _dummyOf.Handlers[C])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -683,7 +686,7 @@
             Pack(_dummyOf.Handlers[A])
                 .In(_dummyOf.Handlers[B])
                 .ThenIn(_dummyOf.Handlers[C])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -705,7 +708,7 @@
             PackXIn(_dummyOf.Handlers[B])
                 .ThenIn(_dummyOf.Handlers[C])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -729,7 +732,7 @@
                         _dummyOf.Handlers[A],
                         _dummyOf.Handlers[B]),
                     _dummyOf.Handlers[C])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -751,7 +754,7 @@
             Inject(_dummyOf.Handlers[A])
                 .Into(_dummyOf.Handlers[B])
                 .ThenInto(_dummyOf.Handlers[C])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -773,7 +776,7 @@
             InjectXInto(_dummyOf.Handlers[B])
                 .ThenInto(_dummyOf.Handlers[C])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -797,7 +800,7 @@
                         _dummyOf.Handlers[A],
                         _dummyOf.Handlers[B]),
                     _dummyOf.Handlers[C])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -819,7 +822,7 @@
             Use(_dummyOf.Handlers[A])
                 .ToCover(_dummyOf.Handlers[B])
                 .ThenCover(_dummyOf.Handlers[C])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -841,7 +844,7 @@
             XCover(_dummyOf.Handlers[B])
                 .ThenCover(_dummyOf.Handlers[C])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -865,7 +868,7 @@
                         _dummyOf.Handlers[A],
                         _dummyOf.Handlers[B]),
                     _dummyOf.Handlers[C])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -887,7 +890,7 @@
             Use(_dummyOf.Handlers[A])
                 .ToWrap(_dummyOf.Handlers[B])
                 .ThenWrap(_dummyOf.Handlers[C])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -909,7 +912,7 @@
             XWrap(_dummyOf.Handlers[B])
                 .ThenWrap(_dummyOf.Handlers[C])
                 .WhereXIs(_dummyOf.Handlers[A])
-                .Execute(token);
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(new[] { A, B, C }));
@@ -947,7 +950,7 @@
 
             Assert.Multiple(() =>
             {
-                Assert.That(MakeCondition(func).Check(token));
+                Assert.That(MakeCondition(func).Check(_token));
                 Assert.That(funcCalled);
             });
         }
@@ -962,7 +965,7 @@
 
             Assert.Multiple(() =>
             {
-                Assert.That(func.AsCondition().Check(token));
+                Assert.That(func.AsCondition().Check(_token));
                 Assert.That(funcCalled);
             });
         }
@@ -977,7 +980,7 @@
 
             Assert.Multiple(() =>
             {
-                Assert.That(func.AsCondition().Check(token));
+                Assert.That(func.AsCondition().Check(_token));
                 Assert.That(funcCalled);
             });
         }
@@ -1069,7 +1072,8 @@
 
             var result = Reverse<string>(Log)("World!!!", "Hello ");
 
-            Assert.That(result, Is.EqualTo("Hello World!!!"));
+            Assert.That(result, 
+                Is.EqualTo("Hello World!!!"));
         }
     }
 }
