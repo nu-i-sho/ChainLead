@@ -64,7 +64,8 @@
                     _dummyOf.Conditions[X])
                  .Execute(_token);
 
-            Assert.That(_dummyOf.Handlers[A].WasExecutedOnce());
+            Assert.That(_dummyOf.Handlers[A]
+                  .WasExecutedOnce());
         }
 
         [Test]
@@ -77,7 +78,8 @@
                     _dummyOf.Conditions[X])
                  .Execute(_token);
 
-            Assert.That(_dummyOf.Handlers[A].WasNeverExecuted());
+            Assert.That(_dummyOf.Handlers[A]
+                  .WasNeverExecuted());
         }
 
         [Test]
@@ -89,9 +91,14 @@
                 .Aggregate(_dummyOf.Handlers[A].Pure, _math.Conditional)
                 .Execute(_token);
 
-            Assert.That(_dummyOf.Conditions[Z].WasCheckedOnce());
-            Assert.That(_dummyOf.Conditions[X, Y].NoOneWasChecked());
-            Assert.That(_dummyOf.Handlers[A].WasNeverExecuted());
+            Assert.That(_dummyOf.Conditions[Z]
+                  .WasCheckedOnce());
+
+            Assert.That(_dummyOf.Conditions[X, Y]
+                  .WereNeverChecked());
+
+            Assert.That(_dummyOf.Handlers[A]
+                  .WasNeverExecuted());
         }
 
         [Test]
@@ -111,9 +118,15 @@
 
             var checkedCount = trueCount + int.Min(1, falseCount);
 
-            Assert.That(all.Reverse().Take(checkedCount).EachWasCheckedOnce());
-            Assert.That(all.Reverse().Skip(checkedCount).NoOneWasChecked());
-            Assert.That(_dummyOf.Handlers[A].WasExecutedOnceWhen(falseCount == 0).ElseNever);
+            Assert.That(all.Reverse().Take(checkedCount)
+                  .EachWasCheckedOnce());
+
+            Assert.That(all.Reverse().Skip(checkedCount)
+                  .WereNeverChecked());
+
+            Assert.That(_dummyOf.Handlers[A]
+                  .WasExecutedOnceWhen(falseCount == 0)
+                  .ElseNever);
         }
 
         [Test]

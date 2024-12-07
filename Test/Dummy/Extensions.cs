@@ -120,7 +120,7 @@
                 condition.Select(x => x.WasCheckedOnce())
                          .Aggregate(true, (acc, x) => acc && x);
 
-        public static bool NoOneWasChecked<T>(
+        public static bool WereNeverChecked<T>(
             this ICollection<Condition<T>, ConditionIndex> condition) =>
                 condition.Select(x => x.WasNeverChecked())
                          .Aggregate(true, (acc, x) => acc && x);

@@ -6,6 +6,7 @@
     using System;
     
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
+    using static ChainLead.Test.Common.Notation.HandlerMath;
     using static ChainLead.Test.Cases.ChainLeadSyntaxFixtureCases;
     using static ChainLead.Test.Cases.Common;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
@@ -28,7 +29,7 @@
             _dummyOf = new(_token, [A, B, C, AB, ABC], [X, Y, XY]);
 
             ChainLeadSyntax.Configure(
-                _dummyOf.HandlerMath.Object,
+                _dummyOf.HandlerMath,
                 _dummyOf.ConditionMath.Object);
         }
 
@@ -36,20 +37,19 @@
         [Test]
         public void Zero_Test()
         {
-            _dummyOf.HandlerMath.Setup__Zero(returns: A);
+            _dummyOf.HandlerMath.Setup.Zero(A);
 
             Assert.That(Handler<T>.Zero,
                 Is.SameAs(_dummyOf.Handlers[A]));
         }
 
         [Test]
-        public void IsZero_Test(
-            [Values(false, true)] bool expectedResult)
+        public void IsZero_Test()
         {
-            _dummyOf.HandlerMath.Setup__IsZero(A, returns: expectedResult);
+            _dummyOf.HandlerMath.Setup.Zero(A);
 
-            Assert.That(_dummyOf.Handlers[A].IsZero(), 
-                Is.EqualTo(expectedResult));
+            Assert.That(_dummyOf.Handlers[A].IsZero(), Is.True);
+            Assert.That(_dummyOf.Handlers[B].IsZero(), Is.False);
         }
 
         [Test]
@@ -58,7 +58,7 @@
             bool funcCalled = false;
             Action<T> func = _ => funcCalled = true;
 
-            _dummyOf.HandlerMath.Setup__MakeHandler(A);
+            _dummyOf.HandlerMath.Setup.MakeHandler(A);
 
             MakeHandler(func).Execute(_token);
 
@@ -71,7 +71,7 @@
             bool funcCalled = false;
             Action<T> func = _ => funcCalled = true;
 
-            _dummyOf.HandlerMath.Setup__MakeHandler(A);
+            _dummyOf.HandlerMath.Setup.MakeHandler(A);
 
             func.AsHandler().Execute(_token);
 
@@ -85,7 +85,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.FirstThenSecond(A, B).Returns(AB);
 
             _dummyOf.Handlers[A]
                 .Then(_dummyOf.Handlers[B])
@@ -102,7 +102,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.FirstThenSecond(A, B).Returns(AB);
 
             FirstThenSecond(
                    _dummyOf.Handlers[A],
@@ -120,7 +120,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.FirstThenSecond(A, B).Returns(AB);
 
             XThen(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
@@ -137,7 +137,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(A, B).Returns(AB);
 
             JoinFirstWithSecond(
                     _dummyOf.Handlers[A],
@@ -155,7 +155,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(A, B).Returns(AB);
 
             Join(_dummyOf.Handlers[A])
                 .With(_dummyOf.Handlers[B])
@@ -172,7 +172,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(A, B).Returns(AB);
 
             JoinXWith(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
@@ -189,7 +189,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(A, B).Returns(AB);
 
             MergeFirstWithSecond(
                     _dummyOf.Handlers[A],
@@ -207,7 +207,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(A, B).Returns(AB);
 
             Merge(_dummyOf.Handlers[A])
                 .With(_dummyOf.Handlers[B])
@@ -224,7 +224,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(A, B).Returns(AB);
 
             MergeXWith(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
@@ -241,7 +241,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.PackFirstInSecond(A, B).Returns(AB);
 
             PackFirstInSecond(
                     _dummyOf.Handlers[A],
@@ -259,7 +259,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.PackFirstInSecond(A, B).Returns(AB);
 
             Pack(_dummyOf.Handlers[A])
                 .In(_dummyOf.Handlers[B])
@@ -276,7 +276,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.PackFirstInSecond(A, B).Returns(AB);
 
             PackXIn(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
@@ -293,7 +293,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(A, B).Returns(AB);
 
             InjectFirstIntoSecond(
                     _dummyOf.Handlers[A],
@@ -311,7 +311,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(A, B).Returns(AB);
 
             Inject(_dummyOf.Handlers[A])
                 .Into(_dummyOf.Handlers[B])
@@ -328,7 +328,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(A, B).Returns(AB);
 
             InjectXInto(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
@@ -345,7 +345,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.FirstCoverSecond(A, B).Returns(AB);
 
             FirstCoverSecond(
                     _dummyOf.Handlers[A],
@@ -363,7 +363,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.FirstCoverSecond(A, B).Returns(AB);
 
             Use(_dummyOf.Handlers[A])
                 .ToCover(_dummyOf.Handlers[B])
@@ -380,7 +380,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.FirstCoverSecond(A, B).Returns(AB);
 
             XCover(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
@@ -397,7 +397,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.FirstWrapSecond(A, B).Returns(AB);
 
             FirstWrapSecond(
                     _dummyOf.Handlers[A],
@@ -415,7 +415,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.FirstWrapSecond(A, B).Returns(AB);
 
             Use(_dummyOf.Handlers[A])
                 .ToWrap(_dummyOf.Handlers[B])
@@ -432,7 +432,7 @@
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
+            _dummyOf.HandlerMath.Setup.FirstWrapSecond(A, B).Returns(AB);
 
             XWrap(_dummyOf.Handlers[B])
                 .WhereXIs(_dummyOf.Handlers[A])
@@ -452,8 +452,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.FirstThenSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.FirstThenSecond(AB, C).Returns(ABC);
 
             _dummyOf.Handlers[A]
                 .Then(_dummyOf.Handlers[B])
@@ -474,8 +474,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.FirstThenSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.FirstThenSecond(AB, C).Returns(ABC);
 
             FirstThenSecond(
                     FirstThenSecond(
@@ -498,8 +498,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__FirstThenSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__FirstThenSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.FirstThenSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.FirstThenSecond(AB, C).Returns(ABC);
 
             XThen(_dummyOf.Handlers[B])
                 .Then(_dummyOf.Handlers[C])
@@ -520,8 +520,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(AB, C).Returns(ABC);
 
             JoinFirstWithSecond(
                     JoinFirstWithSecond(
@@ -544,8 +544,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(AB, C).Returns(ABC);
 
             Join(_dummyOf.Handlers[A])
                 .With(_dummyOf.Handlers[B])
@@ -566,8 +566,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__JoinFirstWithSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(AB, C).Returns(ABC);
 
             JoinXWith(_dummyOf.Handlers[B])
                 .ThenWith(_dummyOf.Handlers[C])
@@ -588,8 +588,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(AB, C).Returns(ABC);
 
             MergeFirstWithSecond(
                     MergeFirstWithSecond(
@@ -612,8 +612,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(AB, C).Returns(ABC);
 
             Merge(_dummyOf.Handlers[A])
                 .With(_dummyOf.Handlers[B])
@@ -634,8 +634,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__MergeFirstWithSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(AB, C).Returns(ABC);
 
             MergeXWith(_dummyOf.Handlers[B])
                 .ThenWith(_dummyOf.Handlers[C])
@@ -656,8 +656,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.PackFirstInSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.PackFirstInSecond(AB, C).Returns(ABC);
 
             PackFirstInSecond(
                     PackFirstInSecond(
@@ -680,8 +680,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.PackFirstInSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.PackFirstInSecond(AB, C).Returns(ABC);
 
             Pack(_dummyOf.Handlers[A])
                 .In(_dummyOf.Handlers[B])
@@ -702,8 +702,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__PackFirstInSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__PackFirstInSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.PackFirstInSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.PackFirstInSecond(AB, C).Returns(ABC);
 
             PackXIn(_dummyOf.Handlers[B])
                 .ThenIn(_dummyOf.Handlers[C])
@@ -724,8 +724,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(AB, C).Returns(ABC);
 
             InjectFirstIntoSecond(
                     InjectFirstIntoSecond(
@@ -748,8 +748,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(AB, C).Returns(ABC);
 
             Inject(_dummyOf.Handlers[A])
                 .Into(_dummyOf.Handlers[B])
@@ -770,8 +770,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__InjectFirstIntoSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(AB, C).Returns(ABC);
 
             InjectXInto(_dummyOf.Handlers[B])
                 .ThenInto(_dummyOf.Handlers[C])
@@ -792,8 +792,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.FirstCoverSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.FirstCoverSecond(AB, C).Returns(ABC);
 
             FirstCoverSecond(
                     FirstCoverSecond(
@@ -816,8 +816,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.FirstCoverSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.FirstCoverSecond(AB, C).Returns(ABC);
 
             Use(_dummyOf.Handlers[A])
                 .ToCover(_dummyOf.Handlers[B])
@@ -838,8 +838,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__FirstCoverSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__FirstCoverSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.FirstCoverSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.FirstCoverSecond(AB, C).Returns(ABC);
 
             XCover(_dummyOf.Handlers[B])
                 .ThenCover(_dummyOf.Handlers[C])
@@ -860,8 +860,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.FirstWrapSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.FirstWrapSecond(AB, C).Returns(ABC);
 
             FirstWrapSecond(
                     FirstWrapSecond(
@@ -884,8 +884,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.FirstWrapSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.FirstWrapSecond(AB, C).Returns(ABC);
 
             Use(_dummyOf.Handlers[A])
                 .ToWrap(_dummyOf.Handlers[B])
@@ -906,8 +906,8 @@
             _dummyOf.Handlers[AB].AddDelegationTo(A, B);
             _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
 
-            _dummyOf.HandlerMath.Setup__FirstWrapSecond(A, B, returns: AB);
-            _dummyOf.HandlerMath.Setup__FirstWrapSecond(AB, C, returns: ABC);
+            _dummyOf.HandlerMath.Setup.FirstWrapSecond(A, B).Returns(AB);
+            _dummyOf.HandlerMath.Setup.FirstWrapSecond(AB, C).Returns(ABC);
 
             XWrap(_dummyOf.Handlers[B])
                 .ThenWrap(_dummyOf.Handlers[C])
@@ -921,7 +921,7 @@
         [Test]
         public void When_Test()
         {
-            _dummyOf.HandlerMath.Setup__Conditional(A, X, returns: B);
+            _dummyOf.HandlerMath.Setup.Conditional(A, X).Returns(B);
 
             Assert.That(_dummyOf.Handlers[A].When(_dummyOf.Conditions[X]), 
                 Is.SameAs(_dummyOf.Handlers[B]));
@@ -930,7 +930,7 @@
         [Test]
         public void WithConditionThat_Test()
         {
-            _dummyOf.HandlerMath.Setup__Conditional(A, X, returns: B);
+            _dummyOf.HandlerMath.Setup.Conditional(A, X).Returns(B);
 
             var handler = WithConditionThat
                 (_dummyOf.Conditions[X])
@@ -1059,7 +1059,7 @@
         [Test]
         public void AtomizeTest()
         {
-            _dummyOf.HandlerMath.Setup__Atomize(A, returns: B);
+            _dummyOf.HandlerMath.Setup.Atomize(A).Returns(B);
 
             Assert.That(_dummyOf.Handlers[A].Atomize(),
                 Is.SameAs(_dummyOf.Handlers[B]));

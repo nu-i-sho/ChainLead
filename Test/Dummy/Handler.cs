@@ -18,6 +18,9 @@
             public void AddCallback(Action f) =>
                 Callback += f;
 
+            public void SetImplementation(Action<T> f) =>
+                Implementation = f;
+
             public void AddLoggingInto(IList<HandlerIndex> acc) =>
                 AddCallback(() => acc.Add(Index));
 
@@ -66,6 +69,11 @@
 
             private int CallsCount { get; set; } = 0;
 
+            private Action<T> Implementation { get; set; } = _ =>
+            {
+                /* INITIALY DO NOTHING */
+            };
+
             private Action Callback { get; set; } = () =>
             {
                 /* INITIALY DO NOTHING */
@@ -75,6 +83,7 @@
             {
                 if (state?.Equals(token) ?? false)
                 {
+                    Implementation(state);
                     Callback();
                     CallsCount++;
                 }

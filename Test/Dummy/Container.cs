@@ -6,7 +6,7 @@
     {
         public class Container<T>
         {
-            public HandlerMath<T> HandlerMath { get; }
+            public SingleTypeHandlerMath<T> HandlerMath { get; }
 
             public ConditionMath<T> ConditionMath { get; }
 
@@ -30,7 +30,7 @@
                 foreach (var i in conditionIndices)
                     Conditions.Add(new(i, tokenArg));
 
-                HandlerMath = new(Handlers, Conditions, tokenArg);
+                HandlerMath = new(Handlers);
                 ConditionMath = new(Conditions, tokenArg);
             }
         }

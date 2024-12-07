@@ -34,17 +34,17 @@ namespace ChainLead.Test
             _math = mathFactory.Create(_dummyOf.ConditionMath.Object);
 
             _do = append =>
-                append switch
-                {
-                    Appends.FirstThenSecond => new(_math.FirstThenSecond),
-                    Appends.PackFirstInSecond => new(_math.PackFirstInSecond),
-                    Appends.InjectFirstIntoSecond => new(_math.InjectFirstIntoSecond),
-                    Appends.FirstCoverSecond => new(_math.FirstCoverSecond),
-                    Appends.FirstWrapSecond => new(_math.FirstWrapSecond),
-                    Appends.JoinFirstWithSecond => new(_math.JoinFirstWithSecond),
-                    Appends.MergeFirstWithSecond => new(_math.MergeFirstWithSecond),
-                    _ => throw new ArgumentOutOfRangeException(nameof(append))
-                };
+                  append switch
+                  {
+                      Cases.Common.Appends.FirstThenSecond => new(_math.FirstThenSecond),
+                      Cases.Common.Appends.PackFirstInSecond => new(_math.PackFirstInSecond),
+                      Cases.Common.Appends.InjectFirstIntoSecond => new(_math.InjectFirstIntoSecond),
+                      Cases.Common.Appends.FirstCoverSecond => new(_math.FirstCoverSecond),
+                      Cases.Common.Appends.FirstWrapSecond => new(_math.FirstWrapSecond),
+                      Cases.Common.Appends.JoinFirstWithSecond => new(_math.JoinFirstWithSecond),
+                      Cases.Common.Appends.MergeFirstWithSecond => new(_math.MergeFirstWithSecond),
+                      _ => throw new ArgumentOutOfRangeException(nameof(append))
+                  };
         }
 
         [Test]
@@ -233,7 +233,7 @@ namespace ChainLead.Test
                   .WasCheckedOnce());
 
             Assert.That(_dummyOf.Conditions[X, Y, Z].Except([expectedCondition])
-                  .NoOneWasChecked());
+                  .WereNeverChecked());
 
             Assert.That(_dummyOf.Handlers[A, B]
                   .EachWasExecutedOnceWhen(@case.FinalConditionCheckResult)
@@ -276,7 +276,7 @@ namespace ChainLead.Test
                   .VerifyChecks(@case.CheckExpected));
 
             Assert.That(_dummyOf.Conditions[unexpectedAnd, aTop, bTop]
-                  .NoOneWasChecked());
+                  .WereNeverChecked());
 
             Assert.That(_dummyOf.Handlers[A, B]
                   .VerifyExecution(@case.ExecutionExpected));
@@ -314,7 +314,7 @@ namespace ChainLead.Test
                   .EachWasCheckedOnce());
 
             Assert.That(_dummyOf.Conditions.Except(expectedToCheck)
-                  .NoOneWasChecked());
+                  .WereNeverChecked());
 
             Assert.That(expectedToExecute
                   .EachWasExecutedOnce());
