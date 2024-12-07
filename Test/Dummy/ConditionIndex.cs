@@ -12,6 +12,12 @@
 
             public static new ConditionIndex Make(char value) => new(value.ToString());
 
+            public static ConditionIndex operator &(ConditionIndex left, ConditionIndex right) =>
+                new($"{left.Value} & {right.Value}");
+
+            public static ConditionIndex operator |(ConditionIndex left, ConditionIndex right) =>
+                new($"{left.Value} | {right.Value}");
+
             public static class Common
             {
                 public static readonly ConditionIndex Q = new("Q");

@@ -6,7 +6,6 @@
     using System;
     
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
-    using static ChainLead.Test.Common.Notation.HandlerMath;
     using static ChainLead.Test.Cases.ChainLeadSyntaxFixtureCases;
     using static ChainLead.Test.Cases.Common;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
@@ -15,10 +14,6 @@
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     public class ChainLeadSyntaxTest<T>
     {
-        readonly Dummy.HandlerIndex AB = new("AB");
-        readonly Dummy.HandlerIndex ABC = new("ABC");
-        readonly Dummy.ConditionIndex XY = new("XY");
-
         Dummy.Container<T> _dummyOf;
         T _token;
 
@@ -26,7 +21,7 @@
         public void Setup()
         {
             _token = TokensProvider.GetRandom<T>();
-            _dummyOf = new(_token, [A, B, C, AB, ABC], [X, Y, XY]);
+            _dummyOf = new(_token, [A, B, C, A+B, A+B+C], [X, Y, X&Y, X|Y]);
 
             ChainLeadSyntax.Configure(
                 _dummyOf.HandlerMath,
@@ -37,19 +32,19 @@
         [Test]
         public void Zero_Test()
         {
-            _dummyOf.HandlerMath.Setup.Zero(A);
+            _dummyOf.HandlerMath.SetZero.Returns(A);
 
             Assert.That(Handler<T>.Zero,
-                Is.SameAs(_dummyOf.Handlers[A]));
+                Is.SameAs(_dummyOf.Handler(A)));
         }
 
         [Test]
         public void IsZero_Test()
         {
-            _dummyOf.HandlerMath.Setup.Zero(A);
+            _dummyOf.HandlerMath.SetZero.Returns(A);
 
-            Assert.That(_dummyOf.Handlers[A].IsZero(), Is.True);
-            Assert.That(_dummyOf.Handlers[B].IsZero(), Is.False);
+            Assert.That(_dummyOf.Handler(A).IsZero(), Is.True);
+            Assert.That(_dummyOf.Handler(B).IsZero(), Is.False);
         }
 
         [Test]
@@ -58,7 +53,7 @@
             bool funcCalled = false;
             Action<T> func = _ => funcCalled = true;
 
-            _dummyOf.HandlerMath.Setup.MakeHandler(A);
+            _dummyOf.HandlerMath.SetMakeHandler.Returns(A);
 
             MakeHandler(func).Execute(_token);
 
@@ -71,7 +66,7 @@
             bool funcCalled = false;
             Action<T> func = _ => funcCalled = true;
 
-            _dummyOf.HandlerMath.Setup.MakeHandler(A);
+            _dummyOf.HandlerMath.SetMakeHandler.Returns(A);
 
             func.AsHandler().Execute(_token);
 
@@ -84,11 +79,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.FirstThenSecond(A, B).Returns(AB);
-
-            _dummyOf.Handlers[A]
-                .Then(_dummyOf.Handlers[B])
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetFirstThenSecond(A, B).Returns(A+B);
+            
+            _dummyOf.Handler(A)
+                .Then(_dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -101,12 +96,12 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.FirstThenSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetFirstThenSecond(A, B).Returns(A+B);
 
             FirstThenSecond(
-                   _dummyOf.Handlers[A],
-                   _dummyOf.Handlers[B])
+                   _dummyOf.Handler(A),
+                   _dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -119,11 +114,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.FirstThenSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetFirstThenSecond(A, B).Returns(A+B);
 
-            XThen(_dummyOf.Handlers[B])
-                .WhereXIs(_dummyOf.Handlers[A])
+            XThen(_dummyOf.Handler(B))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -136,12 +131,12 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetJoinFirstWithSecond(A, B).Returns(A+B);
 
             JoinFirstWithSecond(
-                    _dummyOf.Handlers[A],
-                    _dummyOf.Handlers[B])
+                    _dummyOf.Handler(A),
+                    _dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -154,11 +149,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetJoinFirstWithSecond(A, B).Returns(A+B);
 
-            Join(_dummyOf.Handlers[A])
-                .With(_dummyOf.Handlers[B])
+            Join(_dummyOf.Handler(A))
+                .With(_dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -171,11 +166,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetJoinFirstWithSecond(A, B).Returns(A+B);
 
-            JoinXWith(_dummyOf.Handlers[B])
-                .WhereXIs(_dummyOf.Handlers[A])
+            JoinXWith(_dummyOf.Handler(B))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -188,12 +183,12 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetMergeFirstWithSecond(A, B).Returns(A+B);
 
             MergeFirstWithSecond(
-                    _dummyOf.Handlers[A],
-                    _dummyOf.Handlers[B])
+                    _dummyOf.Handler(A),
+                    _dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -206,11 +201,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetMergeFirstWithSecond(A, B).Returns(A+B);
 
-            Merge(_dummyOf.Handlers[A])
-                .With(_dummyOf.Handlers[B])
+            Merge(_dummyOf.Handler(A))
+                .With(_dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -223,11 +218,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetMergeFirstWithSecond(A, B).Returns(A+B);
 
-            MergeXWith(_dummyOf.Handlers[B])
-                .WhereXIs(_dummyOf.Handlers[A])
+            MergeXWith(_dummyOf.Handler(B))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -240,12 +235,12 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.PackFirstInSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetPackFirstInSecond(A, B).Returns(A+B);
 
             PackFirstInSecond(
-                    _dummyOf.Handlers[A],
-                    _dummyOf.Handlers[B])
+                    _dummyOf.Handler(A),
+                    _dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -258,11 +253,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.PackFirstInSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetPackFirstInSecond(A, B).Returns(A+B);
 
-            Pack(_dummyOf.Handlers[A])
-                .In(_dummyOf.Handlers[B])
+            Pack(_dummyOf.Handler(A))
+                .In(_dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -275,11 +270,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.PackFirstInSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetPackFirstInSecond(A, B).Returns(A+B);
 
-            PackXIn(_dummyOf.Handlers[B])
-                .WhereXIs(_dummyOf.Handlers[A])
+            PackXIn(_dummyOf.Handler(B))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -292,12 +287,12 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetInjectFirstIntoSecond(A, B).Returns(A+B);
 
             InjectFirstIntoSecond(
-                    _dummyOf.Handlers[A],
-                    _dummyOf.Handlers[B])
+                    _dummyOf.Handler(A),
+                    _dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -310,11 +305,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetInjectFirstIntoSecond(A, B).Returns(A+B);
 
-            Inject(_dummyOf.Handlers[A])
-                .Into(_dummyOf.Handlers[B])
+            Inject(_dummyOf.Handler(A))
+                .Into(_dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -327,11 +322,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetInjectFirstIntoSecond(A, B).Returns(A+B);
 
-            InjectXInto(_dummyOf.Handlers[B])
-                .WhereXIs(_dummyOf.Handlers[A])
+            InjectXInto(_dummyOf.Handler(B))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -344,12 +339,12 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.FirstCoverSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetFirstCoverSecond(A, B).Returns(A+B);
 
             FirstCoverSecond(
-                    _dummyOf.Handlers[A],
-                    _dummyOf.Handlers[B])
+                    _dummyOf.Handler(A),
+                    _dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -362,11 +357,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.FirstCoverSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetFirstCoverSecond(A, B).Returns(A+B);
 
-            Use(_dummyOf.Handlers[A])
-                .ToCover(_dummyOf.Handlers[B])
+            Use(_dummyOf.Handler(A))
+                .ToCover(_dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -379,11 +374,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.FirstCoverSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetFirstCoverSecond(A, B).Returns(A+B);
 
-            XCover(_dummyOf.Handlers[B])
-                .WhereXIs(_dummyOf.Handlers[A])
+            XCover(_dummyOf.Handler(B))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -396,12 +391,12 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.FirstWrapSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetFirstWrapSecond(A, B).Returns(A+B);
 
             FirstWrapSecond(
-                    _dummyOf.Handlers[A],
-                    _dummyOf.Handlers[B])
+                    _dummyOf.Handler(A),
+                    _dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -414,11 +409,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.FirstWrapSecond(A, B).Returns(AB);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetFirstWrapSecond(A, B).Returns(A+B);
 
-            Use(_dummyOf.Handlers[A])
-                .ToWrap(_dummyOf.Handlers[B])
+            Use(_dummyOf.Handler(A))
+                .ToWrap(_dummyOf.Handler(B))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -431,11 +426,11 @@
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[A, B].AddLoggingInto(execution);
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.HandlerMath.Setup.FirstWrapSecond(A, B).Returns(AB);
+            _dummyOf.Handlers[A+B].AddDelegationTo(A, B);
+            _dummyOf.HandlerMath.SetFirstWrapSecond(A, B).Returns(A+B);
 
-            XWrap(_dummyOf.Handlers[B])
-                .WhereXIs(_dummyOf.Handlers[A])
+            XWrap(_dummyOf.Handler(B))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -449,15 +444,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
             
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.FirstThenSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.FirstThenSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetFirstThenSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetFirstThenSecond(A+B, C).Returns(A+B+C);
 
-            _dummyOf.Handlers[A]
-                .Then(_dummyOf.Handlers[B])
-                .Then(_dummyOf.Handlers[C])    
+            _dummyOf.Handler(A)
+                .Then(_dummyOf.Handler(B))
+                .Then(_dummyOf.Handler(C))    
                 .Execute(_token);
 
             Assert.That(execution,
@@ -471,17 +466,17 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
             
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.FirstThenSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.FirstThenSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetFirstThenSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetFirstThenSecond(A+B, C).Returns(A+B+C);
 
             FirstThenSecond(
                     FirstThenSecond(
-                        _dummyOf.Handlers[A],
-                        _dummyOf.Handlers[B]),
-                    _dummyOf.Handlers[C])
+                        _dummyOf.Handler(A),
+                        _dummyOf.Handler(B)),
+                    _dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -495,15 +490,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.FirstThenSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.FirstThenSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetFirstThenSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetFirstThenSecond(A+B, C).Returns(A+B+C);
 
-            XThen(_dummyOf.Handlers[B])
-                .Then(_dummyOf.Handlers[C])
-                .WhereXIs(_dummyOf.Handlers[A])
+            XThen(_dummyOf.Handler(B))
+                .Then(_dummyOf.Handler(C))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -517,17 +512,17 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetJoinFirstWithSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetJoinFirstWithSecond(A+B, C).Returns(A+B+C);
 
             JoinFirstWithSecond(
                     JoinFirstWithSecond(
-                        _dummyOf.Handlers[A],
-                        _dummyOf.Handlers[B]),
-                    _dummyOf.Handlers[C])
+                        _dummyOf.Handler(A),
+                        _dummyOf.Handler(B)),
+                    _dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -541,15 +536,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handlers[A+B+C].AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetJoinFirstWithSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetJoinFirstWithSecond(A+B, C).Returns(A+B+C);
 
-            Join(_dummyOf.Handlers[A])
-                .With(_dummyOf.Handlers[B])
-                .ThenWith(_dummyOf.Handlers[C])
+            Join(_dummyOf.Handler(A))
+                .With(_dummyOf.Handler(B))
+                .ThenWith(_dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -563,15 +558,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.JoinFirstWithSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetJoinFirstWithSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetJoinFirstWithSecond(A+B, C).Returns(A+B+C);
 
-            JoinXWith(_dummyOf.Handlers[B])
-                .ThenWith(_dummyOf.Handlers[C])
-                .WhereXIs(_dummyOf.Handlers[A])
+            JoinXWith(_dummyOf.Handler(B))
+                .ThenWith(_dummyOf.Handler(C))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -585,17 +580,17 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetMergeFirstWithSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetMergeFirstWithSecond(A+B, C).Returns(A+B+C);
 
             MergeFirstWithSecond(
                     MergeFirstWithSecond(
-                        _dummyOf.Handlers[A],
-                        _dummyOf.Handlers[B]),
-                    _dummyOf.Handlers[C])
+                        _dummyOf.Handler(A),
+                        _dummyOf.Handler(B)),
+                    _dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -609,15 +604,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetMergeFirstWithSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetMergeFirstWithSecond(A+B, C).Returns(A+B+C);
 
-            Merge(_dummyOf.Handlers[A])
-                .With(_dummyOf.Handlers[B])
-                .ThenWith(_dummyOf.Handlers[C])
+            Merge(_dummyOf.Handler(A))
+                .With(_dummyOf.Handler(B))
+                .ThenWith(_dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -631,15 +626,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.MergeFirstWithSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetMergeFirstWithSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetMergeFirstWithSecond(A+B, C).Returns(A+B+C);
 
-            MergeXWith(_dummyOf.Handlers[B])
-                .ThenWith(_dummyOf.Handlers[C])
-                .WhereXIs(_dummyOf.Handlers[A])
+            MergeXWith(_dummyOf.Handler(B))
+                .ThenWith(_dummyOf.Handler(C))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -653,17 +648,17 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.PackFirstInSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.PackFirstInSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetPackFirstInSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetPackFirstInSecond(A+B, C).Returns(A+B+C);
 
             PackFirstInSecond(
                     PackFirstInSecond(
-                        _dummyOf.Handlers[A],
-                        _dummyOf.Handlers[B]),
-                    _dummyOf.Handlers[C])
+                        _dummyOf.Handler(A),
+                        _dummyOf.Handler(B)),
+                    _dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -677,15 +672,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.PackFirstInSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.PackFirstInSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetPackFirstInSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetPackFirstInSecond(A+B, C).Returns(A+B+C);
 
-            Pack(_dummyOf.Handlers[A])
-                .In(_dummyOf.Handlers[B])
-                .ThenIn(_dummyOf.Handlers[C])
+            Pack(_dummyOf.Handler(A))
+                .In(_dummyOf.Handler(B))
+                .ThenIn(_dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -699,15 +694,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.PackFirstInSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.PackFirstInSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetPackFirstInSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetPackFirstInSecond(A+B, C).Returns(A+B+C);
 
-            PackXIn(_dummyOf.Handlers[B])
-                .ThenIn(_dummyOf.Handlers[C])
-                .WhereXIs(_dummyOf.Handlers[A])
+            PackXIn(_dummyOf.Handler(B))
+                .ThenIn(_dummyOf.Handler(C))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -721,17 +716,17 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetInjectFirstIntoSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetInjectFirstIntoSecond(A+B, C).Returns(A+B+C);
 
             InjectFirstIntoSecond(
                     InjectFirstIntoSecond(
-                        _dummyOf.Handlers[A],
-                        _dummyOf.Handlers[B]),
-                    _dummyOf.Handlers[C])
+                        _dummyOf.Handler(A),
+                        _dummyOf.Handler(B)),
+                    _dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -745,15 +740,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetInjectFirstIntoSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetInjectFirstIntoSecond(A+B, C).Returns(A+B+C);
 
-            Inject(_dummyOf.Handlers[A])
-                .Into(_dummyOf.Handlers[B])
-                .ThenInto(_dummyOf.Handlers[C])
+            Inject(_dummyOf.Handler(A))
+                .Into(_dummyOf.Handler(B))
+                .ThenInto(_dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -767,15 +762,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.InjectFirstIntoSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetInjectFirstIntoSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetInjectFirstIntoSecond(A+B, C).Returns(A+B+C);
 
-            InjectXInto(_dummyOf.Handlers[B])
-                .ThenInto(_dummyOf.Handlers[C])
-                .WhereXIs(_dummyOf.Handlers[A])
+            InjectXInto(_dummyOf.Handler(B))
+                .ThenInto(_dummyOf.Handler(C))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -789,17 +784,17 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.FirstCoverSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.FirstCoverSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetFirstCoverSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetFirstCoverSecond(A+B, C).Returns(A+B+C);
 
             FirstCoverSecond(
                     FirstCoverSecond(
-                        _dummyOf.Handlers[A],
-                        _dummyOf.Handlers[B]),
-                    _dummyOf.Handlers[C])
+                        _dummyOf.Handler(A),
+                        _dummyOf.Handler(B)),
+                    _dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -813,15 +808,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.FirstCoverSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.FirstCoverSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetFirstCoverSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetFirstCoverSecond(A+B, C).Returns(A+B+C);
 
-            Use(_dummyOf.Handlers[A])
-                .ToCover(_dummyOf.Handlers[B])
-                .ThenCover(_dummyOf.Handlers[C])
+            Use(_dummyOf.Handler(A))
+                .ToCover(_dummyOf.Handler(B))
+                .ThenCover(_dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -835,15 +830,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.FirstCoverSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.FirstCoverSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetFirstCoverSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetFirstCoverSecond(A+B, C).Returns(A+B+C);
 
-            XCover(_dummyOf.Handlers[B])
-                .ThenCover(_dummyOf.Handlers[C])
-                .WhereXIs(_dummyOf.Handlers[A])
+            XCover(_dummyOf.Handler(B))
+                .ThenCover(_dummyOf.Handler(C))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -857,17 +852,17 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.FirstWrapSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.FirstWrapSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetFirstWrapSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetFirstWrapSecond(A+B, C).Returns(A+B+C);
 
             FirstWrapSecond(
                     FirstWrapSecond(
-                        _dummyOf.Handlers[A],
-                        _dummyOf.Handlers[B]),
-                    _dummyOf.Handlers[C])
+                        _dummyOf.Handler(A),
+                        _dummyOf.Handler(B)),
+                    _dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -881,15 +876,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.FirstWrapSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.FirstWrapSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetFirstWrapSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetFirstWrapSecond(A+B, C).Returns(A+B+C);
 
-            Use(_dummyOf.Handlers[A])
-                .ToWrap(_dummyOf.Handlers[B])
-                .ThenWrap(_dummyOf.Handlers[C])
+            Use(_dummyOf.Handler(A))
+                .ToWrap(_dummyOf.Handler(B))
+                .ThenWrap(_dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -903,15 +898,15 @@
 
             _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
 
-            _dummyOf.Handlers[AB].AddDelegationTo(A, B);
-            _dummyOf.Handlers[ABC].AddDelegationTo(AB, C);
+            _dummyOf.Handler(A+B).AddDelegationTo(A, B);
+            _dummyOf.Handler(A+B+C).AddDelegationTo(A+B, C);
 
-            _dummyOf.HandlerMath.Setup.FirstWrapSecond(A, B).Returns(AB);
-            _dummyOf.HandlerMath.Setup.FirstWrapSecond(AB, C).Returns(ABC);
+            _dummyOf.HandlerMath.SetFirstWrapSecond(A, B).Returns(A+B);
+            _dummyOf.HandlerMath.SetFirstWrapSecond(A+B, C).Returns(A+B+C);
 
-            XWrap(_dummyOf.Handlers[B])
-                .ThenWrap(_dummyOf.Handlers[C])
-                .WhereXIs(_dummyOf.Handlers[A])
+            XWrap(_dummyOf.Handler(B))
+                .ThenWrap(_dummyOf.Handler(C))
+                .WhereXIs(_dummyOf.Handler(A))
                 .Execute(_token);
 
             Assert.That(execution,
@@ -921,23 +916,23 @@
         [Test]
         public void When_Test()
         {
-            _dummyOf.HandlerMath.Setup.Conditional(A, X).Returns(B);
+            _dummyOf.HandlerMath.SetConditional(A, X).Returns(B);
 
-            Assert.That(_dummyOf.Handlers[A].When(_dummyOf.Conditions[X]), 
-                Is.SameAs(_dummyOf.Handlers[B]));
+            Assert.That(_dummyOf.Handler(A).When(_dummyOf.Conditions[X]), 
+                Is.SameAs(_dummyOf.Handler(B)));
         }
 
         [Test]
         public void WithConditionThat_Test()
         {
-            _dummyOf.HandlerMath.Setup.Conditional(A, X).Returns(B);
+            _dummyOf.HandlerMath.SetConditional(A, X).Returns(B);
 
             var handler = WithConditionThat
                 (_dummyOf.Conditions[X])
-                (_dummyOf.Handlers[A]);
+                (_dummyOf.Handler(A));
 
             Assert.That(handler,
-                Is.SameAs(_dummyOf.Handlers[B]));
+                Is.SameAs(_dummyOf.Handler(B)));
         }
 
         [Test]
@@ -948,11 +943,8 @@
 
             _dummyOf.ConditionMath.Setup__MakeCondition(X);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(MakeCondition(func).Check(_token));
-                Assert.That(funcCalled);
-            });
+            Assert.That(MakeCondition(func).Check(_token));
+            Assert.That(funcCalled);
         }
 
         [Test]
@@ -963,11 +955,8 @@
 
             _dummyOf.ConditionMath.Setup__MakeCondition(X);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(func.AsCondition().Check(_token));
-                Assert.That(funcCalled);
-            });
+            Assert.That(func.AsCondition().Check(_token));
+            Assert.That(funcCalled);
         }
 
         [Test]
@@ -978,11 +967,9 @@
 
             _dummyOf.ConditionMath.Setup__MakeCondition(X);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(func.AsCondition().Check(_token));
-                Assert.That(funcCalled);
-            });
+        
+            Assert.That(func.AsCondition().Check(_token));
+            Assert.That(funcCalled);
         }
 
         [Test]
@@ -1026,25 +1013,25 @@
         [Test]
         public void Or_Test()
         {
-            _dummyOf.ConditionMath.Setup__Or(X, Y, returns: XY);
+            _dummyOf.ConditionMath.Setup__Or(X, Y, returns: X|Y);
 
             var aOrB = _dummyOf.Conditions[X].Or(
                        _dummyOf.Conditions[Y]);
 
             Assert.That(aOrB,
-                Is.SameAs(_dummyOf.Conditions[XY]));
+                Is.SameAs(_dummyOf.Conditions[X|Y]));
         }
 
         [Test]
         public void And_Test()
         {
-            _dummyOf.ConditionMath.Setup__And(X, Y, returns: XY);
+            _dummyOf.ConditionMath.Setup__And(X, Y, returns: X&Y);
 
             var aAndB = _dummyOf.Conditions[X].And(
                         _dummyOf.Conditions[Y]);
 
             Assert.That(aAndB,
-                Is.SameAs(_dummyOf.Conditions[XY]));
+                Is.SameAs(_dummyOf.Conditions[X&Y]));
         }
 
         [Test]
@@ -1059,10 +1046,10 @@
         [Test]
         public void AtomizeTest()
         {
-            _dummyOf.HandlerMath.Setup.Atomize(A).Returns(B);
+            _dummyOf.HandlerMath.SetAtomize(A).Returns(B);
 
-            Assert.That(_dummyOf.Handlers[A].Atomize(),
-                Is.SameAs(_dummyOf.Handlers[B]));
+            Assert.That(_dummyOf.Handler(A).Atomize(),
+                Is.SameAs(_dummyOf.Handler(B)));
         }
 
         [Test]

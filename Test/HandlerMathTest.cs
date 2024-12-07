@@ -439,7 +439,7 @@ namespace ChainLead.Test
                 atomized = new("ATOMIZED"),
                 atom = new("ATOM");
 
-            _dummyOf.Handlers.GenerateMore(atomized, atom);
+            _dummyOf.Handlers.AddRange(atomized, atom);
 
             List<Dummy.Index>
                 executionLog = [],

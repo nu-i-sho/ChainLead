@@ -11,67 +11,51 @@
                 HandlerCollection<T> handlers) 
             : IHandlerMath
         {
-            readonly InternalSetupBuilder _setup = new();
+            Dictionary<(string, HandlerIndex, HandlerIndex), HandlerIndex> _forAppends = new();
+            Dictionary<(HandlerIndex, ConditionIndex), HandlerIndex> _forConditional = new();
+            Dictionary<HandlerIndex, HandlerIndex> _forAtomize = new();
+            HandlerIndex? _forMakeHandler;
+            HandlerIndex? _forZero;
 
-            public SetupBuilder Setup => _setup;
+            public ReturnsStep SetZero =>
+                new(x => _forZero = x);
 
-            public class SetupBuilder
+            public ReturnsStep SetMakeHandler =>
+                new(x => _forMakeHandler = x);
+
+            public ReturnsStep SetFirstThenSecond(HandlerIndex a, HandlerIndex b) =>
+                new(x => _forAppends.Add((Method.FirstThenSecond, a, b), x));
+
+            public ReturnsStep SetPackFirstInSecond(HandlerIndex a, HandlerIndex b) =>
+                new(x => _forAppends.Add((Method.PackFirstInSecond, a, b), x));
+
+            public ReturnsStep SetInjectFirstIntoSecond(HandlerIndex a, HandlerIndex b) =>
+                new(x => _forAppends.Add((Method.InjectFirstIntoSecond, a, b), x));
+
+            public ReturnsStep SetFirstCoverSecond(HandlerIndex a, HandlerIndex b) =>
+                new(x => _forAppends.Add((Method.FirstCoverSecond, a, b), x));
+
+            public ReturnsStep SetFirstWrapSecond(HandlerIndex a, HandlerIndex b) =>
+                new(x => _forAppends.Add((Method.FirstWrapSecond, a, b), x));
+
+            public ReturnsStep SetJoinFirstWithSecond(HandlerIndex a, HandlerIndex b) =>
+                new(x => _forAppends.Add((Method.JoinFirstWithSecond, a, b), x));
+
+            public ReturnsStep SetMergeFirstWithSecond(HandlerIndex a, HandlerIndex b) =>
+                new(x => _forAppends.Add((Method.MergeFirstWithSecond, a, b), x));
+
+            public ReturnsStep SetConditional(HandlerIndex handler, ConditionIndex condition) =>
+                new(x => _forConditional.Add((handler, condition), x));
+
+            public ReturnsStep SetAtomize(HandlerIndex handler) =>
+                new(x => _forAtomize.Add(handler, x));
+
+            public class ReturnsStep(Action<HandlerIndex> add)
             {
-                protected Dictionary<(string, HandlerIndex, HandlerIndex), HandlerIndex> _forAppends = new();
-                protected Dictionary<(HandlerIndex, ConditionIndex), HandlerIndex> _forConditional = new();
-                protected Dictionary<HandlerIndex, HandlerIndex> _forAtomize = new();
-                protected HandlerIndex? _forMakeHandler;
-                protected HandlerIndex? _forZero;
-
-                public void Zero(HandlerIndex handler) =>
-                    _forZero = handler;
-
-                public void MakeHandler(HandlerIndex handler) =>
-                    _forMakeHandler = handler;
-
-                public ReturnsStep FirstThenSecond(HandlerIndex a, HandlerIndex b) =>
-                    new(x => _forAppends.Add((Method.FirstThenSecond, a, b), x));
-
-                public ReturnsStep PackFirstInSecond(HandlerIndex a, HandlerIndex b) =>
-                    new(x => _forAppends.Add((Method.PackFirstInSecond, a, b), x));
-
-                public ReturnsStep InjectFirstIntoSecond(HandlerIndex a, HandlerIndex b) =>
-                    new(x => _forAppends.Add((Method.InjectFirstIntoSecond, a, b), x));
-
-                public ReturnsStep FirstCoverSecond(HandlerIndex a, HandlerIndex b) =>
-                    new(x => _forAppends.Add((Method.FirstCoverSecond, a, b), x));
-
-                public ReturnsStep FirstWrapSecond(HandlerIndex a, HandlerIndex b) =>
-                    new(x => _forAppends.Add((Method.FirstWrapSecond, a, b), x));
-
-                public ReturnsStep JoinFirstWithSecond(HandlerIndex a, HandlerIndex b) =>
-                    new(x => _forAppends.Add((Method.JoinFirstWithSecond, a, b), x));
-
-                public ReturnsStep MergeFirstWithSecond(HandlerIndex a, HandlerIndex b) =>
-                    new(x => _forAppends.Add((Method.MergeFirstWithSecond, a, b), x));
-
-                public ReturnsStep Conditional(HandlerIndex handler, ConditionIndex condition) =>
-                    new(x => _forConditional.Add((handler, condition), x));
-
-                public ReturnsStep Atomize(HandlerIndex handler) =>
-                    new(x => _forAtomize.Add(handler, x));
-
-                public class ReturnsStep(Action<HandlerIndex> add)
-                {
-                    public void Returns(HandlerIndex result) =>
-                        add(result);
-                }
+                public void Returns(HandlerIndex result) =>
+                    add(result);
             }
-
-            class InternalSetupBuilder : SetupBuilder
-            {
-                public Dictionary<(string, HandlerIndex, HandlerIndex), HandlerIndex> ForAppends => _forAppends;
-                public Dictionary<(HandlerIndex, ConditionIndex), HandlerIndex> ForConditional => _forConditional;
-                public Dictionary<HandlerIndex, HandlerIndex> ForAtomize => _forAtomize;
-                public HandlerIndex? ForMakeHandler => _forMakeHandler;
-                public HandlerIndex? ForZero => _forZero;
-            }
-
+            
             static Handler<T> In<U>(IHandler<U> x) => (Handler<T>)x;
 
             static Condition<T> In<U>(ICondition<U> x) => (Condition<T>)x;
@@ -79,14 +63,14 @@
             static IHandler<U> Out<U>(IHandler<T> x) => (IHandler<U>)x;
 
             public IHandler<U> Zero<U>() =>
-                Out<U>(handlers[_setup.ForZero!]);
+                Out<U>(handlers[_forZero!]);
 
             public bool IsZero<U>(IHandler<U> handler) =>
-                handlers[_setup.ForZero!].Index == In(handler).Index;
+                handlers[_forZero!].Index == In(handler).Index;
 
             public IHandler<U> MakeHandler<U>(Action<U> action)
             {
-                var h = handlers[_setup.ForMakeHandler!];
+                var h = handlers[_forMakeHandler!];
                 h.SetImplementation((Action<T>)(object)action);
 
                 return Out<U>(h);
@@ -94,52 +78,55 @@
 
             public IHandler<U> FirstThenSecond<U>(
                 IHandler<U> a, IHandler<U> b) =>
-                    Out<U>(handlers[_setup.ForAppends[
+                    Out<U>(handlers[_forAppends[
                         (Method.FirstThenSecond, In(a).Index, In(b).Index)
                         ]]);
 
             public IHandler<U> PackFirstInSecond<U>(
                 IHandler<U> a, IHandler<U> b) =>
-                    Out<U>(handlers[_setup.ForAppends[
+                    Out<U>(handlers[_forAppends[
                         (Method.PackFirstInSecond, In(a).Index, In(b).Index)
                         ]]);
 
             public IHandler<U> InjectFirstIntoSecond<U>(
                 IHandler<U> a, IHandler<U> b) =>
-                    Out<U>(handlers[_setup.ForAppends[
+                    Out<U>(handlers[_forAppends[
                         (Method.InjectFirstIntoSecond, In(a).Index, In(b).Index)
                         ]]);
 
             public IHandler<U> FirstCoverSecond<U>(
                 IHandler<U> a, IHandler<U> b) =>
-                    Out<U>(handlers[_setup.ForAppends[
+                    Out<U>(handlers[_forAppends[
                         (Method.FirstCoverSecond, In(a).Index, In(b).Index)
                         ]]);
 
             public IHandler<U> FirstWrapSecond<U>(
                 IHandler<U> a, IHandler<U> b) =>
-                    Out<U>(handlers[_setup.ForAppends[
+                    Out<U>(handlers[_forAppends[
                         (Method.FirstWrapSecond, In(a).Index, In(b).Index)
                         ]]);
 
             public IHandler<U> JoinFirstWithSecond<U>(
                 IHandler<U> a, IHandler<U> b) =>
-                    Out<U>(handlers[_setup.ForAppends[
+                    Out<U>(handlers[_forAppends[
                         (Method.JoinFirstWithSecond, In(a).Index, In(b).Index)
                         ]]);
 
             public IHandler<U> MergeFirstWithSecond<U>(
                 IHandler<U> a, IHandler<U> b) =>
-                    Out<U>(handlers[_setup.ForAppends[
+                    Out<U>(handlers[_forAppends[
                         (Method.MergeFirstWithSecond, In(a).Index, In(b).Index)
                         ]]);
 
-            public IHandler<U> Atomize<U>(IHandler<U> handler) =>
-                Out<U>(handlers[_setup.ForAtomize[In(handler).Index]]);
+            public IHandler<U> Atomize<U>(
+                IHandler<U> handler) =>
+                    Out<U>(handlers[_forAtomize[
+                        In(handler).Index
+                        ]]);
 
             public IHandler<U> Conditional<U>(
                 IHandler<U> handler, ICondition<U> condition) =>
-                    Out<U>(handlers[_setup.ForConditional[
+                    Out<U>(handlers[_forConditional[
                         (In(handler).Index, In(condition).Index)
                         ]]);
         }

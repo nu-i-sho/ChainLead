@@ -153,11 +153,11 @@
                 var handlerIndex = HandlerIndex(i);
                 var conditionIndices = jds.Select(j => ConditionIndex(i, j));
 
-                _dummyOf.Handlers.GenerateMore(handlerIndex);
-                _dummyOf.Conditions.GenerateMore(conditionIndices);
+                _dummyOf.Handlers.AddRange(handlerIndex);
+                _dummyOf.Conditions.Add(conditionIndices);
 
                 var handler = _dummyOf.Conditions[conditionIndices]
-                     .Aggregate(_dummyOf.Handlers[handlerIndex].Pure, _math.Conditional);
+                     .Aggregate(_dummyOf.Handler(handlerIndex).Pure, _math.Conditional);
 
                 handlers.Add(handler);
             }

@@ -21,7 +21,7 @@
                 AddRange(tail.Select(x => new Condition<T>(x, _token)));
             }
 
-            public void GenerateMore(IEnumerable<ConditionIndex> indices) =>
+            public void Add(IEnumerable<ConditionIndex> indices) =>
                 AddRange(indices.Select(x => new Condition<T>(x, _token)));
         }
     }

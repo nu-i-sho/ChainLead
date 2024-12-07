@@ -1,4 +1,6 @@
-﻿namespace ChainLead.Test
+﻿using static ChainLead.Test.Dummy;
+
+namespace ChainLead.Test
 {
     public static partial class Dummy
     {
