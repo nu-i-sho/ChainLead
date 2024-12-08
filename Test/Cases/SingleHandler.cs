@@ -2,16 +2,13 @@
 {
     using ChainLead.Contracts;
     using ChainLead.Contracts.Syntax;
-    using ChainLead.Implementation;
-    using System;
+    using ChainLead.Test.Types;
 
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
-    using static ChainLead.Test.Cases.Common;
-    using static ChainLead.Test.Cases.Common.Types;
-
+    
     public static partial class Cases
     {
-        public static class SingleHandlerFixtureCases
+        public static class SingleHandler
         {
             public const string Original = "Original";
             public const string Syntax = "Syntax";
@@ -70,7 +67,7 @@
                 : ISingleHandlerMathFactory
             {
                 public ISingleHandlerMath Create(IConditionMath conditionMath) =>
-                    new Product(new HandlerMath(conditionMath));
+                    new Product(new Implementation.HandlerMath(conditionMath));
 
                 public class Product(IHandlerMath math) : ISingleHandlerMath
                 {
@@ -105,12 +102,12 @@
                     public Product(IConditionMath conditionMath)
                     {
                         Configure(
-                            new HandlerMath(conditionMath),
+                            new Implementation.HandlerMath(conditionMath),
                             conditionMath);
                     }
 
                     public IHandler<T> MakeHandler<T>(Action<T> action) =>
-                        ChainLeadSyntax.MakeHandler(action);
+                        Contracts.Syntax.ChainLeadSyntax.MakeHandler(action);
 
                     public IHandler<T> Zero<T>() =>
                         Handler<T>.Zero;

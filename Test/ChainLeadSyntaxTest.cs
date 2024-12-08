@@ -1,12 +1,11 @@
 ﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts.Syntax;
-
+    using ChainLead.Test.Utils;
     using NUnit.Framework.Internal;
     using System;
     
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
-    using static ChainLead.Test.Cases.ChainLeadSyntaxFixtureCases;
     using static ChainLead.Test.Cases.Common;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
     using static ChainLead.Test.Dummy.HandlerIndex.Common;

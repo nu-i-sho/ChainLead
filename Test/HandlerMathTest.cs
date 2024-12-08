@@ -1,15 +1,12 @@
 namespace ChainLead.Test
 {
     using ChainLead.Contracts;
-    
-    using Moq;
+    using ChainLead.Test.Utils;
     using NUnit.Framework.Internal;
     using System;
     using System.Linq;
 
-    using static ChainLead.Test.Cases.Common;
-    using static ChainLead.Test.Cases.HandlerMathFixtureCases;
-    using static ChainLead.Test.Cases.HandlerMathTestCases;
+    using static ChainLead.Test.Cases.HandlerMath;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
     using static ChainLead.Test.Dummy.HandlerIndex.Common;
     using static ChainLead.Test.Dummy.Index.Common;
@@ -37,13 +34,13 @@ namespace ChainLead.Test
             _do = append =>
                   append switch
                   {
-                      Appends.FirstThenSecond => new(_math.FirstThenSecond),
-                      Appends.PackFirstInSecond => new(_math.PackFirstInSecond),
-                      Appends.InjectFirstIntoSecond => new(_math.InjectFirstIntoSecond),
-                      Appends.FirstCoverSecond => new(_math.FirstCoverSecond),
-                      Appends.FirstWrapSecond => new(_math.FirstWrapSecond),
-                      Appends.JoinFirstWithSecond => new(_math.JoinFirstWithSecond),
-                      Appends.MergeFirstWithSecond => new(_math.MergeFirstWithSecond),
+                      nameof(IHandlerMath.FirstThenSecond) => new(_math.FirstThenSecond),
+                      nameof(IHandlerMath.PackFirstInSecond) => new(_math.PackFirstInSecond),
+                      nameof(IHandlerMath.InjectFirstIntoSecond) => new(_math.InjectFirstIntoSecond),
+                      nameof(IHandlerMath.FirstCoverSecond) => new(_math.FirstCoverSecond),
+                      nameof(IHandlerMath.FirstWrapSecond) => new(_math.FirstWrapSecond),
+                      nameof(IHandlerMath.JoinFirstWithSecond) => new(_math.JoinFirstWithSecond),
+                      nameof(IHandlerMath.MergeFirstWithSecond) => new(_math.MergeFirstWithSecond),
                       _ => throw new ArgumentOutOfRangeException(nameof(append))
                   };
         }

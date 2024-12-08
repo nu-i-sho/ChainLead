@@ -2,9 +2,8 @@
 {
     using ChainLead.Contracts;
     using ChainLead.Implementation;
-
+    using ChainLead.Test.Utils;
     using static ChainLead.Test.Cases.Common;
-    using static ChainLead.Test.Cases.ConditionMathTestFixtureCases;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]

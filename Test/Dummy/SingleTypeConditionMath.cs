@@ -72,10 +72,10 @@
                 _setupForFalse != null && 
                 conditions.Get(_setupForFalse).Index == In(condition).Index;
 
-            public ICondition<U> MakeCondition<U>(Func<U, bool> f)
+            public ICondition<U> MakeCondition<U>(Func<U, bool> predicate)
             {
                 var c = conditions.Get(_setupForMakeCondition!);
-                c.SetImplementation((Func<T, bool>)(object)f);
+                c.SetImplementation((Func<T, bool>)(object)predicate);
 
                 return Out<U>(c);
             }
