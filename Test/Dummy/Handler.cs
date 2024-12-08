@@ -27,11 +27,11 @@
             public void AddLoggingInto(IList<Index> acc) =>
                 AddCallback(() => acc.Add(Index));
 
-            public void AddDelegationTo(params HandlerIndex[] indexes) =>
+            public void DelegatesTo(params HandlerIndex[] indexes) =>
                 AddCallback(() =>
                 {
                     foreach (var i in indexes)
-                        handlers[i].Execute(token);
+                        handlers.Get(i).Execute(token);
                 });
 
             public bool WasExecutedOnce() =>

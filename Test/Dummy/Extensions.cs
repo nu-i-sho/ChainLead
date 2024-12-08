@@ -4,16 +4,6 @@ namespace ChainLead.Test
 {
     public static partial class Dummy
     {
-        public static TDummy Get<TDummy, TIndex>(
-            this ICollection<TDummy, TIndex> dummies,
-            TIndex i)
-                
-                where TDummy : IDummy<TIndex>
-                where TIndex : Index =>
-                
-                    dummies[i];
-
-
         public static ICollection<TDummy, TIndex> Where<TDummy, TIndex>(
             this ICollection<TDummy, TIndex> dummies, 
             Func<TDummy, bool> predicate)
@@ -85,12 +75,12 @@ namespace ChainLead.Test
                                .Except(otherDummies));
 
 
-        public static void SetResults<T>(
+        public static void Return<T>(
             this ICollection<Condition<T>, ConditionIndex> condition,
             bool value)
         {
             foreach (var c in condition)
-                c.SetResult(value);
+                c.Returns(value);
         }
 
         public static void SetResults<T>(
@@ -98,7 +88,7 @@ namespace ChainLead.Test
             IEnumerable<bool> results)
         {
             foreach (var (c, r) in condition.Zip(results))
-                c.SetResult(r);
+                c.Returns(r);
         }
 
         public static void AddLoggingInto<T>(
@@ -109,7 +99,7 @@ namespace ChainLead.Test
                 c.AddLoggingInto(acc);
         }
 
-        public static void AddLoggingInto<T>(
+        public static void LogInto<T>(
             this ICollection<Condition<T>, ConditionIndex> condition,
             IList<Index> acc)
         {
@@ -139,7 +129,7 @@ namespace ChainLead.Test
                 condition.Zip(setup, (x, was) => x.VerifyCheck(was))
                          .Aggregate(true, (acc, x) => acc && x);
 
-        public static void AddLoggingInto<T>(
+        public static void LogInto<T>(
             this ICollection<Handler<T>, HandlerIndex> handlers,
             IList<HandlerIndex> acc)
         {
@@ -147,7 +137,7 @@ namespace ChainLead.Test
                 h.AddLoggingInto(acc);
         }
 
-        public static void AddLoggingInto<T>(
+        public static void LogInto<T>(
             this ICollection<Handler<T>, HandlerIndex> handlers,
             IList<Index> acc)
         {

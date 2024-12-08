@@ -153,8 +153,8 @@
                 var handlerIndex = HandlerIndex(i);
                 var conditionIndices = jds.Select(j => ConditionIndex(i, j));
 
-                _dummyOf.Handlers.AddRange(handlerIndex);
-                _dummyOf.Conditions.Add(conditionIndices);
+                _dummyOf.Handlers.Add(handlerIndex);
+                _dummyOf.Conditions.AddRange(conditionIndices);
 
                 var handler = _dummyOf.Conditions[conditionIndices]
                      .Aggregate(_dummyOf.Handler(handlerIndex).Pure, _math.Conditional);
@@ -162,9 +162,9 @@
                 handlers.Add(handler);
             }
 
-            _dummyOf.Handlers.AddLoggingInto(_callsLog);
-            _dummyOf.Conditions.AddLoggingInto(_callsLog);
-            _dummyOf.Conditions.SetResults(true);
+            _dummyOf.Handlers.LogInto(_callsLog);
+            _dummyOf.Conditions.LogInto(_callsLog);
+            _dummyOf.Conditions.Return(true);
 
             return makeChain(handlers);
         }

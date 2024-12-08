@@ -3,16 +3,13 @@
     public static partial class Dummy
     {
         public interface ICollection<TDummy, TIndex> 
-                : IList<TDummy>
+                : IEnumerable<TDummy>
             where TDummy : IDummy<TIndex>
             where TIndex : Dummy.Index
         {
-            public TDummy this[TIndex indices]
-            {
-                get;
-            }
+            TDummy Get(TIndex i);
 
-            public ICollection<TDummy, TIndex> this[
+            ICollection<TDummy, TIndex> this[
                 TIndex first,
                 TIndex second,
                 params TIndex[] tail]
@@ -24,6 +21,15 @@
                 IEnumerable<TIndex> indices]
             {
                 get;
+            }
+
+            public interface Mutable : ICollection<TDummy, TIndex>
+            {
+                void Add(TIndex i);
+
+                void AddRange(TIndex first, TIndex second, params TIndex[] tail);
+
+                void AddRange(IEnumerable<TIndex> indices);
             }
         }
     }

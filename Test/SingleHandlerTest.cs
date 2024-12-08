@@ -48,8 +48,9 @@
         [Test]
         public void ConditionalZeroIsZero()
         {
-            var conditionalZero =
-                _math.Conditional(_math.Zero<T>(), _dummyOf.Conditions[X]);
+            var conditionalZero = _math.Conditional(
+                _math.Zero<T>(), 
+                _dummyOf.Condition(X));
 
             Assert.That(_math.IsZero(conditionalZero));
         }
@@ -57,47 +58,47 @@
         [Test]
         public void WhenConditionReturnsTrue__HandlerIsExecuted()
         {
-            _dummyOf.Conditions[X].SetResult(true);
+            _dummyOf.Condition(X).Returns(true);
 
             _math.Conditional(
-                    _dummyOf.Handlers[A],
-                    _dummyOf.Conditions[X])
+                    _dummyOf.Handler(A),
+                    _dummyOf.Condition(X))
                  .Execute(_token);
 
-            Assert.That(_dummyOf.Handlers[A]
+            Assert.That(_dummyOf.Handler(A)
                   .WasExecutedOnce());
         }
 
         [Test]
         public void WhenConditionReturnsFalse__HandlerIsNotExecuted()
         {
-            _dummyOf.Conditions[X].SetResult(false);
+            _dummyOf.Condition(X).Returns(false);
 
             _math.Conditional(
-                    _dummyOf.Handlers[A],
-                    _dummyOf.Conditions[X])
+                    _dummyOf.Handler(A),
+                    _dummyOf.Condition(X))
                  .Execute(_token);
 
-            Assert.That(_dummyOf.Handlers[A]
+            Assert.That(_dummyOf.Handler(A)
                   .WasNeverExecuted());
         }
 
         [Test]
         public void WhenTopConditionReturnsFalse__AllOtherChecksAndExecutionsAreNotCalled()
         {
-            _dummyOf.Conditions[Z].SetResult(false);
+            _dummyOf.Condition(Z).Returns(false);
 
             _dummyOf.Conditions[X, Y, Z]
-                .Aggregate(_dummyOf.Handlers[A].Pure, _math.Conditional)
+                .Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional)
                 .Execute(_token);
 
-            Assert.That(_dummyOf.Conditions[Z]
+            Assert.That(_dummyOf.Condition(Z)
                   .WasCheckedOnce());
 
             Assert.That(_dummyOf.Conditions[X, Y]
                   .WereNeverChecked());
 
-            Assert.That(_dummyOf.Handlers[A]
+            Assert.That(_dummyOf.Handler(A)
                   .WasNeverExecuted());
         }
 
@@ -109,11 +110,11 @@
             var trues = _dummyOf.Conditions.Take(trueCount);
             var falses = _dummyOf.Conditions.Skip(trueCount).Take(falseCount);
 
-            trues.SetResults(true);
-            falses.SetResults(false);
+            trues.Return(true);
+            falses.Return(false);
 
             var all = falses.Concat(trues);
-            all.Aggregate(_dummyOf.Handlers[A].Pure, _math.Conditional)
+            all.Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional)
                .Execute(_token);
 
             var checkedCount = trueCount + int.Min(1, falseCount);
@@ -124,7 +125,7 @@
             Assert.That(all.Reverse().Skip(checkedCount)
                   .WereNeverChecked());
 
-            Assert.That(_dummyOf.Handlers[A]
+            Assert.That(_dummyOf.Handler(A)
                   .WasExecutedOnceWhen(falseCount == 0)
                   .ElseNever);
         }
@@ -135,9 +136,9 @@
             List<Dummy.ConditionIndex> checksLog = [];
 
             _dummyOf.Conditions[X, Y, Z].AddLoggingInto(checksLog);
-            _dummyOf.Conditions[X, Y, Z].SetResults(true);
+            _dummyOf.Conditions[X, Y, Z].Return(true);
             _dummyOf.Conditions[X, Y, Z]
-                .Aggregate(_dummyOf.Handlers[A].Pure, _math.Conditional)
+                .Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional)
                 .Execute(_token);
 
             Assert.That(checksLog, 
@@ -170,7 +171,7 @@
         {
             var extended = new Mock<IExtendedHandler<T>>();
             extended.Setup(o => o.Origin)
-                    .Returns(_dummyOf.Handlers[A]);
+                    .Returns(_dummyOf.Handler(A));
 
             Assert.That(_math.IsZero(extended.Object),
                 Is.False);

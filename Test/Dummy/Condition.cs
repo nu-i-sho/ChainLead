@@ -23,7 +23,7 @@
             public void AddLoggingInto(IList<Index> acc) =>
                 AddCallback(() => acc.Add(Index));
 
-            public void SetResult(bool value) =>
+            public void Returns(bool value) =>
                 Return = () => value;
 
             public void SetReturn(Func<bool> f) =>
@@ -44,14 +44,14 @@
 
             public ICondition<T> Pure => this;
 
-            public int CallsCount { get; private set; } = 0;
+            int CallsCount { get; set; } = 0;
 
-            public Action Callback { get; set; } = () =>
+            Action Callback { get; set; } = () =>
             {
                 /* INITIALY DO NOTHING */
             };
 
-            public Func<bool> Return { get; set; } = () => false;
+            Func<bool> Return { get; set; } = () => false;
 
             public bool Check(T x)
             {
