@@ -1,12 +1,11 @@
 ﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts;
-    using Moq;
-
+    
     using static ChainLead.Test.Cases.Common;
     using static ChainLead.Test.Cases.MultipleHandlersFixtureCases;
-    using static System.Linq.Enumerable;
-
+    using static ChainLead.Test.Dummy.Index.Common;
+    
     
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
@@ -26,7 +25,7 @@
         {
             _token = TokensProvider.GetRandom<T>();
             _dummyOf = new Dummy.Container<T>(_token, [], []);
-            _math = mathFactory.Create(_dummyOf.ConditionMath.Object);
+            _math = mathFactory.Create(_dummyOf.ConditionMath);
             _callsLog = [];
         }
 
@@ -170,16 +169,19 @@
         }
 
         void SetupConditionMathAnd() =>
-            _dummyOf.ConditionMath
-                .Setup(o => o.And(It.IsAny<ICondition<T>>(), It.IsAny<ICondition<T>>()))
-                .Returns((ICondition<T> a, ICondition<T> b) =>
-                {
-                    var ab = new Mock<ICondition<T>>();
-                    ab.Setup(o => o.Check(_token))
-                      .Returns(() => a.Check(_token) && b.Check(_token));
+            _dummyOf.ConditionMath.And(Any, Any).Implements((x, y) =>
+            {
+                _dummyOf.Conditions.Add(x & y);
 
-                    return ab.Object;
+                _dummyOf.Condition(x & y).Returns(true);
+                _dummyOf.Condition(x & y).AddCallback(() =>
+                {
+                    _dummyOf.Condition(x).Check(_token);
+                    _dummyOf.Condition(y).Check(_token);
                 });
+
+                return x & y;
+            });
 
         static Dummy.HandlerIndex HandlerIndex(char i) =>
             new($"[{i}]");

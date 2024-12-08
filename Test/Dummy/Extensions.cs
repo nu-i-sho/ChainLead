@@ -83,7 +83,7 @@ namespace ChainLead.Test
                 c.Returns(value);
         }
 
-        public static void SetResults<T>(
+        public static void Return<T>(
             this ICollection<Condition<T>, ConditionIndex> condition,
             IEnumerable<bool> results)
         {
@@ -96,7 +96,7 @@ namespace ChainLead.Test
             IList<ConditionIndex> acc)
         {
             foreach (var c in condition)
-                c.AddLoggingInto(acc);
+                c.LogsInto(acc);
         }
 
         public static void LogInto<T>(
@@ -104,7 +104,7 @@ namespace ChainLead.Test
             IList<Index> acc)
         {
             foreach (var c in condition)
-                c.AddLoggingInto(acc);
+                c.LogsInto(acc);
         }
 
         public static bool EachWasCheckedOnce<T>(
@@ -134,7 +134,7 @@ namespace ChainLead.Test
             IList<HandlerIndex> acc)
         {
             foreach (var h in handlers)
-                h.AddLoggingInto(acc);
+                h.LogsInto(acc);
         }
 
         public static void LogInto<T>(
@@ -142,7 +142,7 @@ namespace ChainLead.Test
             IList<Index> acc)
         {
             foreach (var h in handlers)
-                h.AddLoggingInto(acc);
+                h.LogsInto(acc);
         }
 
         public static void AddCallback<T>(

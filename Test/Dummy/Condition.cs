@@ -14,20 +14,20 @@
 
             public string Name => index.View;
 
+            public void SetImplementation(Func<T, bool> f) =>
+                Implementation = f;
+
             public void AddCallback(Action f) =>
                 Callback += f;
 
-            public void AddLoggingInto(IList<ConditionIndex> acc) =>
+            public void LogsInto(IList<ConditionIndex> acc) =>
                 AddCallback(() => acc.Add(Index));
 
-            public void AddLoggingInto(IList<Index> acc) =>
+            public void LogsInto(IList<Index> acc) =>
                 AddCallback(() => acc.Add(Index));
 
             public void Returns(bool value) =>
-                Return = () => value;
-
-            public void SetReturn(Func<bool> f) =>
-                Return = f;
+                Implementation = _ => value;
 
             public bool WasCheckedOnce() =>
                 CallsCount == 1;
@@ -51,16 +51,18 @@
                 /* INITIALY DO NOTHING */
             };
 
-            Func<bool> Return { get; set; } = () => false;
+            Func<T, bool> Implementation { get; set; } = _ => false;
 
-            public bool Check(T x)
+            public bool Check(T state)
             {
-                if (x?.Equals(token) ?? false)
+                if (state?.Equals(token) ?? false)
                 {
+                    var result = Implementation(state);
+
                     Callback();
                     CallsCount++;
 
-                    return Return();
+                    return result;
                 }
 
                 return false;

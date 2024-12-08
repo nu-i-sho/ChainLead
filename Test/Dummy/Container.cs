@@ -8,11 +8,11 @@
         {
             public SingleTypeHandlerMath<T> HandlerMath { get; }
 
-            public ConditionMath<T> ConditionMath { get; }
+            public SingleTypeConditionMath<T> ConditionMath { get; }
 
-            public ICollection<Handler<T>, HandlerIndex>.Mutable Handlers { get; }
+            public ICollection<Handler<T>, HandlerIndex>.IMutable Handlers { get; }
 
-            public ICollection<Condition<T>, ConditionIndex>.Mutable Conditions { get; }
+            public ICollection<Condition<T>, ConditionIndex>.IMutable Conditions { get; }
 
             public Handler<T> Handler(HandlerIndex index) =>
                 Handlers.Get(index);
@@ -34,7 +34,7 @@
                 Conditions.AddRange(conditionIndices);
 
                 HandlerMath = new(Handlers);
-                ConditionMath = new(Conditions, token);
+                ConditionMath = new(Conditions);
             }
         }
     }

@@ -130,8 +130,8 @@
                     yield return new(false, true, Y, true, "Moon");
                     yield return new(true, false, X, false, "Venus");
                     yield return new(true, false, X, true, "Earth");
-                    yield return new(true, true, Z, false, "Mars");
-                    yield return new(true, true, Z, true, "Saturn");
+                    yield return new(true, true, X & Y, false, "Mars");
+                    yield return new(true, true, X & Y, true, "Saturn");
                 }
             }
 

@@ -23,7 +23,7 @@
                 get;
             }
 
-            public interface Mutable : ICollection<TDummy, TIndex>
+            public interface IMutable : ICollection<TDummy, TIndex>
             {
                 void Add(TIndex i);
 

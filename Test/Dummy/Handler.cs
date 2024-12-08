@@ -15,16 +15,16 @@
 
             public string Name => index.View;
 
-            public void AddCallback(Action f) =>
-                Callback += f;
-
             public void SetImplementation(Action<T> f) =>
                 Implementation = f;
 
-            public void AddLoggingInto(IList<HandlerIndex> acc) =>
+            public void AddCallback(Action f) =>
+                Callback += f;
+
+            public void LogsInto(IList<HandlerIndex> acc) =>
                 AddCallback(() => acc.Add(Index));
 
-            public void AddLoggingInto(IList<Index> acc) =>
+            public void LogsInto(IList<Index> acc) =>
                 AddCallback(() => acc.Add(Index));
 
             public void DelegatesTo(params HandlerIndex[] indexes) =>

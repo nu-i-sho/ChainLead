@@ -29,7 +29,7 @@
 
             public abstract class Mutable :
                 Collection<TDummy, TIndex>,
-                ICollection<TDummy, TIndex>.Mutable
+                ICollection<TDummy, TIndex>.IMutable
             {
                 protected Mutable()
                     : base() { }

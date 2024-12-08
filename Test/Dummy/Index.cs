@@ -23,6 +23,13 @@
 
             public override int GetHashCode() =>
                 View.GetHashCode();
+
+            public static class Common
+            {
+                public record AnyArg;
+
+                public static readonly AnyArg Any = new();
+            }
         }
     }
 }

@@ -22,7 +22,7 @@
         {
             _token = TokensProvider.GetRandom<T>();
             _dummyOf = new(_token);
-            _math = mathFactory.Create(_dummyOf.ConditionMath.Object);
+            _math = mathFactory.Create(_dummyOf.ConditionMath);
         }
 
         [Test]

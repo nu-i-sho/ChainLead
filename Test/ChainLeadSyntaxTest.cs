@@ -27,7 +27,7 @@
 
             ChainLeadSyntax.Configure(
                 _dummyOf.HandlerMath,
-                _dummyOf.ConditionMath.Object);
+                _dummyOf.ConditionMath);
         }
 
 
@@ -943,7 +943,7 @@
             bool funcCalled = false;
             Func<T, bool> func = _ => funcCalled = true;
 
-            _dummyOf.ConditionMath.Setup__MakeCondition(X);
+            _dummyOf.ConditionMath.MakeCondition_Returns(X);
 
             Assert.That(MakeCondition(func).Check(_token));
             Assert.That(funcCalled);
@@ -955,7 +955,7 @@
             bool funcCalled = false;
             Func<T, bool> func = _ => funcCalled = true;
 
-            _dummyOf.ConditionMath.Setup__MakeCondition(X);
+            _dummyOf.ConditionMath.MakeCondition_Returns(X);
 
             Assert.That(func.AsCondition().Check(_token));
             Assert.That(funcCalled);
@@ -967,7 +967,7 @@
             bool funcCalled = false;
             Predicate<T> func = _ => funcCalled = true;
 
-            _dummyOf.ConditionMath.Setup__MakeCondition(X);
+            _dummyOf.ConditionMath.MakeCondition_Returns(X);
 
         
             Assert.That(func.AsCondition().Check(_token));
@@ -977,7 +977,7 @@
         [Test]
         public void True_Test()
         {
-            _dummyOf.ConditionMath.Setup__True(returns: X);
+            _dummyOf.ConditionMath.True_Returns(X);
 
             Assert.That(Condition<T>.True,
                 Is.SameAs(_dummyOf.Condition(X)));
@@ -986,36 +986,37 @@
         [Test]
         public void False_Test()
         {
-            _dummyOf.ConditionMath.Setup__False(returns: X);
+            _dummyOf.ConditionMath.False_Returns(X);
 
             Assert.That(Condition<T>.False,
                 Is.SameAs(_dummyOf.Condition(X)));
         }
 
         [Test]
-        public void IsPredictableTrue_Test(
-            [Values(false, true)] bool expectedResult)
+        public void IsPredictableTrue_Test()
         {
-            _dummyOf.ConditionMath.Setup__IsPredictableTrue(X, returns: expectedResult);
+            _dummyOf.ConditionMath.True_Returns(X);
 
-            Assert.That(_dummyOf.Condition(X).IsPredictableTrue(), 
-                Is.EqualTo(expectedResult));
+            Assert.That(_dummyOf.Condition(X).IsPredictableTrue());
+            Assert.That(_dummyOf.Condition(Y).IsPredictableTrue(),
+                Is.False);
         }
 
         [Test]
         public void IsPredictableFalse_Test(
             [Values(false, true)] bool expectedResult)
         {
-            _dummyOf.ConditionMath.Setup__IsPredictableFalse(X, returns: expectedResult);
+            _dummyOf.ConditionMath.False_Returns(X);
 
-            Assert.That(_dummyOf.Condition(X).IsPredictableFalse(),
-                Is.EqualTo(expectedResult));
+            Assert.That(_dummyOf.Condition(X).IsPredictableFalse());
+            Assert.That(_dummyOf.Condition(Y).IsPredictableFalse(),
+                Is.False);
         }
 
         [Test]
         public void Or_Test()
         {
-            _dummyOf.ConditionMath.Setup__Or(X, Y, returns: X|Y);
+            _dummyOf.ConditionMath.Or(X, Y).Returns(X|Y);
 
             var aOrB = _dummyOf.Condition(X).Or(
                        _dummyOf.Condition(Y));
@@ -1027,7 +1028,7 @@
         [Test]
         public void And_Test()
         {
-            _dummyOf.ConditionMath.Setup__And(X, Y, returns: X&Y);
+            _dummyOf.ConditionMath.And(X, Y).Returns(X&Y);
 
             var aAndB = _dummyOf.Condition(X).And(
                         _dummyOf.Condition(Y));
@@ -1039,7 +1040,7 @@
         [Test]
         public void Not_Test()
         {
-            _dummyOf.ConditionMath.Setup__Not(X, returns: Y);
+            _dummyOf.ConditionMath.Not(X).Returns(Y);
 
             Assert.That(Not(_dummyOf.Condition(X)),
                 Is.SameAs(_dummyOf.Condition(Y)));
