@@ -1,10 +1,10 @@
-﻿namespace ChainLead.Test
-{
-    using static ChainLead.Test.Cases.Common.Types;
+﻿using static ChainLead.Test.Cases.Common.Types;
 
+namespace ChainLead.Test
+{
     public static partial class Cases
     {
-        public static class ChainLeadSyntaxFixtureCases
+        public class ConditionMathTestFixtureCases
         {
             public class _I_Attribute() : TestFixtureAttribute(typeof(int));
             public class _II_Attribute() : TestFixtureAttribute(typeof(string));

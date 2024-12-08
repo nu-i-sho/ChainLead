@@ -17,6 +17,9 @@
             public void SetImplementation(Func<T, bool> f) =>
                 Implementation = f;
 
+            public void Throws(Exception e) =>
+                Callback += () => throw e;
+
             public void AddCallback(Action f) =>
                 Callback += f;
 
