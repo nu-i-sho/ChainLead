@@ -6,32 +6,35 @@
     {
         public class Container<T>
         {
-            public HandlerMath<T> HandlerMath { get; }
+            public SingleTypeHandlerMath<T> HandlerMath { get; }
 
-            public ConditionMath<T> ConditionMath { get; }
+            public SingleTypeConditionMath<T> ConditionMath { get; }
 
-            public HandlerCollection<T> Handlers { get; }
+            public ICollection<Handler<T>, HandlerIndex>.IMutable Handlers { get; }
 
-            public ConditionCollection<T> Conditions { get; }
+            public ICollection<Condition<T>, ConditionIndex>.IMutable Conditions { get; }
 
-            public Container(T tokenArg,
+            public Handler<T> Handler(HandlerIndex index) =>
+                Handlers.Get(index);
+
+            public Condition<T> Condition(ConditionIndex index) =>
+                Conditions.Get(index);
+
+            public Container(T token,
                 [AllowNull] IEnumerable<HandlerIndex> handlerIndices = null,
                 [AllowNull] IEnumerable<ConditionIndex> conditionIndices = null)
             {
                 handlerIndices ??= HandlerIndex.Common.ABCDEFGHIJ;
                 conditionIndices ??= ConditionIndex.Common.QRSTUVWXYZ;
 
-                Handlers = new(tokenArg);
-                Conditions = new(tokenArg);
+                Handlers = new HandlerCollection<T>(token);
+                Conditions = new ConditionCollection<T>(token);
 
-                foreach (var i in handlerIndices)
-                    Handlers.Add(new(Handlers, i, tokenArg));
+                Handlers.AddRange(handlerIndices);
+                Conditions.AddRange(conditionIndices);
 
-                foreach (var i in conditionIndices)
-                    Conditions.Add(new(i, tokenArg));
-
-                HandlerMath = new(Handlers, Conditions, tokenArg);
-                ConditionMath = new(Conditions, tokenArg);
+                HandlerMath = new(Handlers);
+                ConditionMath = new(Conditions);
             }
         }
     }

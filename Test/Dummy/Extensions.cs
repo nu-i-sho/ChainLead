@@ -1,17 +1,9 @@
-﻿namespace ChainLead.Test
+﻿using static ChainLead.Test.Dummy;
+
+namespace ChainLead.Test
 {
     public static partial class Dummy
     {
-        public static TDummy Get<TDummy, TIndex>(
-            this ICollection<TDummy, TIndex> dummies,
-            TIndex i)
-                
-                where TDummy : IDummy<TIndex>
-                where TIndex : Index =>
-                
-                    dummies[i];
-
-
         public static ICollection<TDummy, TIndex> Where<TDummy, TIndex>(
             this ICollection<TDummy, TIndex> dummies, 
             Func<TDummy, bool> predicate)
@@ -83,20 +75,20 @@
                                .Except(otherDummies));
 
 
-        public static void SetResults<T>(
+        public static void Return<T>(
             this ICollection<Condition<T>, ConditionIndex> condition,
             bool value)
         {
             foreach (var c in condition)
-                c.SetResult(value);
+                c.Returns(value);
         }
 
-        public static void SetResults<T>(
+        public static void Return<T>(
             this ICollection<Condition<T>, ConditionIndex> condition,
             IEnumerable<bool> results)
         {
             foreach (var (c, r) in condition.Zip(results))
-                c.SetResult(r);
+                c.Returns(r);
         }
 
         public static void AddLoggingInto<T>(
@@ -104,15 +96,15 @@
             IList<ConditionIndex> acc)
         {
             foreach (var c in condition)
-                c.AddLoggingInto(acc);
+                c.LogsInto(acc);
         }
 
-        public static void AddLoggingInto<T>(
+        public static void LogInto<T>(
             this ICollection<Condition<T>, ConditionIndex> condition,
             IList<Index> acc)
         {
             foreach (var c in condition)
-                c.AddLoggingInto(acc);
+                c.LogsInto(acc);
         }
 
         public static bool EachWasCheckedOnce<T>(
@@ -120,7 +112,7 @@
                 condition.Select(x => x.WasCheckedOnce())
                          .Aggregate(true, (acc, x) => acc && x);
 
-        public static bool NoOneWasChecked<T>(
+        public static bool WereNeverChecked<T>(
             this ICollection<Condition<T>, ConditionIndex> condition) =>
                 condition.Select(x => x.WasNeverChecked())
                          .Aggregate(true, (acc, x) => acc && x);
@@ -137,20 +129,20 @@
                 condition.Zip(setup, (x, was) => x.VerifyCheck(was))
                          .Aggregate(true, (acc, x) => acc && x);
 
-        public static void AddLoggingInto<T>(
+        public static void LogInto<T>(
             this ICollection<Handler<T>, HandlerIndex> handlers,
             IList<HandlerIndex> acc)
         {
             foreach (var h in handlers)
-                h.AddLoggingInto(acc);
+                h.LogsInto(acc);
         }
 
-        public static void AddLoggingInto<T>(
+        public static void LogInto<T>(
             this ICollection<Handler<T>, HandlerIndex> handlers,
             IList<Index> acc)
         {
             foreach (var h in handlers)
-                h.AddLoggingInto(acc);
+                h.LogsInto(acc);
         }
 
         public static void AddCallback<T>(

@@ -2,6 +2,6 @@
 {
     public interface ICondition<in T>
     {
-        bool Check(T x);
+        bool Check(T state);
     }
 }

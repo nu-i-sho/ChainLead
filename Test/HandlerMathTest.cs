@@ -1,77 +1,63 @@
 namespace ChainLead.Test
 {
     using ChainLead.Contracts;
+    
     using Moq;
     using NUnit.Framework.Internal;
     using System;
     using System.Linq;
 
     using static ChainLead.Test.Cases.Common;
-    using static ChainLead.Test.Cases.HandlerMathTest;
+    using static ChainLead.Test.Cases.HandlerMathFixtureCases;
+    using static ChainLead.Test.Cases.HandlerMathTestCases;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
     using static ChainLead.Test.Dummy.HandlerIndex.Common;
+    using static ChainLead.Test.Dummy.Index.Common;
 
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
     [_XVII_][_XVIII_][_XIX_][_XX_][_XXI_][_XXII_][_XXIII_][_XXIV_]
     [_XXV_][_XXVI_][_XXVII_][_XVIII_][_XXIX_][_XXX_][_XXXI_][_XXXII_]
-    public partial class HandlerMathTest<T>(string mathFactoryName)
+    public partial class HandlerMathTest<T>(
+        IHandlerMathFactory mathFactory)
     {
-        public interface IBase;
-        public interface IDerived : IBase;
-
         IHandlerMath _math;
         Dummy.Container<T> _dummyOf;
-        AppendProvider<T> _appendProvider;
+        Func<string, AppendOf> _do;
         T _token;
-
-        AppendProvider<T> Do => _appendProvider;
 
         [SetUp]
         public void Setup()
         {
-            _token = TokensProvider.Get<T>(798);
+            _token = TokensProvider.GetRandom<T>();
             _dummyOf = new Dummy.Container<T>(_token);
-            _math = HandlerMathFactoryProvider
-                .Get(mathFactoryName)
-                .Create(_dummyOf.ConditionMath.Object);
-            
-            _appendProvider = new(_math);
+            _math = mathFactory.Create(_dummyOf.ConditionMath);
+
+            _do = append =>
+                  append switch
+                  {
+                      Appends.FirstThenSecond => new(_math.FirstThenSecond),
+                      Appends.PackFirstInSecond => new(_math.PackFirstInSecond),
+                      Appends.InjectFirstIntoSecond => new(_math.InjectFirstIntoSecond),
+                      Appends.FirstCoverSecond => new(_math.FirstCoverSecond),
+                      Appends.FirstWrapSecond => new(_math.FirstWrapSecond),
+                      Appends.JoinFirstWithSecond => new(_math.JoinFirstWithSecond),
+                      Appends.MergeFirstWithSecond => new(_math.MergeFirstWithSecond),
+                      _ => throw new ArgumentOutOfRangeException(nameof(append))
+                  };
         }
 
         [Test]
         public void ZeroAppendZeroIsZero(
             [AllAppends] string append)
         {
-            var chain = Do[append](
+            var chain = _do(append).Of(
                 _math.Zero<T>(), 
                 _math.Zero<T>());
             
             Assert.That(_math.IsZero(chain));
         }
-
-        //[Test]
-        //public void BaseZeroAppendDerivedZeroIsDerivedZero(
-        //    [ValueSource(typeof(Appends), nameof(All))] string append)
-        //{
-        //    var chain = Do[append](
-        //        _math.Zero<object>(), 
-        //        _math.Zero<T>());
-            
-        //    Assert.That(_math.IsZero(chain));
-        //}
-
-        //[Test]
-        //public void DerivedZeroAppendBaseZeroChainIsDerivedZero(
-        //    [ValueSource(typeof(Appends), nameof(All))] string append)
-        //{
-        //    var chain = Do[append](
-        //        _math.Zero<T>(), 
-        //        _math.Zero<object>());
-            
-        //    Assert.That(_math.IsZero(chain));
-        //}
 
         [Test]
         public void AppendIsNotCommutative(
@@ -82,10 +68,14 @@ namespace ChainLead.Test
                 baExecution = [],
                 execution = [];
 
-            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B].LogInto(execution);
 
-            var ab = Do[append](_dummyOf.Handlers[A], _dummyOf.Handlers[B]);
-            var ba = Do[append](_dummyOf.Handlers[B], _dummyOf.Handlers[A]);
+            IHandler<T>
+                a = _dummyOf.Handler(A),
+                b = _dummyOf.Handler(B),
+
+                ab = _do(append).Of(a, b),
+                ba = _do(append).Of(b, a);
 
             ab.Execute(_token);
             abExecution.AddRange(execution);
@@ -105,11 +95,12 @@ namespace ChainLead.Test
             [Values(2, 3, 4, 5, 100)] int count)
         {
             Enumerable
-                .Repeat(_dummyOf.Handlers[A], count)
-                .Aggregate(Do[append])
+                .Repeat<IHandler<T>>(_dummyOf.Handler(A), count)
+                .Aggregate(_do(append).Of)
                 .Execute(_token);
 
-            Assert.That(_dummyOf.Handlers[A].WasExecuted(count).Times);
+            Assert.That(_dummyOf.Handler(A)
+                  .WasExecuted(count).Times);
         }
 
         [Test]
@@ -121,16 +112,19 @@ namespace ChainLead.Test
                 a_bcExecution = [],
                 execution = [];
 
-            _dummyOf.Handlers[A, B, C].AddLoggingInto(execution);
+            _dummyOf.Handlers[A, B, C].LogInto(execution);
 
             IHandler<T> 
-                a = _dummyOf.Handlers[A],
-                b = _dummyOf.Handlers[B],
-                c = _dummyOf.Handlers[C],
+                a = _dummyOf.Handler(A),
+                b = _dummyOf.Handler(B),
+                c = _dummyOf.Handler(C),
                 
-                ab_c = Do[append](Do[append](a, b), c),
-                a_bc = Do[append](a, Do[append](b, c));
-            
+                ab = _do(append).Of(a, b),
+                bc = _do(append).Of(b, c),
+
+                ab_c = _do(append).Of(ab, c),
+                a_bc = _do(append).Of(a, bc);
+
             ab_c.Execute(_token);
             ab_cExecution.AddRange(execution);
 
@@ -151,11 +145,11 @@ namespace ChainLead.Test
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers[@case.ChainIndices.Distinct()]
-                .AddLoggingInto(execution); 
+                .LogInto(execution); 
 
             var chain = @case.ChainIndices
-                .Select(_dummyOf.Handlers.Get)
-                .Aggregate(Do[append]);
+                .Select(_dummyOf.Handlers.Get).Cast<IHandler<T>>()
+                .Aggregate(_do(append).Of);
 
             chain.Execute(_token);
 
@@ -174,13 +168,13 @@ namespace ChainLead.Test
                  .Where(NotNull).Select(Denullify).Distinct();
 
             _dummyOf.Handlers[uniqueIndices]
-                 .AddLoggingInto(execution);
+                 .LogInto(execution);
 
             @case.ChainIndicesWithNullsAsZeros
                  .Select(i => i != null
-                     ? _dummyOf.Handlers[i]
+                     ? _dummyOf.Handler(i)
                      : _math.Zero<T>())
-                 .Aggregate(Do[append])
+                 .Aggregate(_do(append).Of)
                  .Execute(_token);
 
             Assert.That(execution,
@@ -205,7 +199,7 @@ namespace ChainLead.Test
             var conditions = _dummyOf.Conditions.Take(setup.Count());
             var handlers = _dummyOf.Handlers.Take(setup.Count());
 
-            conditions.SetResults(setup);
+            conditions.Return(setup);
 
             Enumerable
                 .Zip(handlers, conditions, _math.Conditional)
@@ -220,62 +214,67 @@ namespace ChainLead.Test
         public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(
             [GreenCases] GreenCase @case)
         {
-            _dummyOf.ConditionMath.Setup__And(X, Y, returns: Z);
+            _dummyOf.Conditions.Add(X & Y);
+            _dummyOf.ConditionMath.And(X, Y).Returns(X & Y);
 
-            var expectedCondition = _dummyOf.Conditions[@case.ExpectedFinalCondition];
-            expectedCondition.SetResult(@case.FinalConditionCheckResult);
+            var expectedCondition = _dummyOf.Condition(@case.ExpectedFinalCondition);
+            expectedCondition.Returns(@case.FinalConditionCheckResult);
 
-            IHandler<T> a = _dummyOf.Handlers[A];
+            IHandler<T> a = _dummyOf.Handler(A);
             if (@case.AIsConditional)
-                a = _math.Conditional(a, _dummyOf.Conditions[X]);
+                a = _math.Conditional(a, _dummyOf.Condition(X));
 
-            IHandler<T> b = _dummyOf.Handlers[B];
+            IHandler<T> b = _dummyOf.Handler(B);
             if (@case.BIsConditional)
-                b = _math.Conditional(b, _dummyOf.Conditions[Y]);
+                b = _math.Conditional(b, _dummyOf.Condition(Y));
 
             _math.JoinFirstWithSecond(a, b)
                  .Execute(_token);
 
-            Assert.That(expectedCondition.WasCheckedOnce());
-            Assert.That(_dummyOf.Conditions[X, Y, Z].Except([expectedCondition]).NoOneWasChecked());
-            Assert.That(_dummyOf.Handlers[A, B].EachWasExecutedOnceWhen(@case.FinalConditionCheckResult).ElseNoOne);
+            Assert.That(expectedCondition
+                  .WasCheckedOnce());
+
+            Assert.That(_dummyOf.Conditions[X, Y, X & Y].Except([expectedCondition])
+                  .WereNeverChecked());
+
+            Assert.That(_dummyOf.Handlers[A, B]
+                  .EachWasExecutedOnceWhen(@case.FinalConditionCheckResult)
+                  .ElseNoOne);
         }
 
         [Test]
         public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(
             [OrangeCases] OrangeCase @case)
         {
-            Dummy.ConditionIndex 
+            Dummy.ConditionIndex
                 aTop = new("A TOP"),
                 bTop = new("B TOP"),
-                aTop_And_bTop = new("A TOP & B TOP"),
                 aBottom = new("A BOTTOM"),
-                bBottom = new("B BOTTOM"),
-                unexpectedAnd = new("UNEXPECTED &");
+                bBottom = new("B BOTTOM");
 
-            _dummyOf.Conditions.GenerateMore(
-                aTop, bTop, aTop_And_bTop, 
-                aBottom, bBottom, unexpectedAnd);
+            _dummyOf.Conditions.AddRange(
+                aTop, bTop, aTop&bTop, aBottom, bBottom);
 
-            _dummyOf.Conditions[aBottom, bBottom, aTop_And_bTop].SetResults(@case.CheckSetup);
+            _dummyOf.Conditions[aBottom, bBottom, aTop&bTop].Return(@case.CheckSetup);
 
-            _dummyOf.ConditionMath.Setup__And__ForAny(returns: unexpectedAnd);
-            _dummyOf.ConditionMath.Setup__And(aTop, bTop, returns: aTop_And_bTop);
+            _dummyOf.ConditionMath.And(aTop, bTop).Returns(aTop&bTop);
 
-            IHandler<T> a = _dummyOf.Handlers[A];
-            a = _math.Conditional(a, _dummyOf.Conditions[aBottom]);
-            a = _math.Conditional(a, _dummyOf.Conditions[aTop]);
+            IHandler<T> a = _dummyOf.Handler(A);
+            a = _math.Conditional(a, _dummyOf.Condition(aBottom));
+            a = _math.Conditional(a, _dummyOf.Condition(aTop));
 
-            IHandler<T> b = _dummyOf.Handlers[B];
-            b = _math.Conditional(b, _dummyOf.Conditions[bBottom]);
-            b = _math.Conditional(b, _dummyOf.Conditions[bTop]);
+            IHandler<T> b = _dummyOf.Handler(B);
+            b = _math.Conditional(b, _dummyOf.Condition(bBottom));
+            b = _math.Conditional(b, _dummyOf.Condition(bTop));
 
             var ab = _math.JoinFirstWithSecond(a, b);
             ab.Execute(_token);
 
-            Assert.That(_dummyOf.Conditions[aBottom, bBottom, aTop_And_bTop].VerifyChecks(@case.CheckExpected));
-            Assert.That(_dummyOf.Conditions[unexpectedAnd, aTop, bTop].NoOneWasChecked());
-            Assert.That(_dummyOf.Handlers[A, B].VerifyExecution(@case.ExecutionExpected));
+            Assert.That(_dummyOf.Conditions[aBottom, bBottom, aTop&bTop]
+                  .VerifyChecks(@case.CheckExpected));
+
+            Assert.That(_dummyOf.Handlers[A, B]
+                  .VerifyExecution(@case.ExecutionExpected));
         }
 
         [Test]
@@ -283,22 +282,20 @@ namespace ChainLead.Test
             [YellowCases] YellowCase @case)
         {
             _dummyOf.Conditions[@case.ChecksSetup.Keys]
-                    .SetResults(@case.ChecksSetup.Values);
-
-            _dummyOf.ConditionMath.Setup__And__ForAny(returns: Q);
+                    .Return(@case.ChecksSetup.Values);
 
             if (@case.AConditions.Any() &&
                 @case.BConditions.Any())
-                    _dummyOf.ConditionMath.Setup__And(
-                        @case.AConditions.Last(),
-                        @case.BConditions.Last(),
-                        returns: R);
+                    _dummyOf.ConditionMath.And(
+                            @case.AConditions.Last(),
+                            @case.BConditions.Last())
+                        .Returns(R);
 
             var a = _dummyOf.Conditions[@case.AConditions]
-                .Aggregate(_dummyOf.Handlers[A].Pure, _math.Conditional);
+                .Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional);
 
             var b = _dummyOf.Conditions[@case.BConditions]
-                .Aggregate(_dummyOf.Handlers[B].Pure, _math.Conditional);
+                .Aggregate(_dummyOf.Handler(B).Pure, _math.Conditional);
 
             _math.JoinFirstWithSecond(a, b)
                  .Execute(_token);
@@ -306,11 +303,17 @@ namespace ChainLead.Test
             var expectedToCheck = _dummyOf.Conditions[@case.CheckExpected];
             var expectedToExecute = _dummyOf.Handlers[@case.ExecuteExpected];
 
-            Assert.That(expectedToCheck.EachWasCheckedOnce());
-            Assert.That(_dummyOf.Conditions.Except(expectedToCheck).NoOneWasChecked());
+            Assert.That(expectedToCheck
+                  .EachWasCheckedOnce());
 
-            Assert.That(expectedToExecute.EachWasExecutedOnce());
-            Assert.That(_dummyOf.Handlers.Except(expectedToExecute).NoOneWasExecuted());
+            Assert.That(_dummyOf.Conditions.Except(expectedToCheck)
+                  .WereNeverChecked());
+
+            Assert.That(expectedToExecute
+                  .EachWasExecutedOnce());
+
+            Assert.That(_dummyOf.Handlers.Except(expectedToExecute)
+                  .NoOneWasExecuted());
         }
 
         [Test]
@@ -318,53 +321,36 @@ namespace ChainLead.Test
             [WhiteCases] WhiteCase @case,
             [Values(true, false)] bool finalConditionResult)
         {
-            Dummy.Condition<T>? lastAnd = null;
-
-            _dummyOf.ConditionMath
-                .Setup(o => o.And(
-                    It.IsAny<ICondition<T>>(),
-                    It.IsAny<ICondition<T>>()))
-                .Returns((ICondition<T> a, ICondition<T> b) =>
+            _dummyOf.ConditionMath.And(Any, Any).Implements((x, y) =>
                 {
-                    if (a is IDummy<Dummy.ConditionIndex> aDummy && 
-                        b is IDummy<Dummy.ConditionIndex> bDummy)
+                    _dummyOf.Conditions.Add(x & y);
+                    _dummyOf.Condition(x & y).AddCallback(() =>
                     {
-                        Dummy.ConditionIndex i = new(aDummy.Index.Value + bDummy.Index.Value);
-                        Dummy.Condition<T> and = new(i, _token);
-                        lastAnd = and;
-
-                        return and;
-                    }
-
-                    return new Mock<ICondition<T>>().Object;
+                        _dummyOf.Condition(x).Check(_token);
+                        _dummyOf.Condition(y).Check(_token);
+                    });
+                    
+                    return x & y;
                 });
 
             var a = _dummyOf.Conditions[@case.AConditions]
-                .Aggregate(_dummyOf.Handlers[A].Pure, _math.Conditional);
+                .Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional);
 
             var b = _dummyOf.Conditions[@case.BConditions]
-                .Aggregate(_dummyOf.Handlers[B].Pure, _math.Conditional);
+                .Aggregate(_dummyOf.Handler(B).Pure, _math.Conditional);
 
             var ab = _math.MergeFirstWithSecond(a, b);
 
-            Assert.That(lastAnd, Is.Not.Null);
-
-            var allAnded = lastAnd.Index.Value.Select(Dummy.ConditionIndex.Make);
-            var expected = Enumerable.Concat(
-                @case.AConditions,
-                @case.BConditions);
-
-            Assert.That(allAnded,
-                Is.EquivalentTo(expected));
-
-            lastAnd.SetResult(finalConditionResult);
+            _dummyOf.Conditions.Last()
+                .Returns(finalConditionResult);
 
             ab.Execute(_token);
 
-            Assert.That(lastAnd.WasCheckedOnce());
+            var all = Enumerable.Concat(@case.AConditions, @case.BConditions);
+            Assert.That(_dummyOf.Conditions[all].EachWasCheckedOnce());
             Assert.That(_dummyOf.Handlers[A, B]
-                .EachWasExecutedOnceWhen(finalConditionResult)
-                .ElseNoOne);
+                  .EachWasExecutedOnceWhen(finalConditionResult)
+                  .ElseNoOne);
         }
 
         [Test]
@@ -372,11 +358,13 @@ namespace ChainLead.Test
             [Values(false, true)] bool order,
             [Values(false, true)] bool checkResult)
         {
-            _dummyOf.Conditions[X].SetResult(checkResult);
+            _dummyOf.Condition(X).Returns(checkResult);
 
             IHandler<T>
-                first = _dummyOf.Handlers[B],
-                second = _math.Conditional(_dummyOf.Handlers[A], _dummyOf.Conditions[X]);
+                first = _dummyOf.Handler(B),
+                second = _math.Conditional(
+                    _dummyOf.Handler(A), 
+                    _dummyOf.Condition(X));
 
             (first, second) = order
                 ? (first, second)
@@ -385,8 +373,11 @@ namespace ChainLead.Test
             _math.MergeFirstWithSecond(first, second)
                  .Execute(_token);
 
-            Assert.That(_dummyOf.Conditions[X].WasCheckedOnce());
-            Assert.That(_dummyOf.Handlers[A, B].EachWasExecutedOnceWhen(checkResult).ElseNoOne);
+            Assert.That(_dummyOf.Condition(X)
+                  .WasCheckedOnce());
+
+            Assert.That(_dummyOf.Handlers[A, B]
+                  .EachWasExecutedOnceWhen(checkResult).ElseNoOne);
         }
 
 
@@ -396,20 +387,21 @@ namespace ChainLead.Test
         {
             List<Dummy.Index> execution = [];
 
-            _dummyOf.Conditions[@case.AConditions].AddLoggingInto(execution);
-            _dummyOf.Conditions[@case.BConditions].AddLoggingInto(execution);
-            _dummyOf.Handlers[A, B].AddLoggingInto(execution);
+            _dummyOf.Conditions[@case.AConditions].LogInto(execution);
+            _dummyOf.Conditions[@case.BConditions].LogInto(execution);
+            _dummyOf.Handlers[A, B].LogInto(execution);
 
             _dummyOf.Conditions[@case.ChecksSetup.Keys]
-                   .SetResults(@case.ChecksSetup.Values);
+                   .Return(@case.ChecksSetup.Values);
 
             var a = _dummyOf.Conditions[@case.AConditions]
-                .Aggregate(_dummyOf.Handlers[A].Pure, _math.Conditional);
+                .Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional);
 
             var b = _dummyOf.Conditions[@case.BConditions]
-                .Aggregate(_dummyOf.Handlers[B].Pure, _math.Conditional);
+                .Aggregate(_dummyOf.Handler(B).Pure, _math.Conditional);
 
-            Do[@case.Append](a, b).Execute(_token);
+            _do(@case.Append).Of(a, b)
+                .Execute(_token);
 
             Assert.That(execution,
                 Is.EqualTo(@case.ExpectedCallsOrder));
@@ -425,7 +417,7 @@ namespace ChainLead.Test
                 atomized = new("ATOMIZED"),
                 atom = new("ATOM");
 
-            _dummyOf.Handlers.GenerateMore(atomized, atom);
+            _dummyOf.Handlers.AddRange(atomized, atom);
 
             List<Dummy.Index>
                 executionLog = [],
@@ -438,15 +430,15 @@ namespace ChainLead.Test
                         (true,  true)  => [X, Y, Z, atomized, atom]
                     };
 
-            _dummyOf.Handlers.AddLoggingInto(executionLog);
-            _dummyOf.Conditions.AddLoggingInto(executionLog); 
+            _dummyOf.Handlers.LogInto(executionLog);
+            _dummyOf.Conditions.LogInto(executionLog); 
 
-            _dummyOf.Conditions[X, Y].SetResults(true);
-            _dummyOf.Conditions[Z].SetResult(bottomCheckResult);
+            _dummyOf.Conditions[X, Y].Return(true);
+            _dummyOf.Condition(Z).Returns(bottomCheckResult);
 
             IHandler<T>
-                first =  _dummyOf.Handlers[atomized],
-                second = _dummyOf.Handlers[atom];
+                first =  _dummyOf.Handler(atomized),
+                second = _dummyOf.Handler(atom);
 
             first = _dummyOf.Conditions[Z, Y, X].Aggregate(first, _math.Conditional);
             first = _math.Atomize(first);
@@ -455,7 +447,8 @@ namespace ChainLead.Test
                 ? (first, second)
                 : (second, first);
 
-            Do[append](first, second).Execute(_token);
+            _do(append).Of(first, second)
+                .Execute(_token);
 
             Assert.That(executionLog,
                 Is.EqualTo(expectedLog));
@@ -478,22 +471,23 @@ namespace ChainLead.Test
                         (true,  true)  => [U, V, W, A, X, Y, Z, B] 
                     };
 
-            _dummyOf.Handlers.AddLoggingInto(executionLog);
-            _dummyOf.Conditions.AddLoggingInto(executionLog);
+            _dummyOf.Handlers.LogInto(executionLog);
+            _dummyOf.Conditions.LogInto(executionLog);
 
-            _dummyOf.Conditions[U, V, X, Y].SetResults(true);
-            _dummyOf.Conditions[W].SetResult(aBottomCheckResult);
-            _dummyOf.Conditions[Z].SetResult(bBottomCheckResult);
+            _dummyOf.Conditions[U, V, X, Y].Return(true);
+            _dummyOf.Condition(W).Returns(aBottomCheckResult);
+            _dummyOf.Condition(Z).Returns(bBottomCheckResult);
 
-            IHandler<T> a = _dummyOf.Handlers[A];
+            IHandler<T> a = _dummyOf.Handler(A);
             a = _dummyOf.Conditions[W, V, U].Aggregate(a, _math.Conditional);
             a = _math.Atomize(a);
 
-            IHandler<T> b = _dummyOf.Handlers[B];
+            IHandler<T> b = _dummyOf.Handler(B);
             b = _dummyOf.Conditions[Z, Y, X].Aggregate(b, _math.Conditional);
             b = _math.Atomize(b);
 
-            Do[append](a, b).Execute(_token);
+            _do(append).Of(a, b)
+                .Execute(_token);
 
             Assert.That(executionLog,
                 Is.EqualTo(expectedLog));
@@ -502,5 +496,10 @@ namespace ChainLead.Test
         static bool NotNull(object? x) => x != null;
 
         static T Denullify<T>(T? x) where T : class => x!;
+
+        class AppendOf(Func<IHandler<T>, IHandler<T>, IHandler<T>> f)
+        {
+            public IHandler<T> Of(IHandler<T> a, IHandler<T> b) => f(a, b);
+        }
     }
 }

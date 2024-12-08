@@ -592,7 +592,7 @@
             var notTrue = _math.Not(_conditions.ForInt[True]);
             var predictableFalse = _math.IsPredictableFalse(notTrue);
 
-            Assert.That(predictableFalse, Is.True);
+            Assert.That(predictableFalse);
         }
 
         [Test]
@@ -601,7 +601,7 @@
             var notTrue = _math.Not(_conditions.ForBase[True]);
             var predictableFalse = _math.IsPredictableFalse<Derived>(notTrue);
 
-            Assert.That(predictableFalse, Is.True);
+            Assert.That(predictableFalse);
         }
 
         [Test]
@@ -610,7 +610,7 @@
             var notTrue = _math.Not<Derived>(_conditions.ForBase[True]);
             var predictableFalse = _math.IsPredictableFalse(notTrue);
 
-            Assert.That(predictableFalse, Is.True);
+            Assert.That(predictableFalse);
         }
 
         [Test]
@@ -619,7 +619,8 @@
             var notTrue = _math.Not(_conditions.ForInt[True]);
             var predictableTrue = _math.IsPredictableTrue(notTrue);
 
-            Assert.That(predictableTrue, Is.False);
+            Assert.That(predictableTrue,
+                Is.False);
         }
 
         [Test]
@@ -628,7 +629,8 @@
             var notTrue = _math.Not(_conditions.ForBase[True]);
             var predictableTrue = _math.IsPredictableTrue<Derived>(notTrue);
 
-            Assert.That(predictableTrue, Is.False);
+            Assert.That(predictableTrue,
+                Is.False);
         }
 
         [Test]
@@ -637,7 +639,8 @@
             var notTrue = _math.Not<Derived>(_conditions.ForBase[True]);
             var predictableTrue = _math.IsPredictableTrue(notTrue);
 
-            Assert.That(predictableTrue, Is.False);
+            Assert.That(predictableTrue, 
+                Is.False);
         }
 
         [Test]
@@ -646,7 +649,7 @@
             var notFalse = _math.Not(_conditions.ForInt[False]);
             var predictableTrue = _math.IsPredictableTrue(notFalse);
 
-            Assert.That(predictableTrue, Is.True);
+            Assert.That(predictableTrue);
         }
 
         [Test]
@@ -655,7 +658,7 @@
             var notFalse = _math.Not<Derived>(_conditions.ForBase[False]);
             var predictableTrue = _math.IsPredictableTrue(notFalse);
 
-            Assert.That(predictableTrue, Is.True);
+            Assert.That(predictableTrue);
         }
 
         [Test]
@@ -664,7 +667,7 @@
             var notFalse = _math.Not(_conditions.ForBase[False]);
             var predictableTrue = _math.IsPredictableTrue<Derived>(notFalse);
 
-            Assert.That(predictableTrue, Is.True);
+            Assert.That(predictableTrue);
         }
 
         [Test]
@@ -673,7 +676,8 @@
             var notFalse = _math.Not(_conditions.ForInt[False]);
             var predictableFalse = _math.IsPredictableFalse(notFalse);
 
-            Assert.That(predictableFalse, Is.False);
+            Assert.That(predictableFalse, 
+                Is.False);
         }
 
         [Test]
@@ -682,7 +686,8 @@
             var notFalse = _math.Not(_conditions.ForBase[False]);
             var predictableFalse = _math.IsPredictableFalse<Derived>(notFalse);
 
-            Assert.That(predictableFalse, Is.False);
+            Assert.That(predictableFalse,
+                Is.False);
         }
 
         [Test]

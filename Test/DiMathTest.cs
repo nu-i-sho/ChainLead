@@ -28,7 +28,8 @@
         public void AddConditionMathAddsNewTokenDescriptor()
         {
             _serviceCollection.Object.AddConditionMath();
-            Assert.That(_descriptor, Is.Not.Null);
+            Assert.That(_descriptor, 
+                Is.Not.Null);
         }
 
         [Test]
@@ -60,7 +61,8 @@
         public void AddHandlerMathAddsNewTokenDescriptor()
         {
             _serviceCollection.Object.AddHandlerMath();
-            Assert.That(_descriptor, Is.Not.Null);
+            Assert.That(_descriptor, 
+                Is.Not.Null);
         }
 
         [Test]

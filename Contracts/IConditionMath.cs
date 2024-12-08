@@ -16,6 +16,6 @@
 
         ICondition<T> Or<T>(ICondition<T> a, ICondition<T> b);
 
-        ICondition<T> Not<T>(ICondition<T> handler);
+        ICondition<T> Not<T>(ICondition<T> condition);
     }
 }

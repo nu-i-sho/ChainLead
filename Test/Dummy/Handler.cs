@@ -15,20 +15,23 @@
 
             public string Name => index.View;
 
+            public void SetImplementation(Action<T> f) =>
+                Implementation = f;
+
             public void AddCallback(Action f) =>
                 Callback += f;
 
-            public void AddLoggingInto(IList<HandlerIndex> acc) =>
+            public void LogsInto(IList<HandlerIndex> acc) =>
                 AddCallback(() => acc.Add(Index));
 
-            public void AddLoggingInto(IList<Index> acc) =>
+            public void LogsInto(IList<Index> acc) =>
                 AddCallback(() => acc.Add(Index));
 
-            public void AddDelegationTo(params HandlerIndex[] indexes) =>
+            public void DelegatesTo(params HandlerIndex[] indexes) =>
                 AddCallback(() =>
                 {
                     foreach (var i in indexes)
-                        handlers[i].Execute(token);
+                        handlers.Get(i).Execute(token);
                 });
 
             public bool WasExecutedOnce() =>
@@ -66,6 +69,11 @@
 
             private int CallsCount { get; set; } = 0;
 
+            private Action<T> Implementation { get; set; } = _ =>
+            {
+                /* INITIALY DO NOTHING */
+            };
+
             private Action Callback { get; set; } = () =>
             {
                 /* INITIALY DO NOTHING */
@@ -75,6 +83,7 @@
             {
                 if (state?.Equals(token) ?? false)
                 {
+                    Implementation(state);
                     Callback();
                     CallsCount++;
                 }

@@ -1,25 +1,20 @@
 ﻿namespace ChainLead.Test
 {
-    using System.Linq;
-
     public static partial class Dummy
     {
         public class ConditionCollection<T> :
-            Collection<Condition<T>, ConditionIndex>
+            Collection<Condition<T>, ConditionIndex>.Mutable
         {
-            readonly T _expectedArg;
+            readonly T _token;
 
-            public ConditionCollection(T expectedArg) 
-                : base() => _expectedArg = expectedArg;
+            public ConditionCollection(T token) 
+                : base() => _token = token;
 
-            public ConditionCollection(IEnumerable<Condition<T>> items, T expectedArg) 
-                : base(items) => _expectedArg = expectedArg;
+            public ConditionCollection(IEnumerable<Condition<T>> items, T token) 
+                : base(items) => _token = token;
 
-            public void GenerateMore(ConditionIndex head, params ConditionIndex[] tail)
-            {
-                Add(new Condition<T>(head, _expectedArg));
-                AddRange(tail.Select(x => new Condition<T>(x, _expectedArg)));
-            }
+            public override void Add(ConditionIndex i) =>
+                Add(new Condition<T>(i, _token));
         }
     }
 }
