@@ -3,14 +3,13 @@
     using ChainLead.Contracts;
     using ChainLead.Contracts.Syntax;
     using ChainLead.Implementation;
+    using ChainLead.Test.Types;
 
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
-    using static ChainLead.Test.Cases.Common.Types;
-    using static ChainLead.Test.Cases.Common;
-
+    
     public static partial class Cases
     {
-        public static class MultipleHandlersFixtureCases
+        public static class MultipleHandlers
         {
             public const string Direct = "Direct";
             public const string Reverse = "Reverse";
@@ -73,8 +72,8 @@
             {
                 public IMultipleHandlersMath Create(IConditionMath conditionMath)
                 {
-                    IHandlerMath math = new HandlerMath(conditionMath);
-                    ChainLeadSyntax.Configure(math, conditionMath);
+                    IHandlerMath math = new Implementation.HandlerMath(conditionMath);
+                    Contracts.Syntax.ChainLeadSyntax.Configure(math, conditionMath);
 
                     return new Product();
                 }
@@ -156,8 +155,8 @@
             {
                 public IMultipleHandlersMath Create(IConditionMath conditionMath)
                 {
-                    IHandlerMath math = new HandlerMath(conditionMath);
-                    ChainLeadSyntax.Configure(math, conditionMath);
+                    IHandlerMath math = new Implementation.HandlerMath(conditionMath);
+                    Contracts.Syntax.ChainLeadSyntax.Configure(math, conditionMath);
 
                     return new Product();
                 }

@@ -1,46 +1,270 @@
 ﻿namespace ChainLead.Test
 {
-    using static ChainLead.Test.Cases.Common.Appends;
+    using ChainLead.Contracts;
+    using ChainLead.Test.Types;
+
+    using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
     using static ChainLead.Test.Dummy.HandlerIndex.Common;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
 
     public static partial class Cases
     {
-        public static class HandlerMathTestCases
+        public static class HandlerMath
         {
+            public class AllAppendsAttribute()
+                : ValueSourceAttribute(
+                    typeof(Appends),
+                    nameof(Appends.All));
+
+            public class Appends
+            {
+                public static readonly string[] All =
+                [
+                    nameof(IHandlerMath.FirstThenSecond),
+                    nameof(IHandlerMath.PackFirstInSecond),
+                    nameof(IHandlerMath.InjectFirstIntoSecond),
+                    nameof(IHandlerMath.FirstCoverSecond),
+                    nameof(IHandlerMath.FirstWrapSecond),
+                    nameof(IHandlerMath.JoinFirstWithSecond),
+                    nameof(IHandlerMath.MergeFirstWithSecond)
+                ];
+            }
+
+            public const string Original = "Original";
+            public const string Syntax = "Syntax";
+            public const string Separated = "Separated";
+            public const string Reversed = "Reversed";
+
+            public class TestFixtureAttribute(Type t, string mathName)
+                : NUnit.Framework.TestFixtureAttribute(t, GetMathFactory(mathName))
+            {
+                static IHandlerMathFactory GetMathFactory(string name) =>
+                    name switch
+                    {
+                        Original => new OriginalHandlerMathFactory(),
+                        Syntax => new SyntaxHandlerMathFactory(),
+                        Separated => new SeparatedSyntaxHandlerMathFactory(),
+                        Reversed => new ReversedSyntaxHandlerMathFactory(),
+                        _ => throw new ArgumentOutOfRangeException(nameof(name))
+                    };
+            }
+
+            public class _I_Attribute() : TestFixtureAttribute(typeof(int), Original);
+            public class _II_Attribute() : TestFixtureAttribute(typeof(string), Original);
+            public class _III_Attribute() : TestFixtureAttribute(typeof(Class), Original);
+            public class _IV_Attribute() : TestFixtureAttribute(typeof(Struct), Original);
+            public class _V_Attribute() : TestFixtureAttribute(typeof(ReadonlyStruct), Original);
+            public class _VI_Attribute() : TestFixtureAttribute(typeof(Record), Original);
+            public class _VII_Attribute() : TestFixtureAttribute(typeof(RecordStruct), Original);
+            public class _VIII_Attribute() : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Original);
+
+            public class _IX_Attribute() : TestFixtureAttribute(typeof(int), Syntax);
+            public class _X_Attribute() : TestFixtureAttribute(typeof(string), Syntax);
+            public class _XI_Attribute() : TestFixtureAttribute(typeof(Class), Syntax);
+            public class _XII_Attribute() : TestFixtureAttribute(typeof(Struct), Syntax);
+            public class _XIII_Attribute() : TestFixtureAttribute(typeof(ReadonlyStruct), Syntax);
+            public class _XIV_Attribute() : TestFixtureAttribute(typeof(Record), Syntax);
+            public class _XV_Attribute() : TestFixtureAttribute(typeof(RecordStruct), Syntax);
+            public class _XVI_Attribute() : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Syntax);
+
+            public class _XVII_Attribute() : TestFixtureAttribute(typeof(int), Separated);
+            public class _XVIII_Attribute() : TestFixtureAttribute(typeof(string), Separated);
+            public class _XIX_Attribute() : TestFixtureAttribute(typeof(Class), Separated);
+            public class _XX_Attribute() : TestFixtureAttribute(typeof(Struct), Separated);
+            public class _XXI_Attribute() : TestFixtureAttribute(typeof(ReadonlyStruct), Separated);
+            public class _XXII_Attribute() : TestFixtureAttribute(typeof(Record), Separated);
+            public class _XXIII_Attribute() : TestFixtureAttribute(typeof(RecordStruct), Separated);
+            public class _XXIV_Attribute() : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Separated);
+
+            public class _XXV_Attribute() : TestFixtureAttribute(typeof(int), Reversed);
+            public class _XXVI_Attribute() : TestFixtureAttribute(typeof(string), Reversed);
+            public class _XXVII_Attribute() : TestFixtureAttribute(typeof(Class), Reversed);
+            public class _XXVIII_Attribute() : TestFixtureAttribute(typeof(Struct), Reversed);
+            public class _XXIX_Attribute() : TestFixtureAttribute(typeof(ReadonlyStruct), Reversed);
+            public class _XXX_Attribute() : TestFixtureAttribute(typeof(Record), Reversed);
+            public class _XXXI_Attribute() : TestFixtureAttribute(typeof(RecordStruct), Reversed);
+            public class _XXXII_Attribute() : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Reversed);
+
+            public interface IHandlerMathFactory
+            {
+                ITestingHandlerMath Create(IConditionMath conditionMath);
+            }
+
+            public interface ITestingHandlerMath : IHandlerMath;
+
+            public class OriginalHandlerMathFactory
+                : IHandlerMathFactory
+            {
+                public ITestingHandlerMath Create(IConditionMath conditionMath) =>
+                    new Product(new Implementation.HandlerMath(conditionMath));
+
+                public override string ToString() => "Original";
+
+                class Product(IHandlerMath math)
+                    : SingleHandler.OriginalMathFactory.Product(math),
+                    ITestingHandlerMath
+                {
+                    public IHandler<T> FirstCoverSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        math.FirstCoverSecond(a, b);
+
+                    public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        math.FirstThenSecond(a, b);
+
+                    public IHandler<T> FirstWrapSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        math.FirstWrapSecond(a, b);
+
+                    public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        math.InjectFirstIntoSecond(a, b);
+
+                    public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        math.JoinFirstWithSecond(a, b);
+
+                    public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        math.MergeFirstWithSecond(a, b);
+
+                    public IHandler<T> PackFirstInSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        math.PackFirstInSecond(a, b);
+                }
+            }
+
+            public class SyntaxHandlerMathFactory
+                : IHandlerMathFactory
+            {
+                public ITestingHandlerMath Create(IConditionMath conditionMath) =>
+                    new Product(conditionMath);
+
+                public override string ToString() => "Syntax like FirstThenSecond[a, b]";
+
+                class Product(IConditionMath conditionMath)
+                    : SingleHandler.SyntaxMathFactory.Product(conditionMath),
+                    ITestingHandlerMath
+                {
+                    public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        Contracts.Syntax.ChainLeadSyntax.FirstThenSecond(a, b);
+
+                    public IHandler<T> FirstCoverSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        Contracts.Syntax.ChainLeadSyntax.FirstCoverSecond(a, b);
+
+                    public IHandler<T> FirstWrapSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        Contracts.Syntax.ChainLeadSyntax.FirstWrapSecond(a, b);
+
+                    public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        Contracts.Syntax.ChainLeadSyntax.InjectFirstIntoSecond(a, b);
+
+                    public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        Contracts.Syntax.ChainLeadSyntax.JoinFirstWithSecond(a, b);
+
+                    public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        Contracts.Syntax.ChainLeadSyntax.MergeFirstWithSecond(a, b);
+
+                    public IHandler<T> PackFirstInSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        Contracts.Syntax.ChainLeadSyntax.PackFirstInSecond(a, b);
+                }
+            }
+
+            public class SeparatedSyntaxHandlerMathFactory
+                : IHandlerMathFactory
+            {
+                public ITestingHandlerMath Create(IConditionMath conditionMath) =>
+                    new Product(conditionMath);
+
+                public override string ToString() => "Syntax like Pack[a].In[b]";
+
+                class Product(IConditionMath conditionMath)
+                    : SingleHandler.SyntaxMathFactory.Product(conditionMath),
+                    ITestingHandlerMath
+                {
+                    public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        a.Then(b);
+
+                    public IHandler<T> FirstCoverSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        Use(a).ToCover(b);
+
+                    public IHandler<T> FirstWrapSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        Use(a).ToWrap(b);
+
+                    public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        Inject(a).Into(b);
+
+                    public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        Join(a).With(b);
+
+                    public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        Merge(a).With(b);
+
+                    public IHandler<T> PackFirstInSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        Pack(a).In(b);
+                }
+            }
+
+            public class ReversedSyntaxHandlerMathFactory
+               : IHandlerMathFactory
+            {
+                public ITestingHandlerMath Create(IConditionMath conditionMath) =>
+                    new Product(conditionMath);
+
+                public override string ToString() => "Syntax like PackXIn[a].WhereXIs[b]";
+
+                class Product(IConditionMath conditionMath)
+                    : SingleHandler.SyntaxMathFactory.Product(conditionMath),
+                    ITestingHandlerMath
+                {
+                    public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        XThen(b).WhereXIs(a);
+
+                    public IHandler<T> FirstCoverSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        XCover(b).WhereXIs(a);
+
+                    public IHandler<T> FirstWrapSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        XWrap(b).WhereXIs(a);
+
+                    public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        InjectXInto(b).WhereXIs(a);
+
+                    public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        JoinXWith(b).WhereXIs(a);
+
+                    public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        MergeXWith(b).WhereXIs(a);
+
+                    public IHandler<T> PackFirstInSecond<T>(IHandler<T> a, IHandler<T> b) =>
+                        PackXIn(b).WhereXIs(a);
+                }
+            }
+
             public class BlueCasesAttribute()
                 : ValueSourceAttribute(
-                    typeof(HandlerMathTestCases),
+                    typeof(HandlerMath),
                     nameof(BlueCases));
 
             public class RedCasesAttribute()
                 : ValueSourceAttribute(
-                    typeof(HandlerMathTestCases),
+                    typeof(HandlerMath),
                     nameof(RedCases));
 
             public class GreenCasesAttribute()
                 : ValueSourceAttribute(
-                    typeof(HandlerMathTestCases),
+                    typeof(HandlerMath),
                     nameof(GreenCases));
 
             public class OrangeCasesAttribute()
                 : ValueSourceAttribute(
-                    typeof(HandlerMathTestCases),
+                    typeof(HandlerMath),
                     nameof(OrangeCases));
 
             public class YellowCasesAttribute()
                 : ValueSourceAttribute(
-                    typeof(HandlerMathTestCases),
+                    typeof(HandlerMath),
                     nameof(YellowCases));
 
             public class WhiteCasesAttribute()
                 : ValueSourceAttribute(
-                    typeof(HandlerMathTestCases),
+                    typeof(HandlerMath),
                     nameof(WhiteCases));
 
             public class BlackCasesAttribute()
                 : ValueSourceAttribute(
-                    typeof(HandlerMathTestCases),
+                    typeof(HandlerMath),
                     nameof(BlackCases));
 
             public record BlueCase(
@@ -714,7 +938,7 @@
                 get
                 {
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [],
                         BConditions: [],
                         ChecksSetup: [],
@@ -722,7 +946,7 @@
                         NameForEasyFind: "Mary");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U],
                         BConditions: [],
                         ChecksSetup: new() { { U, false } },
@@ -730,7 +954,7 @@
                         NameForEasyFind: "Patricia");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U],
                         BConditions: [],
                         ChecksSetup: new() { { U, true } },
@@ -738,7 +962,7 @@
                         NameForEasyFind: "Jennifer");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [],
                         BConditions: [U],
                         ChecksSetup: new() { { U, false } },
@@ -746,7 +970,7 @@
                         NameForEasyFind: "Linda");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [],
                         BConditions: [U],
                         ChecksSetup: new() { { U, true } },
@@ -754,7 +978,7 @@
                         NameForEasyFind: "Elizabeth");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V],
                         BConditions: [],
                         ChecksSetup: new() { { V, false } },
@@ -762,7 +986,7 @@
                         NameForEasyFind: "Barbara");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V],
                         BConditions: [],
                         ChecksSetup: new() { { V, true }, { U, false } },
@@ -770,7 +994,7 @@
                         NameForEasyFind: "Susan");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V],
                         BConditions: [],
                         ChecksSetup: new() { { V, true }, { U, true } },
@@ -778,7 +1002,7 @@
                         NameForEasyFind: "Jessica");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [],
                         BConditions: [U, V],
                         ChecksSetup: new() { { V, false } },
@@ -786,7 +1010,7 @@
                         NameForEasyFind: "Karen");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [],
                         BConditions: [U, V],
                         ChecksSetup: new() { { V, true }, { U, false } },
@@ -794,7 +1018,7 @@
                         NameForEasyFind: "Sarah");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [],
                         BConditions: [U, V],
                         ChecksSetup: new() { { V, true }, { U, true } },
@@ -802,7 +1026,7 @@
                         NameForEasyFind: "Lisa");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, false } },
@@ -810,7 +1034,7 @@
                         NameForEasyFind: "Nancy");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, false } },
@@ -818,7 +1042,7 @@
                         NameForEasyFind: "Sandra");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -826,7 +1050,7 @@
                         NameForEasyFind: "Betty");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -834,7 +1058,7 @@
                         NameForEasyFind: "Ashley");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -842,7 +1066,7 @@
                         NameForEasyFind: "Emily");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -850,7 +1074,7 @@
                         NameForEasyFind: "Kimberly");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -858,7 +1082,7 @@
                         NameForEasyFind: "Margaret");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -866,7 +1090,7 @@
                         NameForEasyFind: "Donna");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, false } },
@@ -874,7 +1098,7 @@
                         NameForEasyFind: "Michelle");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, false } },
@@ -882,7 +1106,7 @@
                         NameForEasyFind: "Carol");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U],
                         BConditions: [V],
                         ChecksSetup: new() { { V, false } },
@@ -890,7 +1114,7 @@
                         NameForEasyFind: "Amanda");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U],
                         BConditions: [V],
                         ChecksSetup: new() { { V, true }, { U, false } },
@@ -898,7 +1122,7 @@
                         NameForEasyFind: "Melissa");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U],
                         BConditions: [V],
                         ChecksSetup: new() { { V, true }, { U, true } },
@@ -906,7 +1130,7 @@
                         NameForEasyFind: "Deborah");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { W, false } },
@@ -914,7 +1138,7 @@
                         NameForEasyFind: "Stephanie");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { W, false } },
@@ -922,7 +1146,7 @@
                         NameForEasyFind: "Rebecca");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { W, true }, { V, false } },
@@ -930,7 +1154,7 @@
                         NameForEasyFind: "Sharon");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, false } },
@@ -938,7 +1162,7 @@
                         NameForEasyFind: "Laura");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, true } },
@@ -946,7 +1170,7 @@
                         NameForEasyFind: "Cynthia");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { W, false } },
@@ -954,7 +1178,7 @@
                         NameForEasyFind: "Dorothy");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { W, true }, { V, false } },
@@ -962,7 +1186,7 @@
                         NameForEasyFind: "Amy");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, false } },
@@ -970,7 +1194,7 @@
                         NameForEasyFind: "Kathleen");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, true } },
@@ -978,7 +1202,7 @@
                         NameForEasyFind: "Angela");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { X, false } },
@@ -986,7 +1210,7 @@
                         NameForEasyFind: "Shirley");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { X, true }, { W, false } },
@@ -994,7 +1218,7 @@
                         NameForEasyFind: "Emma");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -1002,7 +1226,7 @@
                         NameForEasyFind: "Brenda");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -1010,7 +1234,7 @@
                         NameForEasyFind: "Pamela");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -1018,7 +1242,7 @@
                         NameForEasyFind: "Nicole");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, false } },
@@ -1026,7 +1250,7 @@
                         NameForEasyFind: "Anna");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { Y, false } },
@@ -1034,7 +1258,7 @@
                         NameForEasyFind: "Samantha");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { Y, true }, { X, false } },
@@ -1042,7 +1266,7 @@
                         NameForEasyFind: "Katherine");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { Y, true }, { X, true }, { W, false } },
@@ -1050,7 +1274,7 @@
                         NameForEasyFind: "Christine");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { Y, true }, { X, true }, { W, true }, { V, false } },
@@ -1058,7 +1282,7 @@
                         NameForEasyFind: "Debra");
 
                     yield return new(
-                        Append: InjectFirstIntoSecond,
+                        Append: nameof(IHandlerMath.InjectFirstIntoSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { Y, true }, { X, true }, { W, true }, { V, true }, { U, false } },
@@ -1066,7 +1290,7 @@
                         NameForEasyFind: "Rachel");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [],
                         BConditions: [],
                         ChecksSetup: [],
@@ -1074,7 +1298,7 @@
                         NameForEasyFind: "Carolyn");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U],
                         BConditions: [],
                         ChecksSetup: new() { { U, false } },
@@ -1082,7 +1306,7 @@
                         NameForEasyFind: "Janet");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U],
                         BConditions: [],
                         ChecksSetup: new() { { U, true } },
@@ -1090,7 +1314,7 @@
                         NameForEasyFind: "Maria");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [],
                         BConditions: [U],
                         ChecksSetup: new() { { U, false } },
@@ -1098,7 +1322,7 @@
                         NameForEasyFind: "Olivia");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [],
                         BConditions: [U],
                         ChecksSetup: new() { { U, true } },
@@ -1106,7 +1330,7 @@
                         NameForEasyFind: "Heather");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [],
                         BConditions: [U, V],
                         ChecksSetup: new() { { V, false } },
@@ -1114,7 +1338,7 @@
                         NameForEasyFind: "Helen");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [],
                         BConditions: [U, V],
                         ChecksSetup: new() { { V, true }, { U, false } },
@@ -1122,7 +1346,7 @@
                         NameForEasyFind: "Catherine");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [],
                         BConditions: [U, V],
                         ChecksSetup: new() { { V, true }, { U, true } },
@@ -1130,7 +1354,7 @@
                         NameForEasyFind: "Diane");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V],
                         BConditions: [],
                         ChecksSetup: new() { { V, false } },
@@ -1138,7 +1362,7 @@
                         NameForEasyFind: "Julie");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V],
                         BConditions: [],
                         ChecksSetup: new() { { V, true }, { U, false } },
@@ -1146,7 +1370,7 @@
                         NameForEasyFind: "Victoria");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V],
                         BConditions: [],
                         ChecksSetup: new() { { V, true }, { U, true } },
@@ -1154,7 +1378,7 @@
                         NameForEasyFind: "Joyce");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, false } },
@@ -1162,7 +1386,7 @@
                         NameForEasyFind: "Lauren");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, false } },
@@ -1170,7 +1394,7 @@
                         NameForEasyFind: "Kelly");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -1178,7 +1402,7 @@
                         NameForEasyFind: "Christina");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false }, },
@@ -1186,7 +1410,7 @@
                         NameForEasyFind: "Ruth");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true }, },
@@ -1194,7 +1418,7 @@
                         NameForEasyFind: "Joan");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true }, },
@@ -1202,7 +1426,7 @@
                         NameForEasyFind: "Virginia");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false }, },
@@ -1210,7 +1434,7 @@
                         NameForEasyFind: "Judith");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -1218,7 +1442,7 @@
                         NameForEasyFind: "Evelyn");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, false } },
@@ -1226,7 +1450,7 @@
                         NameForEasyFind: "Hannah");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, false } },
@@ -1234,7 +1458,7 @@
                         NameForEasyFind: "Andrea");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U],
                         BConditions: [V],
                         ChecksSetup: new() { { U, false } },
@@ -1242,7 +1466,7 @@
                         NameForEasyFind: "Megan");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U],
                         BConditions: [V],
                         ChecksSetup: new() { { U, true }, { V, false } },
@@ -1250,7 +1474,7 @@
                         NameForEasyFind: "Cheryl");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U],
                         BConditions: [V],
                         ChecksSetup: new() { { U, true }, { V, true } },
@@ -1258,7 +1482,7 @@
                         NameForEasyFind: "Jacqueline");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { V, false } },
@@ -1266,7 +1490,7 @@
                         NameForEasyFind: "Madison");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { V, true }, { U, false } },
@@ -1274,7 +1498,7 @@
                         NameForEasyFind: "Teresa");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { V, true }, { U, true }, { W, false } },
@@ -1282,7 +1506,7 @@
                         NameForEasyFind: "Abigail");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { V, true }, { U, true }, { W, true } },
@@ -1290,7 +1514,7 @@
                         NameForEasyFind: "Sophia");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { U, false } },
@@ -1298,7 +1522,7 @@
                         NameForEasyFind: "Martha");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { U, true }, { W, false } },
@@ -1306,7 +1530,7 @@
                         NameForEasyFind: "Sara");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { U, true }, { W, true }, { V, false } },
@@ -1314,7 +1538,7 @@
                         NameForEasyFind: "Gloria");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { U, true }, { W, true }, { V, true } },
@@ -1322,7 +1546,7 @@
                         NameForEasyFind: "Janice");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { V, false } },
@@ -1330,7 +1554,7 @@
                         NameForEasyFind: "Kathryn");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { V, true }, { U, false } },
@@ -1338,7 +1562,7 @@
                         NameForEasyFind: "Ann");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { V, true }, { U, true }, { X, false } },
@@ -1346,7 +1570,7 @@
                         NameForEasyFind: "Isabella");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { V, true }, { U, true }, { X, true }, { W, false } },
@@ -1354,7 +1578,7 @@
                         NameForEasyFind: "Judy");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { V, true }, { U, true }, { X, true }, { W, true } },
@@ -1362,7 +1586,7 @@
                         NameForEasyFind: "Charlotte");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, false } },
@@ -1370,7 +1594,7 @@
                         NameForEasyFind: "Julia");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, false } },
@@ -1378,7 +1602,7 @@
                         NameForEasyFind: "Grace");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, false } },
@@ -1386,7 +1610,7 @@
                         NameForEasyFind: "Amber");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, false } },
@@ -1394,7 +1618,7 @@
                         NameForEasyFind: "Alice");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, true }, { Y, false } },
@@ -1402,7 +1626,7 @@
                         NameForEasyFind: "Jean");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, true }, { Y, true }, { X, false } },
@@ -1410,7 +1634,7 @@
                         NameForEasyFind: "Denise");
 
                     yield return new(
-                        Append: FirstWrapSecond,
+                        Append: nameof(IHandlerMath.FirstWrapSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, true }, { Y, true }, { X, true } },
@@ -1418,7 +1642,7 @@
                         NameForEasyFind: "Frances");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [],
                         BConditions: [],
                         ChecksSetup: [],
@@ -1426,7 +1650,7 @@
                         NameForEasyFind: "Danielle");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U],
                         BConditions: [],
                         ChecksSetup: new() { { U, false } },
@@ -1434,7 +1658,7 @@
                         NameForEasyFind: "Danielle");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U],
                         BConditions: [],
                         ChecksSetup: new() { { U, true } },
@@ -1442,7 +1666,7 @@
                         NameForEasyFind: "Natalie");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [],
                         BConditions: [U],
                         ChecksSetup: new() { { U, false } },
@@ -1450,7 +1674,7 @@
                         NameForEasyFind: "Beverly");
 
                     yield return new(
-                    Append: PackFirstInSecond,
+                    Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [],
                         BConditions: [U],
                         ChecksSetup: new() { { U, true } },
@@ -1458,7 +1682,7 @@
                         NameForEasyFind: "Diana");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [],
                         ChecksSetup: new() { { V, false } },
@@ -1466,7 +1690,7 @@
                         NameForEasyFind: "Brittany");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [],
                         ChecksSetup: new() { { V, true }, { U, false } },
@@ -1474,7 +1698,7 @@
                         NameForEasyFind: "Theresa");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [],
                         ChecksSetup: new() { { V, true }, { U, true } },
@@ -1482,7 +1706,7 @@
                         NameForEasyFind: "Kayla");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [],
                         BConditions: [U, V],
                         ChecksSetup: new() { { V, false } },
@@ -1490,7 +1714,7 @@
                         NameForEasyFind: "Alexis");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [],
                         BConditions: [U, V],
                         ChecksSetup: new() { { V, true }, { U, false } },
@@ -1498,7 +1722,7 @@
                         NameForEasyFind: "Doris");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [],
                         BConditions: [U, V],
                         ChecksSetup: new() { { V, true }, { U, true } },
@@ -1506,7 +1730,7 @@
                         NameForEasyFind: "Lori");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, false } },
@@ -1514,7 +1738,7 @@
                         NameForEasyFind: "Tiffany");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, false } },
@@ -1522,7 +1746,7 @@
                         NameForEasyFind: "Carl");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -1530,7 +1754,7 @@
                         NameForEasyFind: "Dylan");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -1538,7 +1762,7 @@
                         NameForEasyFind: "Harold");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -1546,7 +1770,7 @@
                         NameForEasyFind: "Jesse");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -1554,7 +1778,7 @@
                         NameForEasyFind: "Bryan");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -1562,7 +1786,7 @@
                         NameForEasyFind: "Lawrence");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -1570,7 +1794,7 @@
                         NameForEasyFind: "Arthur");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, false } },
@@ -1578,7 +1802,7 @@
                         NameForEasyFind: "Gabriel");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, false } },
@@ -1586,7 +1810,7 @@
                         NameForEasyFind: "Bruce");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U],
                         BConditions: [V],
                         ChecksSetup: new() { { V, false } },
@@ -1594,7 +1818,7 @@
                         NameForEasyFind: "Logan");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U],
                         BConditions: [V],
                         ChecksSetup: new() { { V, true }, { U, false } },
@@ -1602,7 +1826,7 @@
                         NameForEasyFind: "Billy");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U],
                         BConditions: [V],
                         ChecksSetup: new() { { V, true }, { U, true } },
@@ -1610,7 +1834,7 @@
                         NameForEasyFind: "Joe");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { W, false } },
@@ -1618,7 +1842,7 @@
                         NameForEasyFind: "Alan");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { W, true }, { V, false } },
@@ -1626,7 +1850,7 @@
                         NameForEasyFind: "Juan");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, false } },
@@ -1634,7 +1858,7 @@
                         NameForEasyFind: "Elijah");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, true } },
@@ -1642,7 +1866,7 @@
                         NameForEasyFind: "Willie");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { W, true }, { U, true }, { V, true } },
@@ -1650,7 +1874,7 @@
                         NameForEasyFind: "Albert");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { W, true }, { U, true }, { V, false } },
@@ -1658,7 +1882,7 @@
                         NameForEasyFind: "Wayne");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { W, true }, { U, false }, { V, false } },
@@ -1666,7 +1890,7 @@
                         NameForEasyFind: "Randy");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { W, true }, { U, false }, { V, true } },
@@ -1674,7 +1898,7 @@
                         NameForEasyFind: "Mason");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { W, false } },
@@ -1682,7 +1906,7 @@
                         NameForEasyFind: "Vincent");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { X, false } },
@@ -1690,7 +1914,7 @@
                         NameForEasyFind: "Liam");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { X, true }, { V, false }, { W, false } },
@@ -1698,7 +1922,7 @@
                         NameForEasyFind: "Roy");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { X, true }, { V, false }, { W, true } },
@@ -1706,7 +1930,7 @@
                         NameForEasyFind: "Bobby");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { X, true }, { V, true }, { U, false }, { W, false } },
@@ -1714,7 +1938,7 @@
                         NameForEasyFind: "Caleb");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { X, true }, { V, true }, { U, false }, { W, true } },
@@ -1722,7 +1946,7 @@
                         NameForEasyFind: "Bradley");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { X, true }, { V, true }, { U, true }, { W, false } },
@@ -1730,7 +1954,7 @@
                         NameForEasyFind: "Russell");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { X, true }, { V, true }, { U, true }, { W, true } },
@@ -1738,7 +1962,7 @@
                         NameForEasyFind: "Lucas");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, false } },
@@ -1746,7 +1970,7 @@
                         NameForEasyFind: "Zekiel");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { W, false }, { Y, false } },
@@ -1754,7 +1978,7 @@
                         NameForEasyFind: "Yuri");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { W, false }, { Y, true }, { X, false } },
@@ -1762,7 +1986,7 @@
                         NameForEasyFind: "Tyde");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { W, false }, { Y, true }, { X, true } },
@@ -1770,7 +1994,7 @@
                         NameForEasyFind: "Turner");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { W, true }, { V, false }, { Y, false } },
@@ -1778,7 +2002,7 @@
                         NameForEasyFind: "Trevor");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { W, true }, { V, true }, { U, false }, { Y, false } },
@@ -1786,7 +2010,7 @@
                         NameForEasyFind: "Stuart");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { W, true }, { V, true }, { U, true }, { Y, false } },
@@ -1794,7 +2018,7 @@
                         NameForEasyFind: "Stewart");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { W, true }, { V, false }, { Y, true }, { X, false } },
@@ -1802,7 +2026,7 @@
                         NameForEasyFind: "Royston");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { W, true }, { V, true }, { U, false }, { Y, true }, { X, false } },
@@ -1810,7 +2034,7 @@
                         NameForEasyFind: "Rodney");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { W, true }, { V, true }, { U, true }, { Y, true }, { X, false } },
@@ -1818,7 +2042,7 @@
                         NameForEasyFind: "Norman");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { W, true }, { V, true }, { U, false }, { Y, true }, { X, true } },
@@ -1826,7 +2050,7 @@
                         NameForEasyFind: "Nigel");
 
                     yield return new(
-                        Append: PackFirstInSecond,
+                        Append: nameof(IHandlerMath.PackFirstInSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { Z, true }, { W, true }, { V, true }, { U, true }, { Y, true }, { X, true } },
@@ -1834,7 +2058,7 @@
                         NameForEasyFind: "Neymar");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [],
                         BConditions: [],
                         ChecksSetup: [],
@@ -1842,7 +2066,7 @@
                         NameForEasyFind: "Neville");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U],
                         BConditions: [],
                         ChecksSetup: new() { { U, false } },
@@ -1850,7 +2074,7 @@
                         NameForEasyFind: "Melvyn");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U],
                         BConditions: [],
                         ChecksSetup: new() { { U, true } },
@@ -1858,7 +2082,7 @@
                         NameForEasyFind: "Leslie");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [],
                         BConditions: [U],
                         ChecksSetup: new() { { U, false } },
@@ -1866,7 +2090,7 @@
                         NameForEasyFind: "Kobe");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [],
                         BConditions: [U],
                         ChecksSetup: new() { { U, true } },
@@ -1874,7 +2098,7 @@
                         NameForEasyFind: "Iain");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [],
                         ChecksSetup: new() { { V, false } },
@@ -1882,7 +2106,7 @@
                         NameForEasyFind: "Huxon");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [],
                         ChecksSetup: new() { { V, true }, { U, false } },
@@ -1890,7 +2114,7 @@
                         NameForEasyFind: "Howard");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [],
                         ChecksSetup: new() { { V, true }, { U, true } },
@@ -1898,7 +2122,7 @@
                         NameForEasyFind: "Horace");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [],
                         BConditions: [U, V],
                         ChecksSetup: new() { { V, false } },
@@ -1906,7 +2130,7 @@
                         NameForEasyFind: "Graham");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [],
                         BConditions: [U, V],
                         ChecksSetup: new() { { V, true }, { U, false } },
@@ -1914,7 +2138,7 @@
                         NameForEasyFind: "Gordon");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [],
                         BConditions: [U, V],
                         ChecksSetup: new() { { V, true }, { U, true } },
@@ -1922,7 +2146,7 @@
                         NameForEasyFind: "Glenn");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, false } },
@@ -1930,7 +2154,7 @@
                         NameForEasyFind: "Gary");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, false } },
@@ -1938,7 +2162,7 @@
                         NameForEasyFind: "Finch");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -1946,7 +2170,7 @@
                         NameForEasyFind: "Esteban");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -1954,7 +2178,7 @@
                         NameForEasyFind: "Elison");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W, X],
                         BConditions: [],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -1962,7 +2186,7 @@
                         NameForEasyFind: "Duran");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, true } },
@@ -1970,7 +2194,7 @@
                         NameForEasyFind: "Drake");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, true }, { U, false } },
@@ -1978,7 +2202,7 @@
                         NameForEasyFind: "Cyril");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, true }, { V, false } },
@@ -1986,7 +2210,7 @@
                         NameForEasyFind: "Corby");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, true }, { W, false } },
@@ -1994,7 +2218,7 @@
                         NameForEasyFind: "Clifford");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [],
                         BConditions: [U, V, W, X],
                         ChecksSetup: new() { { X, false } },
@@ -2002,7 +2226,7 @@
                         NameForEasyFind: "Claude");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U],
                         BConditions: [V],
                         ChecksSetup: new() { { U, false } },
@@ -2010,7 +2234,7 @@
                         NameForEasyFind: "Clarence");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U],
                         BConditions: [V],
                         ChecksSetup: new() { { U, true }, { V, false } },
@@ -2018,7 +2242,7 @@
                         NameForEasyFind: "Chad");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U],
                         BConditions: [V],
                         ChecksSetup: new() { { U, true }, { V, true } },
@@ -2026,7 +2250,7 @@
                         NameForEasyFind: "Cecil");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { V, false } },
@@ -2034,7 +2258,7 @@
                         NameForEasyFind: "Bill");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { V, true }, { U, false }, { W, false } },
@@ -2042,7 +2266,7 @@
                         NameForEasyFind: "Arlyn");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { V, true }, { U, true }, { W, false } },
@@ -2050,7 +2274,7 @@
                         NameForEasyFind: "Ashton");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { V, true }, { U, false }, { W, true } },
@@ -2058,7 +2282,7 @@
                         NameForEasyFind: "Barry");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [W],
                         ChecksSetup: new() { { V, true }, { U, true }, { W, true } },
@@ -2066,7 +2290,7 @@
                         NameForEasyFind: "Ajax");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { U, false } },
@@ -2074,7 +2298,7 @@
                         NameForEasyFind: "Sonnet");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { U, true }, { W, false } },
@@ -2082,7 +2306,7 @@
                         NameForEasyFind: "Winslow");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { U, true }, { W, true }, { V, false } },
@@ -2090,7 +2314,7 @@
                         NameForEasyFind: "Quinton");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U],
                         BConditions: [V, W],
                         ChecksSetup: new() { { U, true }, { W, true }, { V, true } },
@@ -2098,7 +2322,7 @@
                         NameForEasyFind: "Polly");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { V, false } },
@@ -2106,7 +2330,7 @@
                         NameForEasyFind: "Prudence");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { V, true }, { U, false }, { X, false } },
@@ -2114,7 +2338,7 @@
                         NameForEasyFind: "Ellison");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { V, true }, { U, true }, { X, false } },
@@ -2122,7 +2346,7 @@
                         NameForEasyFind: "Flynn");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { V, true }, { U, false }, { X, true }, { W, false } },
@@ -2130,7 +2354,7 @@
                         NameForEasyFind: "Florence");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { V, true }, { U, false }, { X, true }, { W, true } },
@@ -2138,7 +2362,7 @@
                         NameForEasyFind: "Magnus");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V],
                         BConditions: [W, X],
                         ChecksSetup: new() { { V, true }, { U, true }, { X, true }, { W, true } },
@@ -2146,7 +2370,7 @@
                         NameForEasyFind: "Clementine");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, false } },
@@ -2154,7 +2378,7 @@
                         NameForEasyFind: "Allegra");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, false }, { Z, false }, },
@@ -2162,7 +2386,7 @@
                         NameForEasyFind: "Donte");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, false }, { Z, false }, },
@@ -2170,7 +2394,7 @@
                         NameForEasyFind: "Rogan");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, false }, },
@@ -2178,7 +2402,7 @@
                         NameForEasyFind: "Yousef");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, false }, { Z, true }, { Y, false } },
@@ -2186,7 +2410,7 @@
                         NameForEasyFind: "Marla");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, false }, { Z, true }, { Y, true }, { X, false } },
@@ -2194,7 +2418,7 @@
                         NameForEasyFind: "Mikel");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, false }, { Z, true }, { Y, true }, { X, true } },
@@ -2202,7 +2426,7 @@
                         NameForEasyFind: "Ares");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, false }, { Z, true }, { Y, false } },
@@ -2210,7 +2434,7 @@
                         NameForEasyFind: "Stephano");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, true }, { Y, false } },
@@ -2218,7 +2442,7 @@
                         NameForEasyFind: "Niccola");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, false }, { Z, true }, { Y, true }, { X, false } },
@@ -2226,7 +2450,7 @@
                         NameForEasyFind: "Apollo");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, false }, { Z, true }, { Y, true }, { X, true } },
@@ -2234,7 +2458,7 @@
                         NameForEasyFind: "Booker");
 
                     yield return new(
-                        Append: FirstCoverSecond,
+                        Append: nameof(IHandlerMath.FirstCoverSecond),
                         AConditions: [U, V, W],
                         BConditions: [X, Y, Z],
                         ChecksSetup: new() { { W, true }, { V, true }, { U, true }, { Z, true }, { Y, true }, { X, true } },

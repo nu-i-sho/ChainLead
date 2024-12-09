@@ -1,10 +1,9 @@
 ﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts;
-    using Moq;
+    using ChainLead.Test.Utils;
 
-    using static ChainLead.Test.Cases.Common;
-    using static ChainLead.Test.Cases.SingleHandlerFixtureCases;
+    using static ChainLead.Test.Cases.SingleHandler;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
     using static ChainLead.Test.Dummy.HandlerIndex.Common;
 
@@ -159,21 +158,15 @@
         [Test]
         public void ExtendedZeroIsZero()
         {
-            var extended = new Mock<IExtendedHandler<T>>();
-            extended.Setup(o => o.Origin)
-                    .Returns(_math.Zero<T>());
-
-            Assert.That(_math.IsZero(extended.Object));
+            var extendedZero = _math.Zero<T>().AsExtended();
+            Assert.That(_math.IsZero(extendedZero));
         }
 
         [Test]
         public void ExtendedNotZeroIsNotZero()
         {
-            var extended = new Mock<IExtendedHandler<T>>();
-            extended.Setup(o => o.Origin)
-                    .Returns(_dummyOf.Handler(A));
-
-            Assert.That(_math.IsZero(extended.Object),
+            var extended = _dummyOf.Handler(A).AsExtended();
+            Assert.That(_math.IsZero(extended),
                 Is.False);
         }
     }

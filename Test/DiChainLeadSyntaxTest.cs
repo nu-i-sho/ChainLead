@@ -4,72 +4,71 @@
     using ChainLead.Contracts.Syntax;
     using ChainLead.Contracts.Syntax.DI;
     using Microsoft.Extensions.DependencyInjection;
-    using Moq;
+    
+    using static ChainLead.Test.Dummy.HandlerIndex.Common;
+    using static ChainLead.Test.Dummy.ConditionIndex.Common;
 
     [TestFixture]
     public class DiChainLeadSyntaxTest
     {
-        Mock<IServiceCollection> _serviceCollection;
-        Mock<IServiceProvider> _serviceProvider;
-        Mock<IConditionMath> _conditionMath;
-        Mock<IHandlerMath> _handlerMath;
+        public record TypeDoesNotMatter;
+        public TypeDoesNotMatter _objectDoesNotMetter = new();
 
-        ServiceDescriptor? _callTokenDescriptor;
+        DummyServiceCollection _dummyOfServiceCollection;
+        DummyServiceProvider _dummyOfServiceProvider;
+        Dummy.Container<TypeDoesNotMatter> _dummyOf;
 
         [SetUp]
         public void Setup()
         {
-            _callTokenDescriptor = null;
+            _dummyOfServiceCollection = new();
+            _dummyOfServiceProvider = new();
+            _dummyOf = new(_objectDoesNotMetter);
 
-            _serviceCollection = new Mock<IServiceCollection>();
-            _serviceProvider = new Mock<IServiceProvider>();
-            _conditionMath = new Mock<IConditionMath>();
-            _handlerMath = new Mock<IHandlerMath>();
-
-            _serviceProvider
-                .Setup(o => o.GetService(typeof(IConditionMath)))
-                .Returns(_conditionMath.Object);
-
-            _serviceProvider
-                .Setup(o => o.GetService(typeof(IHandlerMath)))
-                .Returns(_handlerMath.Object);
-
-            _serviceCollection
-                .Setup(o => o.Add(It.Is<ServiceDescriptor>(
-                       x => x.ServiceType == typeof(Extension.CallToken))))
-                .Callback((ServiceDescriptor descriptor) => _callTokenDescriptor = descriptor);
+            _dummyOfServiceProvider.AddSetup<IHandlerMath>(_dummyOf.HandlerMath);
+            _dummyOfServiceProvider.AddSetup<IConditionMath>(_dummyOf.ConditionMath);
         }
 
         [Test]
         public void ConfigureChainLeadSyntaxAddsNotNullServiceDescriptor()
         {
-            _serviceCollection.Object.ConfigureChainLeadSyntax();
-            Assert.That(_callTokenDescriptor, Is.Not.Null);
+            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
+
+            Assert.That(_dummyOfServiceCollection.Count, 
+                Is.EqualTo(1));
         }
 
         [Test]
         public void ConfigureChainLeadSyntaxAddsCallToken()
         {
-            _serviceCollection.Object.ConfigureChainLeadSyntax();
-            Assert.That(_callTokenDescriptor!.ServiceType,
+            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
+            Assert.That(_dummyOfServiceCollection.Last().ServiceType,
                 Is.EqualTo(typeof(Extension.CallToken)));
         }
 
         [Test]
         public void ConfigureChainLeadSyntaxAddsCallTokenAsSingleton()
         {
-            _serviceCollection.Object.ConfigureChainLeadSyntax();
-            Assert.That(_callTokenDescriptor!.Lifetime,
+            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
+            Assert.That(_dummyOfServiceCollection.Last().Lifetime,
                 Is.EqualTo(ServiceLifetime.Singleton));
+        }
+
+        [Test]
+        public void ConfigureChainLeadSyntaxAddsCallTokenWithImplementationFactory()
+        {
+            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
+            Assert.That(_dummyOfServiceCollection.Last().ImplementationFactory,
+                Is.Not.Null);
         }
 
         [Test]
         public void ConfigureChainLeadSyntaxAddsCallTokenAsImplementationByFactory()
         {
-            _serviceCollection.Object.ConfigureChainLeadSyntax();
+            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
 
-            var implementation = _callTokenDescriptor!
-                .ImplementationFactory!(_serviceProvider.Object);
+            var implementation = _dummyOfServiceCollection.Last()
+                .ImplementationFactory!(_dummyOfServiceProvider);
 
             Assert.That(implementation,
                 Is.TypeOf<Extension.CallToken>());
@@ -78,35 +77,38 @@
         [Test]
         public void ConfigureChainLeadSyntaxConfiguresHandlerMathByInstanceFromProvider()
         {
-            var zero = new Mock<IHandler<int>>();
+            _dummyOf.HandlerMath.Zero_Returns(A);
+            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
+            _dummyOfServiceCollection.Last().ImplementationFactory!(_dummyOfServiceProvider);
 
-            _handlerMath
-                .Setup(o => o.Zero<int>())
-                .Returns(zero.Object);
-
-            _serviceCollection.Object.ConfigureChainLeadSyntax();
-
-            _callTokenDescriptor!.ImplementationFactory!(_serviceProvider.Object);
-
-            Assert.That(ChainLeadSyntax.Handler<int>.Zero,
-                Is.SameAs(zero.Object));
+            Assert.That(ChainLeadSyntax.Handler<TypeDoesNotMatter>.Zero,
+                Is.SameAs(_dummyOf.Handler(A)));
         }
 
         [Test]
         public void ConfigureChainLeadSyntaxConfiguresConditionMathByInstanceFromProvider()
         {
-            var @true = new Mock<ICondition<int>>();
+            _dummyOf.ConditionMath.True_Returns(X);
+            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
+            _dummyOfServiceCollection.Last().ImplementationFactory!(_dummyOfServiceProvider);
 
-            _conditionMath
-                .Setup(o => o.True<int>())
-                .Returns(@true.Object);
+            Assert.That(ChainLeadSyntax.Condition<TypeDoesNotMatter>.True,
+                Is.SameAs(_dummyOf.Condition(X)));
+        }
 
-            _serviceCollection.Object.ConfigureChainLeadSyntax();
+        public class DummyServiceCollection :
+            List<ServiceDescriptor>,
+            IServiceCollection;
 
-            _callTokenDescriptor!.ImplementationFactory!(_serviceProvider.Object);
+        public class DummyServiceProvider : IServiceProvider
+        {
+            private readonly Dictionary<Type, object> _setup = new();
 
-            Assert.That(ChainLeadSyntax.Condition<int>.True,
-                Is.SameAs(@true.Object));
+            public void AddSetup<TContract>(TContract impl) =>
+                _setup.Add(typeof(TContract), impl); 
+
+            public object? GetService(Type serviceType) =>
+                _setup.GetValueOrDefault(serviceType);
         }
     }
 }

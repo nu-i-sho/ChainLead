@@ -2,757 +2,505 @@
 {
     using ChainLead.Contracts;
     using ChainLead.Implementation;
-    using Moq;
+    using ChainLead.Test.Utils;
+    using static ChainLead.Test.Cases.Common;
+    using static ChainLead.Test.Dummy.ConditionIndex.Common;
 
-    [TestFixture]
-    public class ConditionMathTest
+    [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
+    public class ConditionMathTest<T>
     {
-        public class Base;
-        public class Derived : Base;
-
-        public class Conditions
-        {
-            public required IReadOnlyDictionary<string, ICondition<int>> ForInt { get; init; }
-            public required IReadOnlyDictionary<string, ICondition<Base>> ForBase { get; init; }
-            public required IReadOnlyDictionary<string, ICondition<Derived>> ForDerived { get; init; }
-        }
-
+        Dummy.Container<T> _dummyOf;
         IConditionMath _math;
-
-        const int Arg = 7938;
-        const string True = "true", False = "false", A = "A", B = "B";
-
-        Dictionary<string, Mock<ICondition<int>>> _conditionMocks; 
-        Conditions _conditions;
+        T _token;
 
         [SetUp]
         public void Setup()
         {
+            _token = TokensProvider.GetRandom<T>();
+            _dummyOf = new(_token);
             _math = new ConditionMath();
-
-            _conditionMocks = new Dictionary<string, Mock<ICondition<int>>>
-            {
-                { A, new Mock<ICondition<int>>() { Name = A } },
-                { B, new Mock<ICondition<int>>() { Name = B } },
-            };
-
-            _conditions = new Conditions
-            {
-                ForInt = new Dictionary<string, ICondition<int>>
-                {
-                    { True, _math.True<int>() },
-                    { False, _math.False<int>() },
-                    { A, _conditionMocks[A].Object }
-                },
-                ForBase = new Dictionary<string, ICondition<Base>>
-                {
-                    { True, _math.True<Base>() },
-                    { False, _math.False<Base>() }
-                },
-                ForDerived = new Dictionary<string, ICondition<Derived>>
-                {
-                    { True, _math.True<Derived>() },
-                    { False, _math.False<Derived>() },
-                    { A, new Mock<ICondition<Derived>>().Object }
-                },
-            };
         }
 
         [Test]
-        public void TrueCheckReturnsTrue()
-        {
-            var result = _conditions.ForInt[True].Check(Arg);
-            Assert.That(result, Is.True);
-        }
+        public void TrueCheckReturnsTrue() =>
+            Assert.That(_math.True<T>().Check(_token));
 
         [Test]
-        public void FalseCheckReturnsTrue()
-        {
-            var result = _conditions.ForInt[False].Check(Arg);   
-            Assert.That(result, Is.False);
-        }
+        public void FalseCheckReturnsFalse() =>
+            Assert.That(_math.False<T>().Check(_token),
+                Is.False);
 
         [Test]
-        public void TrueIsPredictableTrue()
-        {
-            var predictableTrue = 
-                _math.IsPredictableTrue(_conditions.ForInt[True]);   
-            
-            Assert.That(predictableTrue, Is.True);
-        }
+        public void TrueIsPredictableTrue() =>
+            Assert.That(_math.IsPredictableTrue(_math.True<T>()));
 
         [Test]
-        public void TrueIsNotPredictableFalse()
-        {
-            var predictableFalse =
-                _math.IsPredictableFalse(_conditions.ForInt[True]);
-            
-            Assert.That(predictableFalse, Is.False);
-        }
+        public void TrueIsNotPredictableFalse() =>
+            Assert.That(_math.IsPredictableFalse(_math.True<T>()),
+                Is.False);
 
         [Test]
-        public void FalseIsPredictableFalse()
-        {
-            var predictableFalse = 
-                _math.IsPredictableFalse(_conditions.ForInt[False]);
-
-            Assert.That(predictableFalse, Is.True);
-        }
+        public void SomeConditionIsNotPredictableFalse() =>
+            Assert.That(_math.IsPredictableFalse(_dummyOf.Condition(X)),
+                Is.False);
 
         [Test]
-        public void FalseIsNotPredictableTrue()
-        {
-            var predictableTrue = 
-                _math.IsPredictableTrue(_conditions.ForInt[False]);
-
-            Assert.That(predictableTrue, Is.False);
-        }
-
+        public void FalseIsPredictableFalse() =>
+            Assert.That(_math.IsPredictableFalse(_math.False<T>()));
 
         [Test]
-        public void BaseTrueIsPredictableTrueAsDerived()
-        {
-            var predictableTrue =
-                _math.IsPredictableTrue<Derived>(_conditions.ForBase[True]);
-
-            Assert.That(predictableTrue, Is.True);
-        }
+        public void FalseIsNotPredictableTrue() =>
+            Assert.That(_math.IsPredictableTrue(_math.False<T>()),
+                Is.False);
 
         [Test]
-        public void BaseTrueIsNotPredictableFalseAsDerived()
-        {
-            var predictableFalse =
-                _math.IsPredictableFalse<Derived>(_conditions.ForBase[True]);
-
-            Assert.That(predictableFalse, Is.False);
-        }
-
-        [Test]
-        public void BaseFalseIsNotPredictableTrueAsDerived()
-        {
-            var predictableTrue =
-                _math.IsPredictableTrue<Derived>(_conditions.ForBase[False]);
-
-            Assert.That(predictableTrue, Is.False);
-        }
-
-        [Test]
-        public void BaseFalseIsPredictableFalseAsDerived()
-        {
-            var predictableFalse =
-                _math.IsPredictableFalse<Derived>(_conditions.ForBase[False]);
-
-            Assert.That(predictableFalse, Is.True);
-        }
+        public void SomeConditionIsNotPredictableTrue() =>
+            Assert.That(_math.IsPredictableTrue(_dummyOf.Condition(X)),
+                Is.False);
 
         [Test]
         public void FalseAndSomethingIsPredictableFalse(
-            [Values(False, True, A)] string something)
+            [Values(false, true, null)] bool? another)
         {
-            var falseAndSomething = _math.And(
-                _math.False<int>(),
-                _conditions.ForInt[something]);
+            var falseAndSomething = _math.And(_math.False<T>(), Some(another));
+            var isPredictableFalse = _math.IsPredictableFalse(falseAndSomething);
 
-            var predictableFalse = _math.IsPredictableFalse(falseAndSomething);
-
-            Assert.That(predictableFalse, Is.True);
-        }
-
-        [Test]
-        public void BaseFalseAndSomethingDerivedIsPredictableFalse(
-            [Values(False, True, A)] string something)
-        {
-            var falseAndSomething = _math.And(
-                _conditions.ForBase[False],
-                _conditions.ForDerived[something]);
-
-            var predictableFalse = _math.IsPredictableFalse(falseAndSomething);
-
-            Assert.That(predictableFalse, Is.True);
+            Assert.That(isPredictableFalse);
         }
 
         [Test]
         public void FalseAndSomethingIsNotPredictableTrue(
-            [Values(False, True, A)] string something)
-        {            
-            var falseAndSomething = _math.And(
-                _math.False<int>(),
-                _conditions.ForInt[something]);
-
-            var predictableTrue = _math.IsPredictableTrue(falseAndSomething);
-
-            Assert.That(predictableTrue, Is.False);
-        }
-
-        [Test]
-        public void BaseFalseAndSomethingDerivedIsNotPredictableTrue(
-            [Values(False, True, A)] string something)
+            [Values(false, true, null)] bool? another)
         {
-            var falseAndSomething = _math.And(
-                _conditions.ForBase[False],
-                _conditions.ForDerived[something]);
+            var falseAndSomething = _math.And(_math.False<T>(), Some(another));
+            var isPredictableTrue = _math.IsPredictableTrue(falseAndSomething);
 
-            var predictableTrue = _math.IsPredictableTrue(falseAndSomething);
-
-            Assert.That(predictableTrue, Is.False);
+            Assert.That(isPredictableTrue,
+                Is.False);
         }
 
         [Test]
         public void FalseAndSomethingCheckIsFalse(
-            [Values(False, True, A)] string something)
+            [Values(false, true, null)] bool? another)
         {
-            var falseAndSomething = _math.And(
-                _math.False<int>(),
-                _conditions.ForInt[something]);
-
-            var result = falseAndSomething.Check(5346);
-
-            Assert.That(result, Is.False);
-        }
-
-        [Test]
-        public void BaseFalseAndSomethingDerivedCheckIsFalse(
-            [Values(False, True, A)] string something)
-        {
-            var falseAndSomething = _math.And(
-                _conditions.ForBase[False],
-                _conditions.ForDerived[something]);
-
-            var result = falseAndSomething.Check(new Derived());
-
-            Assert.That(result, Is.False);
+            _dummyOf.Condition(X).Returns(true);
+            var falseAndSomething = _math.And(_math.False<T>(), Some(another));
+           
+            Assert.That(falseAndSomething.Check(_token), 
+                Is.False);
         }
 
         [Test]
         public void SomethingAndFalseIsPredictableFalse(
-            [Values(False, True, A)] string something)
+             [Values(false, true, null)] bool? another)
         {
-            var somethingAndFalse = _math.And(
-                _conditions.ForInt[something],
-                _math.False<int>());
+            var somethingAndFalse = _math.And(Some(another), _math.False<T>());
+            var isPredictableFalse = _math.IsPredictableFalse(somethingAndFalse);
 
-            var predictableFalse = _math.IsPredictableFalse(somethingAndFalse);
-
-            Assert.That(predictableFalse, Is.True);
-        }
-
-        [Test]
-        public void SomethingDerivedAndBaseFalseIsPredictableFalse(
-            [Values(False, True, A)] string something)
-        {
-            var somethingAndFalse = _math.And(
-                _conditions.ForDerived[something],
-                _conditions.ForBase[False]);
-
-            var predictableFalse = _math.IsPredictableFalse(somethingAndFalse);
-
-            Assert.That(predictableFalse, Is.True);
+            Assert.That(isPredictableFalse);
         }
 
         [Test]
         public void SomethingAndFalseIsNotPredictableTrue(
-            [Values(False, True, A)] string something)
+            [Values(false, true, null)] bool? another)
         {
-            var somethingAndFalse = _math.And(
-                _conditions.ForInt[something],
-                _math.False<int>());
-
+            var somethingAndFalse = _math.And(Some(another), _math.False<T>());
             var isPredictableTrue = _math.IsPredictableTrue(somethingAndFalse);
 
-            Assert.That(isPredictableTrue, Is.False);
-        }
-
-        [Test]
-        public void SomethingDerivedAndBaseFalseIsNotPredictableTrue(
-            [Values(False, True, A)] string something)
-        {
-            var somethingAndFalse = _math.And(
-                _conditions.ForDerived[something],
-                _conditions.ForBase[False]);
-
-            var predictableTrue = _math.IsPredictableTrue(somethingAndFalse);
-
-            Assert.That(predictableTrue, Is.False);
+            Assert.That(isPredictableTrue,
+                Is.False);
         }
 
         [Test]
         public void SomethingAndFalseCheckIsFalse(
-            [Values(False, True, A)] string something)
+            [Values(false, true, null)] bool? another)
         {
-            var somethingAndFalse = _math.And(
-                _conditions.ForInt[something],
-                _math.False<int>());
+            var somethingAndFalse = _math.And(Some(another), _math.False<T>());
 
-            var result = somethingAndFalse.Check(Arg);
-
-            Assert.That(result, Is.False);
+            Assert.That(somethingAndFalse.Check(_token),
+                Is.False);
         }
 
         [Test]
-        public void SomethingDerivedAndBaseFalseCheckIsFalse(
-            [Values(False, True, A)] string something)
+        public void SomethingAndFalseCheckDoesNotCallCheckOfSomething()
         {
-            var somethingAndFalse = _math.And(
-                _conditions.ForDerived[something],
-                _conditions.ForBase[False]);
+            var somethingAndFalse = _math.And(_dummyOf.Condition(X), _math.False<T>());
+            somethingAndFalse.Check(_token);
 
-            var result = somethingAndFalse.Check(new Derived());
+            Assert.That(_dummyOf.Condition(X)
+                  .WasNeverChecked());
+        }
 
-            Assert.That(result, Is.False);
+        [Test]
+        public void FalseAndSomethingCheckDoesNotCallCheckOfSomething()
+        {
+            var falseAndSomething = _math.And(_math.False<T>(), _dummyOf.Condition(X));
+            falseAndSomething.Check(_token);
+
+            Assert.That(_dummyOf.Condition(X)
+                  .WasNeverChecked());
+        }
+
+        [Test]
+        public void FalseOrSomethingButNotFalseIsNotPredictableFalse(
+            [Values(true, null)] bool? another)
+        {
+            var falseOrSomething = _math.Or(_math.False<T>(), Some(another));
+            var isPredictableFalse = _math.IsPredictableFalse(falseOrSomething);
+
+            Assert.That(isPredictableFalse,
+                Is.False);
+        }
+
+        [Test]
+        public void FalseOrFalseIsPredictableFalse()
+        {
+            var falseOrFalse = _math.Or(_math.False<T>(), _math.False<T>());
+            var isPredictableFalse = _math.IsPredictableFalse(falseOrFalse);
+
+            Assert.That(isPredictableFalse);
+        }
+
+        [Test]
+        public void FalseOrSomethingButNotTrueIsNotNotPredictableTrue(
+            [Values(false, null)] bool? another)
+        {
+            var falseOrSomething = _math.Or(_math.False<T>(), Some(another));
+            var isPredictableTrue = _math.IsPredictableTrue(falseOrSomething);
+
+            Assert.That(isPredictableTrue,
+                Is.False);
+        }
+
+        [Test]
+        public void FalseOrTrueIsPredictableTrue()
+        {
+            var falseOrTrue = _math.Or(_math.False<T>(), _math.True<T>());
+            var isPredictableTrue = _math.IsPredictableTrue(falseOrTrue);
+
+            Assert.That(isPredictableTrue);
+        }
+
+        [Test]
+        public void FalseOrSomethingCheckIsSomethingCheckResult(
+            [Values(false, true)] bool anotherCheckResult)
+        {
+            _dummyOf.Condition(X).Returns(anotherCheckResult);
+            var falseOrSomething = _math.Or(_math.False<T>(), _dummyOf.Condition(X));
+
+            Assert.That(falseOrSomething.Check(_token),
+                Is.EqualTo(anotherCheckResult));
+        }
+
+        [Test]
+        public void FalseOrSomethingCheckCallsCheckFromSomething()
+        {
+            _dummyOf.Condition(X).Returns(true);
+
+            var falseOrSomething = _math.Or(_math.False<T>(), _dummyOf.Condition(X));
+            falseOrSomething.Check(_token);
+
+            Assert.That(_dummyOf.Condition(X)
+                  .WasCheckedOnce());
+        }
+
+        [Test]
+        public void FalseOrSomethingIsSomething()
+        {
+            var falseOrSomething = _math.Or(_math.False<T>(), _dummyOf.Condition(X));
+            
+            Assert.That(falseOrSomething,
+                Is.SameAs(_dummyOf.Condition(X)));
+        }
+
+        [Test]
+        public void SomethingOrFalseButNotFalseIsNotPredictableFalse(
+            [Values(true, null)] bool? another)
+        {
+            var somethingOrFalse = _math.Or(Some(another), _math.False<T>());
+            var isPredictableFalse = _math.IsPredictableFalse(somethingOrFalse);
+
+            Assert.That(isPredictableFalse,
+                Is.False);
+        }
+
+        [Test]
+        public void SomethingButNotTrueOrFalseIsNotNotPredictableTrue(
+            [Values(false, null)] bool? another)
+        {
+            var somethingOrFalse = _math.Or(Some(another), _math.False<T>());
+            var isPredictableTrue = _math.IsPredictableTrue(somethingOrFalse);
+
+            Assert.That(isPredictableTrue,
+                Is.False);
+        }
+
+        [Test]
+        public void TrueOrFalseIsPredictableTrue()
+        {
+            var trueOrFalse = _math.Or(_math.True<T>(), _math.False<T>());
+            var isPredictableTrue = _math.IsPredictableTrue(trueOrFalse);
+
+            Assert.That(isPredictableTrue);
+        }
+
+        [Test]
+        public void SomethingOrFalseCheckIsSomethingCheckResult(
+            [Values(false, true)] bool anotherCheckResult)
+        {
+            _dummyOf.Condition(X).Returns(anotherCheckResult);
+            var somethingOrFalse = _math.Or(_dummyOf.Condition(X), _math.False<T>());
+
+            Assert.That(somethingOrFalse.Check(_token),
+                Is.EqualTo(anotherCheckResult));
+        }
+
+        [Test]
+        public void SomethingOrFalseCheckCallsCheckFromSomething()
+        {
+            _dummyOf.Condition(X).Returns(true);
+
+            var somethingOrFalse = _math.Or(_dummyOf.Condition(X), _math.False<T>());
+            somethingOrFalse.Check(_token);
+
+            Assert.That(_dummyOf.Condition(X)
+                  .WasCheckedOnce());
         }
 
         [Test]
         public void SomethingOrFalseIsSomething()
         {
-            var somethingOrFalse = _math.Or(
-                _conditions.ForInt[A],
-                _conditions.ForInt[False]);
+            var somethingOrFalse = _math.Or(_dummyOf.Condition(X), _math.False<T>());
 
             Assert.That(somethingOrFalse,
-                Is.SameAs(_conditions.ForInt[A]));
-        }
-
-        [Test]
-        public void SomethingDerivedOrBaseFalseIsSomethingDerived()
-        {
-            var somethingOrFalse = _math.Or(
-                _conditions.ForDerived[A],
-                _conditions.ForBase[False]);
-
-            Assert.That(somethingOrFalse,
-                Is.SameAs(_conditions.ForDerived[A]));
-        }
-
-        [Test]
-        public void SomethingOrFalseCheckIsSomethingCheck(
-            [Values(false, true)] bool somethingCheckResult)
-        {
-            var something = _conditionMocks[A];
-            something
-                .Setup(o => o.Check(Arg))
-                .Returns(somethingCheckResult);
-
-            var somethingOrFalse = _math.Or(
-                something.Object,
-                _conditions.ForInt[False]);
-
-            var result = somethingOrFalse.Check(Arg);
-
-            Assert.That(result, 
-                Is.EqualTo(somethingCheckResult));
-        }
-
-        [Test]
-        public void SomethingDerivedOrBaseFalseCheckIsSomethingDerivedCheck(
-            [Values(false, true)] bool somethingCheckResult)
-        {
-            var arg = new Derived();
-            var something = new Mock<ICondition<Derived>>();
-            something
-                .Setup(o => o.Check(arg))
-                .Returns(somethingCheckResult);
-
-            var somethingOrFalse = _math.Or(
-                something.Object,
-                _conditions.ForBase[False]);
-
-            var result = somethingOrFalse.Check(arg);
-
-            Assert.That(result, 
-                Is.EqualTo(somethingCheckResult));
-        }
-
-        [Test]
-        public void FalseOrSomethingIsSomething(
-            [Values(False, True, A)] string something)
-        {
-            var falseOrSomething = _math.Or(
-                _math.False<int>(),
-                _conditions.ForInt[something]);
-
-            Assert.That(falseOrSomething, 
-                Is.SameAs(_conditions.ForInt[something]));
-        }
-
-        [Test]
-        public void BaseFalseOrSomethingDerivedIsSomethingDerived(
-            [Values(False, True, A)] string something)
-        {
-            var falseOrSomething = _math.Or(
-                _conditions.ForBase[False],
-                _conditions.ForDerived[something]);
-
-            Assert.That(falseOrSomething,
-                Is.SameAs(_conditions.ForDerived[something]));
+                Is.SameAs(_dummyOf.Condition(X)));
         }
 
         [Test]
         public void TrueOrSomethingIsPredictableTrue(
-            [Values(False, True, A)] string something)
+            [Values(false, true, null)] bool? another)
         {
-            var trueOrSomething = _math.Or(
-                _math.True<int>(),
-                _conditions.ForInt[something]);
-
+            var trueOrSomething = _math.Or(_math.True<T>(), Some(another));
             var predictableTrue = _math.IsPredictableTrue(trueOrSomething);
 
-            Assert.That(predictableTrue, Is.True);
-        }
-
-        [Test]
-        public void BaseTrueOrSomethingDerivedIsPredictableTrue(
-            [Values(False, True, A)] string something)
-        {
-            var trueOrSomething = _math.Or(
-                _conditions.ForBase[True],
-                _conditions.ForDerived[something]);
-
-            var predictableTrue = _math.IsPredictableTrue(trueOrSomething);
-
-            Assert.That(predictableTrue, Is.True);
+            Assert.That(predictableTrue);
         }
 
         [Test]
         public void TrueOrSomethingIsNotPredictableFalse(
-            [Values(False, True, A)] string something)
+            [Values(false, true, null)] bool? another)
         {
-            var trueOrSomething = _math.Or(
-                _math.True<int>(),
-                _conditions.ForInt[something]);
-
+            var trueOrSomething = _math.Or(_math.True<T>(), Some(another));
             var predictableFalse = _math.IsPredictableFalse(trueOrSomething);
-
-            Assert.That(predictableFalse, Is.False);
-        }
-
-        [Test]
-        public void BaseTrueOrSomethingDerivedIsNotPredictableFalse(
-            [Values(False, True, A)] string something)
-        {
-            var trueOrSomething = _math.Or(
-                _conditions.ForBase[True],
-                _conditions.ForDerived[something]);
-
-            var predictableFalse = _math.IsPredictableFalse(trueOrSomething);
-
-            Assert.That(predictableFalse, Is.False);
-        }
-
-        [Test]
-        public void TrueOrSomethingCheckIsTrue(
-            [Values(False, True, A)] string something)
-        {
-            var trueOrSomething = _math.Or(
-                _math.True<int>(),
-                _conditions.ForInt[something]);
-
-            var result = trueOrSomething.Check(325);
-
-            Assert.That(result, Is.True);
-        }
-
-        [Test]
-        public void BaseTrueOrSomethingDerivedCheckIsTrue(
-            [Values(False, True, A)] string something)
-        {
-            var trueOrSomething = _math.Or(
-                _conditions.ForBase[True],
-                _conditions.ForDerived[something]);
-
-            var result = trueOrSomething.Check(new Derived());
-
-            Assert.That(result, Is.True);
-        }
-
-        [Test]
-        public void SomethingOrTrueIsPredictableTrue(
-            [Values(False, True, A)] string something)
-        {
-            var somethingOrTrue = _math.Or(
-                _conditions.ForInt[something],
-                _math.True<int>());
-
-            var predictableTrue = _math.IsPredictableTrue(somethingOrTrue);
-
-            Assert.That(predictableTrue, Is.True);
-        }
-
-        [Test]
-        public void SomethingDerivedOrBaseTrueIsPredictableTrue(
-            [Values(False, True, A)] string something)
-        {
-            var somethingOrTrue = _math.Or(
-                _conditions.ForDerived[something],
-                _conditions.ForBase[True]);
-
-            var predictableTrue = _math.IsPredictableTrue(somethingOrTrue);
-
-            Assert.That(predictableTrue, Is.True);
-        }
-
-        [Test]
-        public void SomethingOrTrueIsNotPredictableFalse(
-            [Values(False, True, A)] string something)
-        {
-            var somethingOrTrue = _math.Or(
-                _conditions.ForInt[something],
-                _math.True<int>());
-
-            var predictableFalse = _math.IsPredictableFalse(somethingOrTrue);
-
-            Assert.That(predictableFalse, Is.False);
-        }
-
-        [Test]
-        public void SomethingDerivedOrBaseTrueIsNotPredictableFalse(
-            [Values(False, True, A)] string something)
-        {
-            var somethingOrTrue = _math.Or(
-                _conditions.ForDerived[something],
-                _conditions.ForBase[True]);
-
-            var predictableFalse = _math.IsPredictableFalse(somethingOrTrue);
-
-            Assert.That(predictableFalse, Is.False);
-        }
-
-        [Test]
-        public void SomethingOrTrueCheckIsTrue(
-            [Values(False, True, A)] string something)
-        {
-            var somethingOrTrue = _math.Or(
-                _conditions.ForInt[something],
-                _math.True<int>());
-
-            var result = somethingOrTrue.Check(Arg);
-
-            Assert.That(result, Is.True);
-        }
-
-        [Test]
-        public void SomethingDerivedOrBaseTrueCheckIsTrue(
-            [Values(False, True, A)] string something)
-        {
-            var somethingOrTrue = _math.Or(
-                _conditions.ForDerived[something],
-                _conditions.ForBase[True]);
-
-            var result = somethingOrTrue.Check(new Derived());
-
-            Assert.That(result, Is.True);
-        }
-
-        [Test]
-        public void SomethingAndTrueIsSomething()
-        {
-            var somethingAndTrue = _math.And(
-                _conditions.ForInt[A], 
-                _conditions.ForInt[True]);
-            
-            Assert.That(somethingAndTrue, 
-                Is.SameAs(_conditions.ForInt[A]));
-        }
-
-        [Test]
-        public void SomethingDerivedAndBaseTrueIsSomethingDerived()
-        {
-            var somethingAndTrue = _math.And(
-                _conditions.ForDerived[A],
-                _conditions.ForBase[True]);
-
-            Assert.That(somethingAndTrue,
-                Is.SameAs(_conditions.ForDerived[A]));
-        }
-
-        [Test]
-        public void TrueAndSomethingIsSomething()
-        {
-            var trueAndSomething = _math.And(
-                _conditions.ForInt[True],
-                _conditions.ForInt[A]);
-
-            Assert.That(trueAndSomething,
-                Is.SameAs(_conditions.ForInt[A]));
-        }
-
-        [Test]
-        public void BaseTrueAndSomethingDerivedIsSomethingDerived()
-        {
-            var trueAndSomething = _math.And(
-                _conditions.ForBase[True],
-                _conditions.ForDerived[A]);
-
-            Assert.That(trueAndSomething,
-                Is.SameAs(_conditions.ForDerived[A]));
-        }
-
-        [Test]
-        public void NotTrueIsPredictableFalse()
-        {
-            var notTrue = _math.Not(_conditions.ForInt[True]);
-            var predictableFalse = _math.IsPredictableFalse(notTrue);
-
-            Assert.That(predictableFalse);
-        }
-
-        [Test]
-        public void NotOfBaseTrueIsPredictableFalseByDerivedCheck()
-        {
-            var notTrue = _math.Not(_conditions.ForBase[True]);
-            var predictableFalse = _math.IsPredictableFalse<Derived>(notTrue);
-
-            Assert.That(predictableFalse);
-        }
-
-        [Test]
-        public void DerivedNotOfBaseTrueIsPredictableFalse()
-        {
-            var notTrue = _math.Not<Derived>(_conditions.ForBase[True]);
-            var predictableFalse = _math.IsPredictableFalse(notTrue);
-
-            Assert.That(predictableFalse);
-        }
-
-        [Test]
-        public void NotTrueIsNotPredictableTrue()
-        {
-            var notTrue = _math.Not(_conditions.ForInt[True]);
-            var predictableTrue = _math.IsPredictableTrue(notTrue);
-
-            Assert.That(predictableTrue,
-                Is.False);
-        }
-
-        [Test]
-        public void NotOfBaseTrueIsNotPredictableTrueByDerivedCheck()
-        {
-            var notTrue = _math.Not(_conditions.ForBase[True]);
-            var predictableTrue = _math.IsPredictableTrue<Derived>(notTrue);
-
-            Assert.That(predictableTrue,
-                Is.False);
-        }
-
-        [Test]
-        public void DerivedNotOfBaseTrueIsNotPredictableTrue()
-        {
-            var notTrue = _math.Not<Derived>(_conditions.ForBase[True]);
-            var predictableTrue = _math.IsPredictableTrue(notTrue);
-
-            Assert.That(predictableTrue, 
-                Is.False);
-        }
-
-        [Test]
-        public void NotFalseIsPredictableTrue()
-        {
-            var notFalse = _math.Not(_conditions.ForInt[False]);
-            var predictableTrue = _math.IsPredictableTrue(notFalse);
-
-            Assert.That(predictableTrue);
-        }
-
-        [Test]
-        public void DerivedNotOfBaseFalseIsPredictableTrue()
-        {
-            var notFalse = _math.Not<Derived>(_conditions.ForBase[False]);
-            var predictableTrue = _math.IsPredictableTrue(notFalse);
-
-            Assert.That(predictableTrue);
-        }
-
-        [Test]
-        public void NotOfBaseFalseIsPredictableTrueByDerivedCheck()
-        {
-            var notFalse = _math.Not(_conditions.ForBase[False]);
-            var predictableTrue = _math.IsPredictableTrue<Derived>(notFalse);
-
-            Assert.That(predictableTrue);
-        }
-
-        [Test]
-        public void NotFalseIsNotPredictableFalse()
-        {
-            var notFalse = _math.Not(_conditions.ForInt[False]);
-            var predictableFalse = _math.IsPredictableFalse(notFalse);
-
-            Assert.That(predictableFalse, 
-                Is.False);
-        }
-
-        [Test]
-        public void NotOfBaseFalseIsNotPredictableFalseByDerivedCheck()
-        {
-            var notFalse = _math.Not(_conditions.ForBase[False]);
-            var predictableFalse = _math.IsPredictableFalse<Derived>(notFalse);
 
             Assert.That(predictableFalse,
                 Is.False);
         }
 
         [Test]
-        public void DerivedNotOfBaseFalseIsNotPredictableFalse()
+        public void TrueOrSomethingCheckIsTrue(
+            [Values(false, true, null)] bool? another)
         {
-            var notFalse = _math.Not<Derived>(_conditions.ForBase[False]);
-            var predictableFalse = _math.IsPredictableFalse(notFalse);
+            var trueOrSomething = _math.Or(_math.True<T>(), Some(another));
 
-            Assert.That(predictableFalse, Is.False);
+            Assert.That(trueOrSomething.Check(_token));
+        }
+
+        [Test]
+        public void TrueOrSomethingCheckDoesNotCallCheckFromSomething()
+        {
+            var trueOrSomething = _math.Or(_math.True<T>(), _dummyOf.Condition(X));
+            trueOrSomething.Check(_token);
+
+            Assert.That(_dummyOf.Condition(X)
+                  .WasNeverChecked());
+        }
+
+        [Test]
+        public void SomethingOrTrueIsPredictableTrue(
+            [Values(false, true, null)] bool? another)
+        {
+            var somethingOrTrue = _math.Or(Some(another), _math.True<T>());
+            var predictableTrue = _math.IsPredictableTrue(somethingOrTrue);
+
+            Assert.That(predictableTrue);
+        }
+
+        [Test]
+        public void SomethingOrTrueIsNotPredictableFalse(
+            [Values(false, true, null)] bool? another)
+        {
+            var somethingOrTrue = _math.Or(Some(another), _math.True<T>());
+            var predictableFalse = _math.IsPredictableFalse(somethingOrTrue);
+
+            Assert.That(predictableFalse,
+                Is.False);
+        }
+
+        [Test]
+        public void SomethingOrTrueCheckIsTrue(
+            [Values(false, true, null)] bool? another)
+        {
+            var somethingOrTrue = _math.Or(Some(another), _math.True<T>());
+
+            Assert.That(somethingOrTrue.Check(_token));
+        }
+
+        [Test]
+        public void SomethingOrTrueCheckDoesNotCallCheckFromSomething()
+        {
+            var somethingOrTrue = _math.Or(_dummyOf.Condition(X), _math.True<T>());
+            somethingOrTrue.Check(_token);
+
+            Assert.That(_dummyOf.Condition(X)
+                  .WasNeverChecked());
+        }
+
+        [Test]
+        public void SomethingAndTrueIsSomething()
+        {
+            var somethingAndTrue = _math.And(_dummyOf.Condition(X), _math.True<T>());
+            
+            Assert.That(somethingAndTrue, 
+                Is.SameAs(_dummyOf.Condition(X)));
+        }
+
+        [Test]
+        public void TrueAndSomethingIsSomething()
+        {
+            var trueAndSomething = _math.And(_math.True<T>(), _dummyOf.Condition(X));
+
+            Assert.That(trueAndSomething,
+                Is.SameAs(_dummyOf.Condition(X)));
+        }
+
+        [Test]
+        public void TrueAndSomethingCheckIsSomethingCheckResult(
+            [Values(false, true)] bool anotherCheckResult)
+        {
+            _dummyOf.Condition(X).Returns(anotherCheckResult);
+            var trueAndSomething = _math.And(_math.True<T>(), _dummyOf.Condition(X));
+
+            Assert.That(trueAndSomething.Check(_token),
+                Is.EqualTo(anotherCheckResult));
+        }
+
+        [Test]
+        public void TrueAndSomethingCheckCallsCheckFromSomething()
+        {
+            _dummyOf.Condition(X).Returns(true);
+
+            var trueAndSomething = _math.And(_math.True<T>(), _dummyOf.Condition(X));
+            trueAndSomething.Check(_token);
+
+            Assert.That(_dummyOf.Condition(X)
+                  .WasCheckedOnce());
+        }
+
+        [Test]
+        public void SomethingAndTrueCheckIsSomethingCheckResult(
+            [Values(false, true)] bool anotherCheckResult)
+        {
+            _dummyOf.Condition(X).Returns(anotherCheckResult);
+            var somethingAndTrue = _math.And(_dummyOf.Condition(X), _math.True<T>());
+
+            Assert.That(somethingAndTrue.Check(_token),
+                Is.EqualTo(anotherCheckResult));
+        }
+
+        [Test]
+        public void SomethingAndTrueCheckCallsCheckFromSomething()
+        {
+            _dummyOf.Condition(X).Returns(true);
+
+            var somethingAndTrue = _math.And(_dummyOf.Condition(X), _math.True<T>());
+            somethingAndTrue.Check(_token);
+
+            Assert.That(_dummyOf.Condition(X)
+                  .WasCheckedOnce());
+        }
+
+        [Test]
+        public void NotTrueIsPredictableFalse()
+        {
+            var notTrue = _math.Not(_math.True<T>());
+
+            Assert.That(_math.IsPredictableFalse(notTrue));
+        }
+
+        [Test]
+        public void NotTrueIsNotPredictableTrue()
+        {
+            var notTrue = _math.Not(_math.True<T>());
+            
+            Assert.That(_math.IsPredictableTrue(notTrue),
+                Is.False);
+        }
+
+        [Test]
+        public void NotFalseIsPredictableTrue()
+        {
+            var notFalse = _math.Not(_math.False<T>());
+
+            Assert.That(_math.IsPredictableTrue(notFalse));
+        }
+
+        [Test]
+        public void NotFalseIsNotPredictableFalse()
+        {
+            var notFalse = _math.Not(_math.False<T>());
+            
+            Assert.That(_math.IsPredictableFalse(notFalse), 
+                Is.False);
         }
 
         [Test]
         public void NotTrueCheckIsFalse()
         {
-            var notTrue = _math.Not(_conditions.ForInt[True]);
-            var result = notTrue.Check(Arg);
+            var notTrue = _math.Not(_math.True<T>());
 
-            Assert.That(result, Is.False);
+            Assert.That(notTrue.Check(_token),
+                Is.False);
         }
 
         [Test]
         public void NotFalseCheckIsTrue()
         {
-            var notFalse = _math.Not(_conditions.ForInt[False]);
-            var result = notFalse.Check(Arg);
-
-            Assert.That(result, Is.True);
+            var notFalse = _math.Not(_math.False<T>());
+            
+            Assert.That(notFalse.Check(_token));
         }
 
         [Test]
         public void MakeConditionCallsEncapsulatedFunc()
         {
             bool called = false;
-            var condition = _math.MakeCondition<int>(_ => called = true);
+            var condition = _math.MakeCondition<T>(_ => called = true);
 
-            condition.Check(Arg);
-
-            Assert.That(called, Is.True);
+            Assert.That(condition.Check(_token));
+            Assert.That(called);
         }
 
         [Test]
         public void MakeConditionReturnsEncapsulatedFuncResult(
             [Values(false, true)] bool funcResult)
         {
-            var condition = _math.MakeCondition<int>(_ => funcResult);
-            var result = condition.Check(Arg);
+            var condition = _math.MakeCondition<T>(_ => funcResult);
 
-            Assert.That(result, Is.EqualTo(funcResult));
+            Assert.That(condition.Check(_token), 
+                Is.EqualTo(funcResult));
         }
 
         [TestCase(false, true)]
         [TestCase(true, false)]
         public void NotConditionCheckTest(
-            bool aResult,
-            bool notAExpectedResult)
+            bool checkResult,
+            bool expectedCheckResultOfNot)
         {
-            _conditionMocks[A]
-                .Setup(o => o.Check(Arg))
-                .Returns(aResult);
+            _dummyOf.Condition(X).Returns(checkResult);
 
-            var notA = _math.Not(_conditionMocks[A].Object);
-            var notAResult = notA.Check(Arg);
-
-            Assert.That(notAResult,
-                Is.EqualTo(notAExpectedResult));
+            Assert.That(_math.Not(_dummyOf.Condition(X)).Check(_token),
+                Is.EqualTo(expectedCheckResultOfNot));
         }
 
         [TestCase(false, false, false)]
@@ -760,26 +508,19 @@
         [TestCase(true, false, false)]
         [TestCase(true, true, true)]
         public void AndConditionCheckTest(
-            bool aResult,
-            bool bResult,
-            bool abExpectedResult)
+            bool xResult,
+            bool yResult,
+            bool xyExpectedResult)
         {
-            _conditionMocks[A]
-                .Setup(o => o.Check(Arg))
-                .Returns(aResult);
+            _dummyOf.Condition(X).Returns(xResult);
+            _dummyOf.Condition(Y).Returns(yResult);
 
-            _conditionMocks[B]
-                .Setup(o => o.Check(Arg))
-                .Returns(bResult);
+            var xAndY = _math.And(
+                _dummyOf.Condition(X),
+                _dummyOf.Condition(Y));
 
-            var ab = _math.And(
-                _conditionMocks[A].Object,
-                _conditionMocks[B].Object);
-
-            var abResult = ab.Check(Arg);
-
-            Assert.That(abResult, 
-                Is.EqualTo(abExpectedResult));
+            Assert.That(xAndY.Check(_token),
+                Is.EqualTo(xyExpectedResult));
         }
 
         [TestCase(false, false, false)]
@@ -787,26 +528,27 @@
         [TestCase(true, false, true)]
         [TestCase(true, true, true)]
         public void OrConditionCheckTest(
-            bool aResult,
-            bool bResult,
-            bool abExpectedResult)
+            bool xResult,
+            bool yResult,
+            bool xyExpectedResult)
         {
-            _conditionMocks[A]
-                .Setup(o => o.Check(Arg))
-                .Returns(aResult);
+            _dummyOf.Condition(X).Returns(xResult);
+            _dummyOf.Condition(Y).Returns(yResult);
 
-            _conditionMocks[B]
-                .Setup(o => o.Check(Arg))
-                .Returns(bResult);
+            var xOrY = _math.Or(
+                _dummyOf.Condition(X),
+                _dummyOf.Condition(Y));
 
-            var ab = _math.Or(
-                _conditionMocks[A].Object,
-                _conditionMocks[B].Object);
-
-            var abResult = ab.Check(Arg);
-
-            Assert.That(abResult,
-                Is.EqualTo(abExpectedResult));
+            Assert.That(xOrY.Check(_token),
+                Is.EqualTo(xyExpectedResult));
         }
+
+        ICondition<T> Some(bool? marker) =>
+            marker switch
+            {
+                null => _dummyOf.Condition(X),
+                false => _math.False<T>(),
+                true => _math.True<T>(),
+            };
     }
 }

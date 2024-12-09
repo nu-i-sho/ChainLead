@@ -1,4 +1,5 @@
-﻿using static ChainLead.Test.Dummy;
+﻿using ChainLead.Contracts;
+using static ChainLead.Test.Dummy;
 
 namespace ChainLead.Test
 {
@@ -185,5 +186,13 @@ namespace ChainLead.Test
             IEnumerable<bool> setup) =>
                 handlers.Zip(setup, (h, x) => h.VerifyExecution(x))
                         .Aggregate(true, (acc, x) => acc && x);
+
+        public static IExtendedHandler<T> AsExtended<T>(this IHandler<T> origin) => 
+            new Extended<T>(origin);
+
+        class Extended<T>(IHandler<T> origin) : IExtendedHandler<T>
+        {
+            IHandler<T> IExtendedHandler<T>.Origin => origin;
+        }
     }
 }

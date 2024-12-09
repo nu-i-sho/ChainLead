@@ -1,9 +1,8 @@
 ﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts;
-    
-    using static ChainLead.Test.Cases.Common;
-    using static ChainLead.Test.Cases.MultipleHandlersFixtureCases;
+    using ChainLead.Test.Utils;
+    using static ChainLead.Test.Cases.MultipleHandlers;
     using static ChainLead.Test.Dummy.Index.Common;
     
     
