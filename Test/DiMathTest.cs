@@ -4,89 +4,84 @@
     using ChainLead.Implementation;
     using ChainLead.Implementation.DI;
     using Microsoft.Extensions.DependencyInjection;
-    using Moq;
 
     [TestFixture]
     public class DiMathTest
     {
-        Mock<IServiceCollection> _serviceCollection;
-        ServiceDescriptor? _descriptor;
-
+        DummyServiceCollection _dummyOfServiceCollection;
+        
         [SetUp]
         public void Setup()
         {
-            _descriptor = null;
-
-            _serviceCollection = new Mock<IServiceCollection>();
-
-            _serviceCollection
-                .Setup(o => o.Add(It.IsAny<ServiceDescriptor>()))
-                .Callback((ServiceDescriptor descriptor) => _descriptor = descriptor);
+            _dummyOfServiceCollection = new();
         }
 
         [Test]
         public void AddConditionMathAddsNewTokenDescriptor()
         {
-            _serviceCollection.Object.AddConditionMath();
-            Assert.That(_descriptor, 
-                Is.Not.Null);
+            _dummyOfServiceCollection.AddConditionMath();
+            Assert.That(_dummyOfServiceCollection.Count, 
+                Is.EqualTo(1));
         }
 
         [Test]
         public void AddConditionMathAddsImplementationFor_IConditionMath()
         {
-            _serviceCollection.Object.AddConditionMath();
-            Assert.That(_descriptor!.ServiceType,
+            _dummyOfServiceCollection.AddConditionMath();
+            Assert.That(_dummyOfServiceCollection.Last().ServiceType,
                 Is.EqualTo(typeof(IConditionMath)));
         }
-
 
         [Test]
         public void AddConditionMathAdds_ConditionMath_AsImplementation()
         {
-            _serviceCollection.Object.AddConditionMath();
-            Assert.That(_descriptor!.ImplementationType,
+            _dummyOfServiceCollection.AddConditionMath();
+            Assert.That(_dummyOfServiceCollection.Last().ImplementationType,
                 Is.EqualTo(typeof(ConditionMath)));
         }
 
         [Test]
         public void AddConditionMathAddsItAsSingleton()
         {
-            _serviceCollection.Object.AddConditionMath();
-            Assert.That(_descriptor!.Lifetime,
+            _dummyOfServiceCollection.AddConditionMath();
+            Assert.That(_dummyOfServiceCollection.Last().Lifetime,
                 Is.EqualTo(ServiceLifetime.Singleton));
         }
 
         [Test]
         public void AddHandlerMathAddsNewTokenDescriptor()
         {
-            _serviceCollection.Object.AddHandlerMath();
-            Assert.That(_descriptor, 
-                Is.Not.Null);
+            _dummyOfServiceCollection.AddHandlerMath();
+            Assert.That(_dummyOfServiceCollection.Count(), 
+                Is.EqualTo(1));
         }
 
         [Test]
         public void AddHandlerMathAddsImplementationFor_IHandlerMath()
         {
-            _serviceCollection.Object.AddHandlerMath();
-            Assert.That(_descriptor!.ServiceType,
+            _dummyOfServiceCollection.AddHandlerMath();
+            Assert.That(_dummyOfServiceCollection.Last().ServiceType,
                 Is.EqualTo(typeof(IHandlerMath)));
         }
 
         [Test]
         public void AddHandlerMathAdds_HandlerMath_AsImplementation()
         {
-            _serviceCollection.Object.AddHandlerMath();
-            Assert.That(_descriptor!.ImplementationType,
+            _dummyOfServiceCollection.AddHandlerMath();
+            Assert.That(_dummyOfServiceCollection.Last().ImplementationType,
                 Is.EqualTo(typeof(HandlerMath)));
         }
 
         [Test]
         public void AddHandlerMathAddsItAsSingleton()
         {
-            _serviceCollection.Object.AddHandlerMath();
-            Assert.That(_descriptor!.Lifetime,
+            _dummyOfServiceCollection.AddHandlerMath();
+            Assert.That(_dummyOfServiceCollection.Last().Lifetime,
                 Is.EqualTo(ServiceLifetime.Singleton));
         }
+
+        public class DummyServiceCollection :
+            List<ServiceDescriptor>,
+            IServiceCollection;
     }
 }
