@@ -9,9 +9,9 @@
                 ICollection<Condition<T>, ConditionIndex> conditions)
             : IConditionMath
         {
-            readonly Dictionary<string, Func<ConditionIndex, ConditionIndex, ConditionIndex>> _setupForAnyAppend = new();
-            readonly Dictionary<(string, ConditionIndex, ConditionIndex), ConditionIndex> _setupForAppend = new();
-            readonly Dictionary<ConditionIndex, ConditionIndex> _setupForNot = new();
+            readonly Dictionary<string, Func<ConditionIndex, ConditionIndex, ConditionIndex>> _setupForAnyAppend = [];
+            readonly Dictionary<(string, ConditionIndex, ConditionIndex), ConditionIndex> _setupForAppend = [];
+            readonly Dictionary<ConditionIndex, ConditionIndex> _setupForNot = [];
             ConditionIndex? _setupForMakeCondition;
             ConditionIndex? _setupForTrue;
             ConditionIndex? _setupForFalse;

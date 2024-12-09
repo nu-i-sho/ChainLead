@@ -2,7 +2,6 @@
 {
     using ChainLead.Contracts;
     using ChainLead.Contracts.Syntax;
-    using ChainLead.Implementation;
     using ChainLead.Test.Types;
 
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
@@ -11,11 +10,18 @@
     {
         public static class MultipleHandlers
         {
-            public const string Direct = "Direct";
-            public const string Reverse = "Reverse";
+            public class IIndicesAttribute() : 
+                ValuesAttribute("AB", "ABC", "ABCD", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+
+            public class JIndicesAttribute() :
+                ValuesAttribute("012", "01234", "01234567890");
+
             public class TestFixtureAttribute(Type t, string mathName)
                 : NUnit.Framework.TestFixtureAttribute(t, GetMathFactory(mathName))
             {
+                public const string Direct = "Direct";
+                public const string Reverse = "Reverse";
+
                 static IMultipleHandlersMathFactory GetMathFactory(string name) =>
                     name switch
                     {

@@ -49,12 +49,12 @@
         }
 
         public ICondition<T> Not<T>(
-            ICondition<T> handler)
+            ICondition<T> condition)
         {
-            if (IsPredictableFalse(handler)) return True<T>();
-            if (IsPredictableTrue(handler)) return False<T>();
+            if (IsPredictableFalse(condition)) return True<T>();
+            if (IsPredictableTrue(condition)) return False<T>();
 
-            return new Not<T>(handler);
+            return new Not<T>(condition);
         }
     }
 
@@ -75,29 +75,29 @@
     file struct Condition<T>(
         Func<T, bool> check) : ICondition<T>
     {
-        public readonly bool Check(T x) => check(x);
+        public readonly bool Check(T state) => check(state);
     }
 
     file struct And<T>(
         ICondition<T> a,
         ICondition<T> b) : ICondition<T>
     {
-        public readonly bool Check(T x) =>
-            a.Check(x) && b.Check(x);
+        public readonly bool Check(T state) =>
+            a.Check(state) && b.Check(state);
     }
 
     file struct Or<T>(
         ICondition<T> a,
         ICondition<T> b) : ICondition<T>
     {
-        public readonly bool Check(T x) =>
-            a.Check(x) || b.Check(x);
+        public readonly bool Check(T state) =>
+            a.Check(state) || b.Check(state);
     }
 
     file struct Not<T>(
         ICondition<T> condition) : ICondition<T>
     {
-        public readonly bool Check(T x) =>
-            !condition.Check(x);
+        public readonly bool Check(T state) =>
+            !condition.Check(state);
     }
 }

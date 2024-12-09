@@ -1,0 +1,45 @@
+﻿[HandlerMathTest.cs]
+
+# CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+# Initializing NUnit test fixture class members in the setup method is common practice.
+dotnet_diagnostic.CS8618.severity = none
+
+[MultipleHandlersTest.cs]
+
+# CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+# Initializing NUnit test fixture class members in the setup method is common practice.
+dotnet_diagnostic.CS8618.severity = none
+
+[SingleHandlerTest.cs]
+
+# CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+# Initializing NUnit test fixture class members in the setup method is common practice.
+dotnet_diagnostic.CS8618.severity = none
+
+[Cases/*]
+# S101: Types should be named in PascalCase
+# [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_] looks better than [I][II][III][IV][V][VI][VII][VIII]
+dotnet_diagnostic.S101.severity = none
+# IDE1006: Naming Styles
+# The same story with [_I_].
+dotnet_diagnostic.IDE1006.severity = none
+
+[Types/*]
+# IDE0251: Make member 'readonly'
+# These types were created as testing dummies. 
+dotnet_diagnostic.IDE0251.severity = none
+
+[*.cs]
+
+# S6608: Prefer indexing instead of "Enumerable" methods on types implementing "IList"
+# Common, "Any()" is better readable. Readability is more prioritized than performance in unit tests. 
+dotnet_diagnostic.S6608.severity = none
+
+# S3993: Custom attributes should be marked with "System.AttributeUsageAttribute"
+# It is derived from TestFixtureConfigure which is well-known in the unit testing context. I don't need additional garbage on top of many attributes.
+dotnet_diagnostic.S3993.severity = none
+
+# S2094: Classes should not be empty
+# It is a totally stupid rule. I need only nominal and object without any implementation as an access token or marker. It is a cool code trick.
+dotnet_diagnostic.S2094.severity = none
+

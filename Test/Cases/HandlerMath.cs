@@ -16,7 +16,7 @@
                     typeof(Appends),
                     nameof(Appends.All));
 
-            public class Appends
+            public static class Appends
             {
                 public static readonly string[] All =
                 [
@@ -105,25 +105,25 @@
                     ITestingHandlerMath
                 {
                     public IHandler<T> FirstCoverSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.FirstCoverSecond(a, b);
+                        Math.FirstCoverSecond(a, b);
 
                     public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.FirstThenSecond(a, b);
+                        Math.FirstThenSecond(a, b);
 
                     public IHandler<T> FirstWrapSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.FirstWrapSecond(a, b);
+                        Math.FirstWrapSecond(a, b);
 
                     public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.InjectFirstIntoSecond(a, b);
+                        Math.InjectFirstIntoSecond(a, b);
 
                     public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.JoinFirstWithSecond(a, b);
+                        Math.JoinFirstWithSecond(a, b);
 
                     public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.MergeFirstWithSecond(a, b);
+                        Math.MergeFirstWithSecond(a, b);
 
                     public IHandler<T> PackFirstInSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.PackFirstInSecond(a, b);
+                        Math.PackFirstInSecond(a, b);
                 }
             }
 

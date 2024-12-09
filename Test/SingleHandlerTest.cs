@@ -1,8 +1,6 @@
 ﻿namespace ChainLead.Test
 {
-    using ChainLead.Contracts;
     using ChainLead.Test.Utils;
-
     using static ChainLead.Test.Cases.SingleHandler;
     using static ChainLead.Test.Dummy.ConditionIndex.Common;
     using static ChainLead.Test.Dummy.HandlerIndex.Common;

@@ -492,7 +492,7 @@ namespace ChainLead.Test
 
         static bool NotNull(object? x) => x != null;
 
-        static T Denullify<T>(T? x) where T : class => x!;
+        static U Denullify<U>(U? x) where U : class => x!;
 
         class AppendOf(Func<IHandler<T>, IHandler<T>, IHandler<T>> f)
         {

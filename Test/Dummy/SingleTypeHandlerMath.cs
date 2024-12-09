@@ -8,9 +8,9 @@
                 ICollection<Handler<T>, HandlerIndex> handlers) 
             : IHandlerMath
         {
-            readonly Dictionary<(string, HandlerIndex, HandlerIndex), HandlerIndex> _setupForAppends = new();
-            readonly Dictionary<(HandlerIndex, ConditionIndex), HandlerIndex> _setuprForConditional = new();
-            readonly Dictionary<HandlerIndex, HandlerIndex> _setupForAtomize = new();
+            readonly Dictionary<(string, HandlerIndex, HandlerIndex), HandlerIndex> _setupForAppends = [];
+            readonly Dictionary<(HandlerIndex, ConditionIndex), HandlerIndex> _setuprForConditional = [];
+            readonly Dictionary<HandlerIndex, HandlerIndex> _setupForAtomize = [];
             HandlerIndex? _setupForMakeHandler;
             HandlerIndex? _setupForZero;
 

@@ -2,18 +2,16 @@
 {
     using ChainLead.Contracts;
     using ChainLead.Test.Utils;
+
     using static ChainLead.Test.Cases.MultipleHandlers;
     using static ChainLead.Test.Dummy.Index.Common;
-    
-    
+
+
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
     public class MultipleHandlersTest<T>(
         IMultipleHandlersMathFactory mathFactory)
     {
-        static readonly string[] Ids = ["AB", "ABC", "ABCD", "ABCDEFGHIJKLMNOPQRSTUVWXYZ"];
-        static readonly string[] Jds = ["012", "01234", "01234567890"];
-
         Dummy.Container<T> _dummyOf;
         IMultipleHandlersMath _math;
         List<Dummy.Index> _callsLog;
@@ -30,126 +28,126 @@
 
         [Test]
         public void PackAllConditionsTrueTest(
-            [ValueSource(nameof(Ids))] string ids,
-            [ValueSource(nameof(Jds))] string jds)
+            [IIndices] string i_s,
+            [JIndices] string j_s)
         {
-            var chain = SetupChain(_math.PackChain, ids, jds);
+            var chain = SetupChain(_math.PackChain, i_s, j_s);
             chain.Execute(_token);
 
             var expectedCallsLog = Enumerable.Concat(
-                ids.Reverse().Select(i => Index(i, jds.Last())),
-                ids.SelectMany(i => jds.Reverse().Skip(1)
+                i_s.Reverse().Select(i => Index(i, j_s.Last())),
+                i_s.SelectMany(i => j_s.Reverse().Skip(1)
                        .Select(j => Index(i, j))
                        .Concat([Index(i)])));
 
-            Assert.That(_callsLog, 
+            Assert.That(_callsLog,
                 Is.EqualTo(expectedCallsLog));
         }
 
         [Test]
         public void JoinAllConditionsTrueTest(
-            [ValueSource(nameof(Ids))] string ids,
-            [ValueSource(nameof(Jds))] string jds)
+            [IIndices] string i_s, 
+            [JIndices] string j_s)
         {
             SetupConditionMathAnd();
 
-            var chain = SetupChain(_math.JoinChain, ids, jds);
+            var chain = SetupChain(_math.JoinChain, i_s, j_s);
             chain.Execute(_token);
 
             var expectedCallsLog = Enumerable.Concat(
-                ids.Select(i => Index(i, jds.Last())),
-                ids.SelectMany(i => jds.Reverse().Skip(1)
+                i_s.Select(i => Index(i, j_s.Last())),
+                i_s.SelectMany(i => j_s.Reverse().Skip(1)
                        .Select(j => Index(i, j))
                        .Concat([Index(i)])));
 
-            Assert.That(_callsLog, 
+            Assert.That(_callsLog,
                 Is.EqualTo(expectedCallsLog));
         }
 
         [Test]
         public void InjectAllConditionsTrueTest(
-            [ValueSource(nameof(Ids))] string ids,
-            [ValueSource(nameof(Jds))] string jds)
+            [IIndices] string i_s,
+            [JIndices] string j_s)
         {
-            var chain = SetupChain(_math.InjectChain, ids, jds);
+            var chain = SetupChain(_math.InjectChain, i_s, j_s);
             chain.Execute(_token);
 
             var expectedCallsLog = Enumerable.Concat(
-                ids.Reverse()
-                    .SelectMany(i => jds.Reverse()
-                        .Select(j => Index(i, j))),
-                ids.Select(Index));
+                i_s.Reverse()
+                   .SelectMany(i => j_s.Reverse()
+                       .Select(j => Index(i, j))),
+                i_s.Select(Index));
 
-            Assert.That(_callsLog, 
+            Assert.That(_callsLog,
                 Is.EqualTo(expectedCallsLog));
         }
 
         [Test]
         public void CoverAllConditionsTrueTest(
-            [ValueSource(nameof(Ids))] string ids,
-            [ValueSource(nameof(Jds))] string jds) =>
-                CoverWrapOrThenAllConditionsTrueTest(_math.CoverChain, ids, jds);
+            [IIndices] string i_s,
+            [JIndices] string j_s) =>
+                CoverWrapOrThenAllConditionsTrueTest(_math.CoverChain, i_s, j_s);
 
         [Test]
         public void WrapAllConditionsTrueTest(
-            [ValueSource(nameof(Ids))] string ids,
-            [ValueSource(nameof(Jds))] string jds) =>
-                CoverWrapOrThenAllConditionsTrueTest(_math.WrapChain, ids, jds);
+            [IIndices] string i_s,
+            [JIndices] string j_s) =>
+                CoverWrapOrThenAllConditionsTrueTest(_math.WrapChain, i_s, j_s);
 
         [Test]
         public void ThenAllConditionsTrueTest(
-            [ValueSource(nameof(Ids))] string ids,
-            [ValueSource(nameof(Jds))] string jds) =>
-                CoverWrapOrThenAllConditionsTrueTest(_math.ThenChain, ids, jds);
+            [IIndices] string i_s,
+            [JIndices] string j_s) =>
+                CoverWrapOrThenAllConditionsTrueTest(_math.ThenChain, i_s, j_s);
 
         void CoverWrapOrThenAllConditionsTrueTest(
             Func<IEnumerable<IHandler<T>>, IHandler<T>> append,
-            string ids,
-            string jds)
+            string i_s,
+            string j_s)
         {
-            var chain = SetupChain(append, ids, jds);
+            var chain = SetupChain(append, i_s, j_s);
 
             chain.Execute(_token);
 
             var expectedCallsLog =
-                ids.SelectMany(i => 
-                    jds.Reverse().Select(j => Index(i, j))
+                i_s.SelectMany(i => 
+                    j_s.Reverse().Select(j => Index(i, j))
                        .Concat([Index(i)]));
 
-            Assert.That(_callsLog, 
+            Assert.That(_callsLog,
                 Is.EqualTo(expectedCallsLog));
         }
 
         [Test]
         public void MergeAllConditionsTrueTest(
-            [ValueSource(nameof(Ids))] string ids,
-            [ValueSource(nameof(Jds))] string jds)
+            [IIndices] string i_s,
+            [JIndices] string j_s)
         {
             SetupConditionMathAnd();
 
-            var chain = SetupChain(_math.MergeChain, ids, jds);
+            var chain = SetupChain(_math.MergeChain, i_s, j_s);
             chain.Execute(_token);
 
             var expectedCallsLog = Enumerable.Concat(
-                ids.SelectMany(i => jds.Reverse()
+                i_s.SelectMany(i => j_s.Reverse()
                        .Select(j => Index(i, j))),
-                ids.Select(Index));
+                i_s.Select(Index));
 
-            Assert.That(_callsLog, 
+            Assert.That(_callsLog,
                 Is.EqualTo(expectedCallsLog));
         }
 
         IHandler<T> SetupChain(
             Func<IEnumerable<IHandler<T>>, IHandler<T>> makeChain,
-            string ids,
-            string jds)
+            string i_s,
+            string j_s)
         {
-            List<IHandler<T>> handlers = new();
+            List<IHandler<T>> handlers = [];
 
-            foreach(var i in ids) 
+            foreach(var i in i_s) 
             {
                 var handlerIndex = HandlerIndex(i);
-                var conditionIndices = jds.Select(j => ConditionIndex(i, j));
+                var conditionIndices = j_s.Select(j => ConditionIndex(i, j));
 
                 _dummyOf.Handlers.Add(handlerIndex);
                 _dummyOf.Conditions.AddRange(conditionIndices);

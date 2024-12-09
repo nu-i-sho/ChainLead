@@ -2,11 +2,9 @@
 {
     public static partial class Dummy
     {
-        public class HandlerIndex : Index
+        public class HandlerIndex(string value) : Index(value)
         {
             public override char ViewBorder => '|';
-
-            public HandlerIndex(string value) : base(value) { }
 
             public static new HandlerIndex Make(string value) => new(value);
 
@@ -15,7 +13,7 @@
             public static HandlerIndex operator +(HandlerIndex left, HandlerIndex right) =>
                 new(left.Value + right.Value);
 
-            public static class Common
+            public static new class Common
             {
                 public static readonly HandlerIndex A = new("A");
                 public static readonly HandlerIndex B = new("B");

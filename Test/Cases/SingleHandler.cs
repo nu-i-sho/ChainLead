@@ -71,22 +71,24 @@
 
                 public class Product(IHandlerMath math) : ISingleHandlerMath
                 {
+                    protected IHandlerMath Math => math;
+
                     public IHandler<T> MakeHandler<T>(Action<T> action) =>
-                        math.MakeHandler(action);
+                        Math.MakeHandler(action);
 
                     public IHandler<T> Zero<T>() =>
-                        math.Zero<T>();
+                        Math.Zero<T>();
 
                     public bool IsZero<T>(IHandler<T> handler) =>
-                        math.IsZero(handler);
+                        Math.IsZero(handler);
 
                     public IHandler<T> Atomize<T>(IHandler<T> handler) =>
-                        math.Atomize(handler);
+                        Math.Atomize(handler);
 
                     public IHandler<T> Conditional<T>(
                         IHandler<T> handler,
                         ICondition<T> condition) =>
-                            math.Conditional(handler, condition);
+                            Math.Conditional(handler, condition);
                 }
 
                 public override string ToString() => Original;

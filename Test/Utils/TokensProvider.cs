@@ -16,7 +16,7 @@
                 { typeof(ReadonlyRecordStruct), id => new ReadonlyRecordStruct(id) },
             };
 
-        static readonly Random _randon = new Random();
+        static readonly Random _randon = new();
 
         public static T Get<T>(int id) =>
             (T)_tokens[typeof(T)](id);

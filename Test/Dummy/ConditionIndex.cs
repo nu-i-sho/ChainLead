@@ -2,11 +2,9 @@
 {
     public static partial class Dummy
     {
-        public class ConditionIndex : Index
+        public class ConditionIndex(string value) : Index(value)
         {
             public override char ViewBorder => ':';
-
-            public ConditionIndex(string value) : base(value) { }
 
             public static new ConditionIndex Make(string value) => new(value);
 
@@ -18,7 +16,7 @@
             public static ConditionIndex operator |(ConditionIndex left, ConditionIndex right) =>
                 new($"{left.Value} | {right.Value}");
 
-            public static class Common
+            public static new class Common
             {
                 public static readonly ConditionIndex Q = new("Q");
                 public static readonly ConditionIndex R = new("R");

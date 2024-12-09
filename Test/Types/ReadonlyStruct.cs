@@ -2,7 +2,7 @@
 {
     public readonly struct ReadonlyStruct(int id)
     {
-        public int Id { get; } = id;
+        public int Id => id;
 
         public Member.Class MemberClass { get; } = new(id + 100);
         public Member.Struct MemberStruct { get; } = new(id + 200);

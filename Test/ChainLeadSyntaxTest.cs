@@ -1002,8 +1002,7 @@
         }
 
         [Test]
-        public void IsPredictableFalse_Test(
-            [Values(false, true)] bool expectedResult)
+        public void IsPredictableFalse_Test()
         {
             _dummyOf.ConditionMath.False_Returns(X);
 

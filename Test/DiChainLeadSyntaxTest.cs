@@ -21,7 +21,7 @@
         [SetUp]
         public void Setup()
         {
-            _dummyOfServiceCollection = new();
+            _dummyOfServiceCollection = [];
             _dummyOfServiceProvider = new();
             _dummyOf = new(_objectDoesNotMetter);
 
@@ -34,8 +34,8 @@
         {
             _dummyOfServiceCollection.ConfigureChainLeadSyntax();
 
-            Assert.That(_dummyOfServiceCollection.Count, 
-                Is.EqualTo(1));
+            Assert.That(_dummyOfServiceCollection, 
+               Has.Count.EqualTo(1));
         }
 
         [Test]
@@ -102,10 +102,10 @@
 
         public class DummyServiceProvider : IServiceProvider
         {
-            private readonly Dictionary<Type, object> _setup = new();
+            private readonly Dictionary<Type, object> _setup = [];
 
             public void AddSetup<TContract>(TContract impl) =>
-                _setup.Add(typeof(TContract), impl); 
+                _setup.Add(typeof(TContract), impl!); 
 
             public object? GetService(Type serviceType) =>
                 _setup.GetValueOrDefault(serviceType);
