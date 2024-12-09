@@ -57,7 +57,7 @@
                 public bool ElseNever => answer;
             }
 
-            public override string ToString() => index.View;
+            public override string ToString() => $"h[{index.View}]";
 
             public IHandler<T> Pure => this;
 

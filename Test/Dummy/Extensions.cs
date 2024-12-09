@@ -73,34 +73,25 @@ namespace ChainLead.Test
             IConditionCollection<T> otherDummies) =>
                 dummies[dummies.Indices.Except(otherDummies.Indices)];
 
-        public static bool EachWasCheckedWhen<T>(
-            this ICollection<Condition<T>, ConditionIndex> condition,
-            bool checkedCondition) =>
-                condition.Select(x => x.WasCheckedOnceWhen(checkedCondition).ElseNever)
-                         .Aggregate(true, (acc, x) => acc && x);
+        public static IHandlerCollection<T> ApplyMask<T>(
+            this IHandlerCollection<T> dummies,
+            IEnumerable<bool> mask) =>
+                dummies[dummies.Indices
+                    .Zip(mask, (item, set) => new { item, set })
+                    .Where(x => x.set)
+                    .Select(x => x.item)];
 
-        public static bool VerifyChecks<T>(
-            this ICollection<Condition<T>, ConditionIndex> condition,
-            IEnumerable<bool> setup) =>
-                condition.Zip(setup, (x, was) => x.WasCheckedOnceWhen(was).ElseNever)
-                         .Aggregate(true, (acc, x) => acc && x);
+        public static IConditionCollection<T> ApplyMask<T>(
+            this IConditionCollection<T> dummies,
+            IEnumerable<bool> mask) =>
+                dummies[dummies.Indices
+                    .Zip(mask, (item, set) => new { item, set })
+                    .Where(x => x.set)
+                    .Select(x => x.item)];
 
-        public static ElseNoOneContinuation EachWasExecutedOnceWhen<T>(
-            this ICollection<Handler<T>, HandlerIndex> handlers,
-            bool condition) => new(
-                handlers.Select(h => h.WasExecutedOnceWhen(condition).ElseNever)
-                        .Aggregate(true, (acc, x) => acc && x));
-
-        public class ElseNoOneContinuation(bool answer)
-        {
-            public bool ElseNoOne => answer;
-        }
-
-        public static bool VerifyExecution<T>(
-            this ICollection<Handler<T>, HandlerIndex> handlers,
-            IEnumerable<bool> setup) =>
-                handlers.Zip(setup, (h, x) => h.WasExecutedOnceWhen(x).ElseNever)
-                        .Aggregate(true, (acc, x) => acc && x);
+        public static IEnumerable<bool> Inverse(
+            this IEnumerable<bool> mask) =>
+                mask.Select(x => !x);
 
         public static IExtendedHandler<T> AsExtended<T>(this IHandler<T> origin) => 
             new Extended<T>(origin);

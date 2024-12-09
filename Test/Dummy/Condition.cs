@@ -44,7 +44,7 @@
                 public bool ElseNever => answer;
             }
 
-            public override string ToString() => index.View;
+            public override string ToString() => $"c<{index.View}>";
 
             public ICondition<T> Pure => this;
 

@@ -210,8 +210,12 @@ namespace ChainLead.Test
 
             Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
                 Is.EquivalentTo(_dummyOf.Conditions));
-            
-            Assert.That(_dummyOf.Handlers.VerifyExecution(setup));
+
+            Assert.That(_dummyOf.Handlers.ThatWereExecutedOnce,
+                Is.EquivalentTo(_dummyOf.Handlers.ApplyMask(setup)));
+
+            Assert.That(_dummyOf.Handlers.ThatWereNeverExecuted,
+                Is.EquivalentTo(_dummyOf.Handlers.ApplyMask(setup.Inverse())));
         }
 
         [Test]
@@ -241,9 +245,13 @@ namespace ChainLead.Test
             Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
                 Is.EquivalentTo(_dummyOf.Conditions[X, Y, X&Y].Except([expectedCondition])));
 
-            Assert.That(_dummyOf.Handlers[A, B]
-                  .EachWasExecutedOnceWhen(@case.FinalConditionCheckResult)
-                  .ElseNoOne);
+            Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
+                Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
+                  .EqualTo(@case.FinalConditionCheckResult));
+
+            Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
+                Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And.
+               Not.EqualTo(@case.FinalConditionCheckResult));
         }
 
         [Test]
@@ -260,7 +268,7 @@ namespace ChainLead.Test
             _dummyOf.Conditions.Generate(aTop, bTop, aTop&bTop, aBottom, bBottom);
 
             _dummyOf.Conditions[aBottom, bBottom, aTop&bTop].Return(@case.CheckSetup);
-            _dummyOf.ConditionMath.And(aTop, bTop).Returns(aTop&bTop);
+            _dummyOf.ConditionMath.And(aTop, bTop).Returns(aTop & bTop);
 
             IHandler<T> a = _dummyOf.Handler(A);
             a = _math.Conditional(a, _dummyOf.Condition(aBottom));
@@ -273,11 +281,19 @@ namespace ChainLead.Test
             var ab = _math.JoinFirstWithSecond(a, b);
             ab.Execute(_token);
 
-            Assert.That(_dummyOf.Conditions[aBottom, bBottom, aTop&bTop]
-                  .VerifyChecks(@case.CheckExpected));
+            var topsConjunctionAndBottoms = _dummyOf.Conditions[aBottom, bBottom, aTop & bTop];
 
-            Assert.That(_dummyOf.Handlers[A, B]
-                  .VerifyExecution(@case.ExecutionExpected));
+            Assert.That(topsConjunctionAndBottoms.ThatWereCheckedOnce,
+                Is.EquivalentTo(topsConjunctionAndBottoms.ApplyMask(@case.CheckExpected)));
+
+            Assert.That(topsConjunctionAndBottoms.ThatWereNeverChecked,
+                Is.EquivalentTo(topsConjunctionAndBottoms.ApplyMask(@case.CheckExpected.Inverse())));
+
+            Assert.That(_dummyOf.Handlers[A, B].ThatWereExecutedOnce,
+                Is.EquivalentTo(_dummyOf.Handlers[A, B].ApplyMask(@case.ExecutionExpected)));
+
+            Assert.That(_dummyOf.Handlers[A, B].ThatWereNeverExecuted,
+                Is.EquivalentTo(_dummyOf.Handlers[A, B].ApplyMask(@case.ExecutionExpected.Inverse())));
         }
 
         [Test]
@@ -362,9 +378,13 @@ namespace ChainLead.Test
             Assert.That(_dummyOf.Conditions[abConditions].ThatWereCheckedOnce, 
                 Is.EquivalentTo(_dummyOf.Conditions[abConditions]));
 
-            Assert.That(_dummyOf.Handlers[A, B]
-                  .EachWasExecutedOnceWhen(finalConditionResult)
-                  .ElseNoOne);
+            Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
+                Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
+                  .EqualTo(finalConditionResult));
+
+            Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
+                Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And.
+               Not.EqualTo(finalConditionResult));
         }
 
         [Test]
@@ -391,8 +411,13 @@ namespace ChainLead.Test
 
             Assert.That(_dummyOf.Condition(X).WasCheckedOnce);
 
-            Assert.That(_dummyOf.Handlers[A, B]
-                  .EachWasExecutedOnceWhen(checkResult).ElseNoOne);
+            Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
+                Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
+                  .EqualTo(checkResult));
+
+            Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
+                Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And.
+               Not.EqualTo(checkResult));
         }
 
         [Test]
