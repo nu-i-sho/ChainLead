@@ -10,38 +10,29 @@
     {
         public static class SingleHandler
         {
-            public const string Original = "Original";
-            public const string Syntax = "Syntax";
+            public class OriginalTestFixtureAttribute(Type t) 
+                : TestFixtureAttribute(t, new OriginalMathFactory());
 
-            public class TestFixtureAttribute(Type t, string mathName)
-                : NUnit.Framework.TestFixtureAttribute(t, GetMathFactory(mathName))
-            {
-                static ISingleHandlerMathFactory GetMathFactory(string name) =>
-                    name switch
-                    {
-                        Original => new OriginalMathFactory(),
-                        Syntax => new SyntaxMathFactory(),
-                        _ => throw new ArgumentOutOfRangeException(nameof(name))
-                    };
-            }
+            public class _I_Attribute() : OriginalTestFixtureAttribute(typeof(int));
+            public class _II_Attribute() : OriginalTestFixtureAttribute(typeof(string));
+            public class _III_Attribute() : OriginalTestFixtureAttribute(typeof(Class));
+            public class _IV_Attribute() : OriginalTestFixtureAttribute(typeof(Struct));
+            public class _V_Attribute() : OriginalTestFixtureAttribute(typeof(ReadonlyStruct));
+            public class _VI_Attribute() : OriginalTestFixtureAttribute(typeof(Record));
+            public class _VII_Attribute() : OriginalTestFixtureAttribute(typeof(RecordStruct));
+            public class _VIII_Attribute() : OriginalTestFixtureAttribute(typeof(ReadonlyRecordStruct));
 
-            public class _I_Attribute() : TestFixtureAttribute(typeof(int), Original);
-            public class _II_Attribute() : TestFixtureAttribute(typeof(string), Original);
-            public class _III_Attribute() : TestFixtureAttribute(typeof(Class), Original);
-            public class _IV_Attribute() : TestFixtureAttribute(typeof(Struct), Original);
-            public class _V_Attribute() : TestFixtureAttribute(typeof(ReadonlyStruct), Original);
-            public class _VI_Attribute() : TestFixtureAttribute(typeof(Record), Original);
-            public class _VII_Attribute() : TestFixtureAttribute(typeof(RecordStruct), Original);
-            public class _VIII_Attribute() : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Original);
+            public class SyntaxTestFixtureAttribute(Type t)
+                : TestFixtureAttribute(t, new SyntaxMathFactory());
 
-            public class _IX_Attribute() : TestFixtureAttribute(typeof(int), Syntax);
-            public class _X_Attribute() : TestFixtureAttribute(typeof(string), Syntax);
-            public class _XI_Attribute() : TestFixtureAttribute(typeof(Class), Syntax);
-            public class _XII_Attribute() : TestFixtureAttribute(typeof(Struct), Syntax);
-            public class _XIII_Attribute() : TestFixtureAttribute(typeof(ReadonlyStruct), Syntax);
-            public class _XIV_Attribute() : TestFixtureAttribute(typeof(Record), Syntax);
-            public class _XV_Attribute() : TestFixtureAttribute(typeof(RecordStruct), Syntax);
-            public class _XVI_Attribute() : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Syntax);
+            public class _IX_Attribute() : SyntaxTestFixtureAttribute(typeof(int));
+            public class _X_Attribute() : SyntaxTestFixtureAttribute(typeof(string));
+            public class _XI_Attribute() : SyntaxTestFixtureAttribute(typeof(Class));
+            public class _XII_Attribute() : SyntaxTestFixtureAttribute(typeof(Struct));
+            public class _XIII_Attribute() : SyntaxTestFixtureAttribute(typeof(ReadonlyStruct));
+            public class _XIV_Attribute() : SyntaxTestFixtureAttribute(typeof(Record));
+            public class _XV_Attribute() : SyntaxTestFixtureAttribute(typeof(RecordStruct));
+            public class _XVI_Attribute() : SyntaxTestFixtureAttribute(typeof(ReadonlyRecordStruct));
 
             public interface ISingleHandlerMathFactory
             {
@@ -69,6 +60,8 @@
                 public ISingleHandlerMath Create(IConditionMath conditionMath) =>
                     new Product(new Implementation.HandlerMath(conditionMath));
 
+                public override string ToString() => "Original";
+
                 public class Product(IHandlerMath math) : ISingleHandlerMath
                 {
                     protected IHandlerMath Math => math;
@@ -90,14 +83,14 @@
                         ICondition<T> condition) =>
                             Math.Conditional(handler, condition);
                 }
-
-                public override string ToString() => Original;
             }
 
             public class SyntaxMathFactory : ISingleHandlerMathFactory
             {
                 public ISingleHandlerMath Create(IConditionMath conditionMath) =>
                     new Product(conditionMath);
+
+                public override string ToString() => "Original";
 
                 public class Product : ISingleHandlerMath
                 {
@@ -109,7 +102,7 @@
                     }
 
                     public IHandler<T> MakeHandler<T>(Action<T> action) =>
-                        Contracts.Syntax.ChainLeadSyntax.MakeHandler(action);
+                        ChainLeadSyntax.MakeHandler(action);
 
                     public IHandler<T> Zero<T>() =>
                         Handler<T>.Zero;
@@ -125,8 +118,6 @@
                         ICondition<T> condition) =>
                             handler.When(condition);
                 }
-
-                public override string ToString() => Syntax;
             }
         }
     }

@@ -7,8 +7,8 @@
     
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
     using static ChainLead.Test.Cases.Common;
-    using static ChainLead.Test.Dummy.ConditionIndex.Common;
-    using static ChainLead.Test.Dummy.HandlerIndex.Common;
+    using static ChainLead.Test.Dummy.ConditionIndex;
+    using static ChainLead.Test.Dummy.HandlerIndex;
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     public class ChainLeadSyntaxTest<T>
@@ -22,7 +22,10 @@
         public void Setup()
         {
             _token = TokensProvider.GetRandom<T>();
-            _dummyOf = new(_token, [A, B, C, AB, ABC], [X, Y, X&Y, X|Y]);
+            
+            _dummyOf = new(_token);
+            _dummyOf.Handlers.Generate(A, B, C, AB, ABC);
+            _dummyOf.Conditions.Generate([X, Y, X&Y, X|Y]);
 
             ChainLeadSyntax.Configure(
                 _dummyOf.HandlerMath,

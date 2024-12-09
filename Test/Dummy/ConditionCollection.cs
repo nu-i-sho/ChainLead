@@ -2,19 +2,22 @@
 {
     public static partial class Dummy
     {
-        public class ConditionCollection<T> :
-            Collection<Condition<T>, ConditionIndex>.Mutable
+        public class ConditionCollection<T>(T token) :
+            List<Condition<T>>, IConditionCollection<T>.IMutable
         {
-            readonly T _token;
+            public T Token => token;
 
-            public ConditionCollection(T token) 
-                : base() => _token = token;
-
-            public ConditionCollection(IEnumerable<Condition<T>> items, T token) 
-                : base(items) => _token = token;
-
-            public override void Add(ConditionIndex i) =>
-                Add(new Condition<T>(i, _token));
+            public ICollection<Condition<T>, ConditionIndex> this[IEnumerable<ConditionIndex> indices]
+            {
+                get
+                {
+                    var slice = new ConditionCollection<T>(token);
+                    slice.AddRange(indices.Select(((IConditionCollection<T>)this).Get));
+                    return slice;
+                }
+            }
+            public void Generate(ConditionIndex i) =>
+                Add(new Condition<T>(i, token));
         }
     }
 }

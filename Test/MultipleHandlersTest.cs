@@ -4,7 +4,7 @@
     using ChainLead.Test.Utils;
 
     using static ChainLead.Test.Cases.MultipleHandlers;
-    using static ChainLead.Test.Dummy.Index.Common;
+    using static ChainLead.Test.Dummy.Common;
 
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
@@ -14,14 +14,14 @@
     {
         Dummy.Container<T> _dummyOf;
         IMultipleHandlersMath _math;
-        List<Dummy.Index> _callsLog;
+        List<Dummy.ChainElementIndex> _callsLog;
         T _token;
 
         [SetUp]
         public void Setup()
         {
             _token = TokensProvider.GetRandom<T>();
-            _dummyOf = new Dummy.Container<T>(_token, [], []);
+            _dummyOf = new(_token);
             _math = mathFactory.Create(_dummyOf.ConditionMath);
             _callsLog = [];
         }
@@ -149,8 +149,8 @@
                 var handlerIndex = HandlerIndex(i);
                 var conditionIndices = j_s.Select(j => ConditionIndex(i, j));
 
-                _dummyOf.Handlers.Add(handlerIndex);
-                _dummyOf.Conditions.AddRange(conditionIndices);
+                _dummyOf.Handlers.Generate(handlerIndex);
+                _dummyOf.Conditions.Generate(conditionIndices);
 
                 var handler = _dummyOf.Conditions[conditionIndices]
                      .Aggregate(_dummyOf.Handler(handlerIndex).Pure, _math.Conditional);
@@ -168,7 +168,7 @@
         void SetupConditionMathAnd() =>
             _dummyOf.ConditionMath.And(Any, Any).Implements((x, y) =>
             {
-                _dummyOf.Conditions.Add(x & y);
+                _dummyOf.Conditions.Generate(x & y);
 
                 _dummyOf.Condition(x & y).Returns(true);
                 _dummyOf.Condition(x & y).AddCallback(() =>
@@ -186,8 +186,8 @@
         static Dummy.ConditionIndex ConditionIndex(char i, char j) =>
             new($"[{i}][{j}]");
 
-        static Dummy.Index Index(char i) => HandlerIndex(i);
+        static Dummy.ChainElementIndex Index(char i) => HandlerIndex(i);
 
-        static Dummy.Index Index(char i, char j) => ConditionIndex(i, j);
+        static Dummy.ChainElementIndex Index(char i, char j) => ConditionIndex(i, j);
     }
 }

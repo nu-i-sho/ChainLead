@@ -36,10 +36,13 @@ dotnet_diagnostic.IDE0251.severity = none
 dotnet_diagnostic.S6608.severity = none
 
 # S3993: Custom attributes should be marked with "System.AttributeUsageAttribute"
-# It is derived from TestFixtureConfigure which is well-known in the unit testing context. I don't need additional garbage on top of many attributes.
+# It is derived from TestFixtureConfigure which is well-known in the unit testing context. 
+# I don't need additional garbage on top of many attributes.
 dotnet_diagnostic.S3993.severity = none
 
 # S2094: Classes should not be empty
-# It is a totally stupid rule. I need only nominal and object without any implementation as an access token or marker. It is a cool code trick.
+# It is a totally stupid rule. 
+# I need only nominal and object without any implementation as an access token or marker. 
+# It is a cool code trick.
 dotnet_diagnostic.S2094.severity = none
 

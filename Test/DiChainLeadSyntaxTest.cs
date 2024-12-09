@@ -5,14 +5,14 @@
     using ChainLead.Contracts.Syntax.DI;
     using Microsoft.Extensions.DependencyInjection;
     
-    using static ChainLead.Test.Dummy.HandlerIndex.Common;
-    using static ChainLead.Test.Dummy.ConditionIndex.Common;
+    using static ChainLead.Test.Dummy.HandlerIndex;
+    using static ChainLead.Test.Dummy.ConditionIndex;
 
     [TestFixture]
     public class DiChainLeadSyntaxTest
     {
         public record TypeDoesNotMatter;
-        public TypeDoesNotMatter _objectDoesNotMetter = new();
+        public TypeDoesNotMatter _objectDoesNotMatter = new();
 
         DummyServiceCollection _dummyOfServiceCollection;
         DummyServiceProvider _dummyOfServiceProvider;
@@ -23,7 +23,10 @@
         {
             _dummyOfServiceCollection = [];
             _dummyOfServiceProvider = new();
-            _dummyOf = new(_objectDoesNotMetter);
+
+            _dummyOf = new(_objectDoesNotMatter);
+            _dummyOf.Handlers.Generate(A);
+            _dummyOf.Conditions.Generate(X);
 
             _dummyOfServiceProvider.AddSetup<IHandlerMath>(_dummyOf.HandlerMath);
             _dummyOfServiceProvider.AddSetup<IConditionMath>(_dummyOf.ConditionMath);

@@ -2,7 +2,7 @@
 {
     public static partial class Dummy
     {
-        public class Index(string value)
+        public class ChainElementIndex(string value)
         {
             public virtual char ViewBorder => '?';
 
@@ -10,24 +10,17 @@
 
             public string View => $"{ViewBorder}{Value}{ViewBorder}";
 
-            public static Index Make(string value) => new(value);
+            public static ChainElementIndex Make(string value) => new(value);
 
-            public static Index Make(char value) => new(value.ToString());
+            public static ChainElementIndex Make(char value) => new(value.ToString());
 
             public override string ToString() => View;
 
             public override bool Equals(object? obj) =>
-                obj is Index index && index.View == View;
+                obj is ChainElementIndex index && index.View == View;
 
             public override int GetHashCode() =>
                 View.GetHashCode();
-
-            public static class Common
-            {
-                public record AnyArg;
-
-                public static readonly AnyArg Any = new();
-            }
         }
     }
 }

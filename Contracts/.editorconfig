@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# S2094: Classes should not be empty
+# It is a totally stupid rule. 
+# I need only nominal and object without any implementation as an access token or marker. 
+# It is a cool code trick.
+dotnet_diagnostic.S2094.severity = none

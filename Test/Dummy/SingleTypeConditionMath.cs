@@ -1,7 +1,7 @@
 ﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts;
-    using static ChainLead.Test.Dummy.Index.Common;
+    using static ChainLead.Test.Dummy.Common;
 
     public static partial class Dummy
     {
@@ -9,36 +9,44 @@
                 ICollection<Condition<T>, ConditionIndex> conditions)
             : IConditionMath
         {
-            readonly Dictionary<string, Func<ConditionIndex, ConditionIndex, ConditionIndex>> _setupForAnyAppend = [];
-            readonly Dictionary<(string, ConditionIndex, ConditionIndex), ConditionIndex> _setupForAppend = [];
-            readonly Dictionary<ConditionIndex, ConditionIndex> _setupForNot = [];
-            ConditionIndex? _setupForMakeCondition;
-            ConditionIndex? _setupForTrue;
-            ConditionIndex? _setupForFalse;
+            readonly Dictionary<string, Func<ConditionIndex, ConditionIndex, ConditionIndex>> _anyAppendSetup = [];
+            readonly Dictionary<(string, ConditionIndex, ConditionIndex), ConditionIndex> _appendSetup = [];
+            readonly Dictionary<ConditionIndex, ConditionIndex> _notSetup = [];
+            ConditionIndex? _makeConditionSetup;
+            ConditionIndex? _trueSetup;
+            ConditionIndex? _falseSetup;
 
             public void True_Returns(ConditionIndex condition) =>
-                _setupForTrue = condition;
+                _trueSetup = condition;
 
             public void False_Returns(ConditionIndex condition) =>
-                _setupForFalse = condition;
+                _falseSetup = condition;
 
             public void MakeCondition_Returns(ConditionIndex condition) =>
-                _setupForMakeCondition = condition;
+                _makeConditionSetup = condition;
 
-            public ReturnsStep And(ConditionIndex a, ConditionIndex b) =>
-                new(x => _setupForAppend.Add((nameof(IConditionMath.And), a, b), x));
+            public ReturnsStep And(ConditionIndex forLeft, ConditionIndex andRight)
+            {
+                var forFuncAndArgs = (nameof(IConditionMath.And), forLeft, andRight);
+                return new(returnResult => _appendSetup.Add(forFuncAndArgs, returnResult));
+            }
 
             public ImplementsStep And(AnyArg _, AnyArg __) =>
-                new(f => _setupForAnyAppend.Add(nameof(IConditionMath.And), f)); 
+                new(implementation => _anyAppendSetup
+                    .Add(nameof(IConditionMath.And), implementation)); 
 
-            public ReturnsStep Or(ConditionIndex a, ConditionIndex b) =>
-                new (x => _setupForAppend.Add((nameof(IConditionMath.Or), a, b), x));
+            public ReturnsStep Or(ConditionIndex forLeft, ConditionIndex andRight)
+            {
+                var forFuncAndArgs = (nameof(IConditionMath.Or), forLeft, andRight);
+                return new (returnResult => _appendSetup.Add(forFuncAndArgs, returnResult));
+            }
 
             public ImplementsStep Or(AnyArg _, AnyArg __) =>
-                new(f => _setupForAnyAppend.Add(nameof(IConditionMath.Or), f));
+                new(implementation => _anyAppendSetup
+                    .Add(nameof(IConditionMath.Or), implementation));
 
-            public ReturnsStep Not(ConditionIndex a) =>
-                new(x => _setupForNot.Add(a, x));
+            public ReturnsStep Not(ConditionIndex forCondition) =>
+                new(returnResult => _notSetup.Add(forCondition, returnResult));
 
             public class ReturnsStep(Action<ConditionIndex> add)
             {
@@ -54,62 +62,55 @@
                         add(implementation);
             }
 
-            static Condition<T> In<U>(ICondition<U> x) => (Condition<T>)x;
+            static ConditionIndex In<U>(ICondition<U> x) => ((Condition<T>)x).Index;
 
-            static ICondition<U> Out<U>(Condition<T> x) => (ICondition<U>)x;
+            ICondition<U> Out<U>(ConditionIndex i) => (ICondition<U>)conditions.Get(i);
 
-            public ICondition<U> True<U>() =>
-                Out<U>(conditions.Get(_setupForTrue!));
+            public ICondition<U> True<U>() => Out<U>(_trueSetup!);
 
-            public ICondition<U> False<U>() =>
-                Out<U>(conditions.Get(_setupForFalse!));
+            public ICondition<U> False<U>() => Out<U>(_falseSetup!);
 
             public bool IsPredictableTrue<U>(ICondition<U> condition) =>
-                _setupForTrue != null && 
-                conditions.Get(_setupForTrue).Index == In(condition).Index;
+                _trueSetup != null && 
+                conditions.Get(_trueSetup).Index == In(condition);
 
             public bool IsPredictableFalse<U>(ICondition<U> condition) =>
-                _setupForFalse != null && 
-                conditions.Get(_setupForFalse).Index == In(condition).Index;
+                _falseSetup != null && 
+                conditions.Get(_falseSetup).Index == In(condition);
 
             public ICondition<U> MakeCondition<U>(Func<U, bool> predicate)
             {
-                var c = conditions.Get(_setupForMakeCondition!);
-                c.SetImplementation((Func<T, bool>)(object)predicate);
+                var condition = conditions.Get(_makeConditionSetup!);
+                condition.SetImplementation((Func<T, bool>)(object)predicate);
 
-                return Out<U>(c);
+                return Out<U>(condition.Index);
             }
 
-            public ICondition<U> And<U>(
-                ICondition<U> a, ICondition<U> b) =>
-                    Append(nameof(IConditionMath.And), a, b);
+            public ICondition<U> And<U>(ICondition<U> left, ICondition<U> right) =>
+                Append(nameof(IConditionMath.And), left, right);
 
-            public ICondition<U> Or<U>(
-                ICondition<U> a, ICondition<U> b) =>
-                    Append(nameof(IConditionMath.Or), a, b);
+            public ICondition<U> Or<U>(ICondition<U> left, ICondition<U> right) =>
+                Append(nameof(IConditionMath.Or), left, right);
                 
             public ICondition<U> Not<U>(ICondition<U> condition) =>
-                Out<U>(conditions.Get(_setupForNot[In(condition).Index]));
+                Out<U>(_notSetup[In(condition)]);
 
-            ICondition<U> Append<U>(string name, ICondition<U> a, ICondition<U> b)
+            ICondition<U> Append<U>(string name, ICondition<U> left, ICondition<U> right)
             {
-                var i = In(a).Index;
-                var j = In(b).Index;
-
                 ConditionIndex? result = null;
                 Func<ConditionIndex, ConditionIndex, ConditionIndex>? implementation = null;
 
-                if (!_setupForAppend.TryGetValue((name, i, j), out result) &&
-                    _setupForAnyAppend.TryGetValue(name, out implementation))
+                if (!_appendSetup.TryGetValue((name, In(left), In(right)), out result) &&
+                    _anyAppendSetup.TryGetValue(name, out implementation))
                 {
-                    result = implementation(i, j);
+                    result = implementation(In(left), In(right));
                 }
 
                 if (result == null)
                     throw new NotImplementedException(
                         $"{nameof(IConditionMath)}.{nameof(IConditionMath.And)}");
 
-                return Out<U>(conditions.Get(result));
+                return Out<U>(result);
             }
         }
     }
