@@ -17,7 +17,7 @@
         }
 
         [Test]
-        public void AddConditionMathAddsNewTokenDescriptor()
+        public void AddConditionMath__Adds_NewTokenDescriptor()
         {
             _dummyOfServiceCollection.AddConditionMath();
             Assert.That(_dummyOfServiceCollection,
@@ -25,7 +25,7 @@
         }
 
         [Test]
-        public void AddConditionMathAddsImplementationFor_IConditionMath()
+        public void AddConditionMath__Adds_ImplementationFor_IConditionMath()
         {
             _dummyOfServiceCollection.AddConditionMath();
             Assert.That(_dummyOfServiceCollection.Last().ServiceType,
@@ -33,7 +33,7 @@
         }
 
         [Test]
-        public void AddConditionMathAdds_ConditionMath_AsImplementation()
+        public void AddConditionMath__Adds_ConditionMath_AsImplementation()
         {
             _dummyOfServiceCollection.AddConditionMath();
             Assert.That(_dummyOfServiceCollection.Last().ImplementationType,
@@ -41,7 +41,7 @@
         }
 
         [Test]
-        public void AddConditionMathAddsItAsSingleton()
+        public void AddConditionMath__AddsIt_AsSingleton()
         {
             _dummyOfServiceCollection.AddConditionMath();
             Assert.That(_dummyOfServiceCollection.Last().Lifetime,
@@ -49,7 +49,7 @@
         }
 
         [Test]
-        public void AddHandlerMathAddsNewTokenDescriptor()
+        public void AddHandlerMath__Adds_NewTokenDescriptor()
         {
             _dummyOfServiceCollection.AddHandlerMath();
             Assert.That(_dummyOfServiceCollection, 
@@ -57,7 +57,7 @@
         }
 
         [Test]
-        public void AddHandlerMathAddsImplementationFor_IHandlerMath()
+        public void AddHandlerMath__Adds_ImplementationFor_IHandlerMath()
         {
             _dummyOfServiceCollection.AddHandlerMath();
             Assert.That(_dummyOfServiceCollection.Last().ServiceType,
@@ -65,7 +65,7 @@
         }
 
         [Test]
-        public void AddHandlerMathAdds_HandlerMath_AsImplementation()
+        public void AddHandlerMath__Adds_HandlerMath_AsImplementation()
         {
             _dummyOfServiceCollection.AddHandlerMath();
             Assert.That(_dummyOfServiceCollection.Last().ImplementationType,
@@ -73,7 +73,7 @@
         }
 
         [Test]
-        public void AddHandlerMathAddsItAsSingleton()
+        public void AddHandlerMath__AddsIt_AsSingleton()
         {
             _dummyOfServiceCollection.AddHandlerMath();
             Assert.That(_dummyOfServiceCollection.Last().Lifetime,

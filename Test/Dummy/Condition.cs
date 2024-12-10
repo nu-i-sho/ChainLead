@@ -18,11 +18,11 @@
             public void AddCallback(Action f) =>
                 Callback += f;
 
-            public void LogsInto(IList<ConditionIndex> acc) =>
-                AddCallback(() => acc.Add(Index));
+            public void LogsInto(IList<ConditionIndex> log) =>
+                AddCallback(() => log.Add(Index));
 
-            public void LogsInto(IList<ChainElementIndex> acc) =>
-                AddCallback(() => acc.Add(Index));
+            public void LogsInto(IList<ChainElementIndex> log) =>
+                AddCallback(() => log.Add(Index));
 
             public void Returns(bool value) =>
                 Implementation = _ => value;
@@ -45,6 +45,12 @@
             }
 
             public override string ToString() => $"c<{index.View}>";
+
+            public override bool Equals(object? obj) =>
+                obj is Condition<T> handler && Index == handler.Index;
+
+            public override int GetHashCode() =>
+                index.GetHashCode();
 
             public ICondition<T> Pure => this;
 

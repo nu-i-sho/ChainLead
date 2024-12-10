@@ -45,4 +45,3 @@ dotnet_diagnostic.S3993.severity = none
 # I need only nominal and object without any implementation as an access token or marker. 
 # It is a cool code trick.
 dotnet_diagnostic.S2094.severity = none
-

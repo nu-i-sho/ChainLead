@@ -26,15 +26,15 @@
         }
 
         [Test]
-        public void ZeroDoesNothing() =>
+        public void Zero__DoesNothing() =>
             Assert.DoesNotThrow(() => _math.Zero<T>().Execute(_token));
 
         [Test]
-        public void ZeroIsZero() =>
+        public void Zero__IsZero() =>
             Assert.That(_math.IsZero(_math.Zero<T>()));
 
         [Test]
-        public void MadeHandlerExecutesProvidedAction()
+        public void MadeHandler__Executes_ProvidedAction()
         {
             T? x = default;
             var action = new Action<T>(a => x = a);
@@ -46,7 +46,7 @@
         }
 
         [Test]
-        public void ConditionalZeroIsZero()
+        public void ConditionalZero__IsZero()
         {
             _dummyOf.Conditions.Generate(X);
             var conditionalZero = _math.Conditional(
@@ -71,7 +71,7 @@
         }
 
         [Test]
-        public void WhenConditionReturnsFalse__HandlerIsNotExecuted()
+        public void WhenConditionReturnsFalse__HandlerIs_Not_Executed()
         {
             _dummyOf.Conditions.Generate(X);
             _dummyOf.Condition(X).Returns(false);
@@ -85,7 +85,7 @@
         }
 
         [Test]
-        public void WhenTopConditionReturnsFalse__AllOtherChecksAndExecutionsAreNotCalled()
+        public void WhenTopConditionReturnsFalse__AllOther_Checks_And_Executions_Are_Not_Called()
         {
             _dummyOf.Conditions.Generate(X, Y, Z);
             _dummyOf.Condition(Z).Returns(false);
@@ -94,16 +94,19 @@
                 .Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional)
                 .Execute(_token);
 
-            Assert.That(_dummyOf.Condition(Z).WasCheckedOnce);
+            Assert.Multiple(() =>
+            {
+                Assert.That(_dummyOf.Condition(Z).WasCheckedOnce);
 
-            Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
-                Is.EquivalentTo(_dummyOf.Conditions[X, Y]));
+                Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
+                    Is.EquivalentTo(_dummyOf.Conditions[X, Y]));
 
-            Assert.That(_dummyOf.Handler(A).WasNeverExecuted);
+                Assert.That(_dummyOf.Handler(A).WasNeverExecuted);
+            });
         }
 
         [Test]
-        public void ChecksAllConditionsUpToFirstFalse(
+        public void ChecksAllConditionsUpToFirstFalse__Test(
             [Values(0, 1, 2, 5)] int trueCount,
             [Values(0, 1, 2, 5)] int falseCount)
         {
@@ -124,19 +127,22 @@
 
             var checkedCount = trueCount + int.Min(1, falseCount);
 
-            Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
-                Is.EquivalentTo(truesThenFalses.Take(checkedCount)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
+                    Is.EquivalentTo(truesThenFalses.Take(checkedCount)));
 
-            Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
-                Is.EquivalentTo(truesThenFalses.Skip(checkedCount)));
+                Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
+                    Is.EquivalentTo(truesThenFalses.Skip(checkedCount)));
 
-            Assert.That(_dummyOf.Handler(A)
-                  .WasExecutedOnceWhen(falseCount == 0)
-                  .ElseNever);
+                Assert.That(_dummyOf.Handler(A)
+                      .WasExecutedOnceWhen(falseCount == 0)
+                      .ElseNever);
+            });
         }
 
         [Test]
-        public void ChecksOrderEqualsConditionsReverseAttachingOrder()
+        public void Checks_Order__Equals_ConditionsReverseAttachingOrder()
         {
             List<Dummy.ConditionIndex> checksLog = [];
 
@@ -152,7 +158,7 @@
         }
 
         [Test]
-        public void AtomizeZeroMakeHandlerThatIsNotZero()
+        public void AtomizeZero__Makes_HandlerThatIs_Not_Zero()
         {
             var zero = _math.Zero<T>();
             zero = _math.Atomize(zero);
@@ -163,14 +169,14 @@
         }
 
         [Test]
-        public void ExtendedZeroIsZero()
+        public void ExtendedZero__IsZero()
         {
             var extendedZero = _math.Zero<T>().AsExtended();
             Assert.That(_math.IsZero(extendedZero));
         }
 
         [Test]
-        public void ExtendedNotZeroIsNotZero()
+        public void Extended_Not_Zero__Is_Not_Zero()
         {
             var extended = _dummyOf.Handler(A).AsExtended();
             Assert.That(_math.IsZero(extended),

@@ -33,7 +33,7 @@
         }
 
         [Test]
-        public void ConfigureChainLeadSyntaxAddsNotNullServiceDescriptor()
+        public void ConfigureChainLeadSyntax__Adds_NotNull_ServiceDescriptor()
         {
             _dummyOfServiceCollection.ConfigureChainLeadSyntax();
 
@@ -42,7 +42,7 @@
         }
 
         [Test]
-        public void ConfigureChainLeadSyntaxAddsCallToken()
+        public void ConfigureChainLeadSyntax__Adds_CallToken()
         {
             _dummyOfServiceCollection.ConfigureChainLeadSyntax();
             Assert.That(_dummyOfServiceCollection.Last().ServiceType,
@@ -50,7 +50,7 @@
         }
 
         [Test]
-        public void ConfigureChainLeadSyntaxAddsCallTokenAsSingleton()
+        public void ConfigureChainLeadSyntax__Adds_CallToken_AsSingleton()
         {
             _dummyOfServiceCollection.ConfigureChainLeadSyntax();
             Assert.That(_dummyOfServiceCollection.Last().Lifetime,
@@ -58,7 +58,7 @@
         }
 
         [Test]
-        public void ConfigureChainLeadSyntaxAddsCallTokenWithImplementationFactory()
+        public void ConfigureChainLeadSyntax__Adds_CallToken_WithImplementationFactory()
         {
             _dummyOfServiceCollection.ConfigureChainLeadSyntax();
             Assert.That(_dummyOfServiceCollection.Last().ImplementationFactory,
@@ -66,7 +66,7 @@
         }
 
         [Test]
-        public void ConfigureChainLeadSyntaxAddsCallTokenAsImplementationByFactory()
+        public void ConfigureChainLeadSyntax__Adds_CallToken_AsImplementationByFactory()
         {
             _dummyOfServiceCollection.ConfigureChainLeadSyntax();
 
@@ -78,7 +78,7 @@
         }
 
         [Test]
-        public void ConfigureChainLeadSyntaxConfiguresHandlerMathByInstanceFromProvider()
+        public void ConfigureChainLeadSyntax__Configures_HandlerMath_ByInstanceFromProvider()
         {
             _dummyOf.HandlerMath.Zero_Returns(A);
             _dummyOfServiceCollection.ConfigureChainLeadSyntax();
@@ -89,7 +89,7 @@
         }
 
         [Test]
-        public void ConfigureChainLeadSyntaxConfiguresConditionMathByInstanceFromProvider()
+        public void ConfigureChainLeadSyntax__Configures_ConditionMath_ByInstanceFromProvider()
         {
             _dummyOf.ConditionMath.True_Returns(X);
             _dummyOfServiceCollection.ConfigureChainLeadSyntax();

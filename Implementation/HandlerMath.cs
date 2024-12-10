@@ -1,6 +1,6 @@
 ﻿namespace ChainLead.Implementation
 {
-    //// DO NOT using ChainLead.Contracts.Syntax;
+    //// DO NOT using ChainLead.Contracts.Syntax; HERE
     using ChainLead.Contracts;
     using System;
 
@@ -127,7 +127,7 @@
                     ? conditionMath.And(accCondition, iCondition)
                     : iCondition;
 
-                (handler, iCondition) = SplitHandlerAndAllConditions(handler);
+                (handler, iCondition) = SplitHandlerAndCondition(handler);
             }
 
             return (handler, accCondition);

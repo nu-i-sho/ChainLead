@@ -90,7 +90,7 @@
                 public ISingleHandlerMath Create(IConditionMath conditionMath) =>
                     new Product(conditionMath);
 
-                public override string ToString() => "Original";
+                public override string ToString() => "Syntax";
 
                 public class Product : ISingleHandlerMath
                 {

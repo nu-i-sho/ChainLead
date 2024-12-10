@@ -45,7 +45,7 @@ namespace ChainLead.Test
         }
 
         [Test]
-        public void ZeroAppendZeroIsZero(
+        public void Zero_Append_Zero__IsZero__Test(
             [AllAppends] string append)
         {
             var chain = _do(append).Of(
@@ -56,7 +56,7 @@ namespace ChainLead.Test
         }
 
         [Test]
-        public void AppendIsNotCommutative(
+        public void Append__Is_Not_Commutative__Test(
             [AllAppends] string append)
         {
             _dummyOf.Handlers.Generate(A, B);
@@ -88,22 +88,22 @@ namespace ChainLead.Test
         }
 
         [Test]
-        public void AppendIsNotIdempotent(
+        public void Append__Is_Not_Idempotent__Test(
             [AllAppends] string append,
-            [Values(2, 3, 4, 5, 100)] int count)
+            [Values(2, 3, 4, 5, 100)] int chainLength)
         {
             _dummyOf.Handlers.Generate(A);
 
             Enumerable
-                .Repeat<IHandler<T>>(_dummyOf.Handler(A), count)
+                .Repeat<IHandler<T>>(_dummyOf.Handler(A), chainLength)
                 .Aggregate(_do(append).Of)
                 .Execute(_token);
 
-            Assert.That(_dummyOf.Handler(A).WasExecuted(count).Times);
+            Assert.That(_dummyOf.Handler(A).WasExecuted(chainLength).Times);
         }
 
         [Test]
-        public void UnconditionalChainIsAssociative(
+        public void UnconditionalChain__Is_Associative__Test(
             [AllAppends] string append)
         {
             _dummyOf.Handlers.Generate(A, B, C);
@@ -139,41 +139,37 @@ namespace ChainLead.Test
         }
 
         [Test]
-        public void ChainExecutesHandlersOneByOne(
+        public void Chain__Executes_Handlers_OneByOne__Test(
             [AllAppends] string append,
             [BlueCases] BlueCase @case)
         {
-            var distinct = @case.ChainIndices.Distinct();
-            _dummyOf.Handlers.Generate(distinct);
-
             List<Dummy.HandlerIndex> execution = [];
+
+            _dummyOf.Handlers.Generate(@case.Chain.Distinct());
             _dummyOf.Handlers.LogInto(execution); 
 
-            var chain = @case.ChainIndices
+            var chain = @case.Chain
                 .Select(_dummyOf.Handlers.Get).Cast<IHandler<T>>()
                 .Aggregate(_do(append).Of);
 
             chain.Execute(_token);
 
             Assert.That(execution,
-                Is.EqualTo(@case.ChainIndices));
+                Is.EqualTo(@case.Chain));
         }
 
         [Test]
-        public void ChainExecutesHandlersOneByOneAndIgnoresZeros(
+        public void Chain__Executes_Handlers_OneByOne_And_IgnoresZeros__Test(
             [AllAppends] string append,
             [RedCases] RedCase @case)
         {
-            var distinct = @case.ChainIndicesWithNullsAsZeros
-                 .Where(NotNull).Select(Denullify).Distinct();
-
-            _dummyOf.Handlers.Generate(distinct);
-
+            var handlers = @case.Chain.Where(RedCase.IsNotZero).Distinct();
             List<Dummy.HandlerIndex> execution = [];
+
+            _dummyOf.Handlers.Generate(handlers);
             _dummyOf.Handlers.LogInto(execution);
 
-            @case.ChainIndicesWithNullsAsZeros
-                 .Select(i => i != null
+            @case.Chain.Select(i => RedCase.IsNotZero(i)
                      ? _dummyOf.Handler(i)
                      : _math.Zero<T>())
                  .Aggregate(_do(append).Of)
@@ -194,13 +190,13 @@ namespace ChainLead.Test
         [TestCase("0101010101")]
         [TestCase("1111111111")]
         [TestCase("0000000000")]
-        public void ConditionalHandlersAddedToChainExecuteRelevantHandlers(
-            string conditionsSetup)
+        public void ConditionalHandlers_AddedToChain__Execute_OriginalHandlers__Test(
+            string conditionsChecksSetup)
         {
-            var setup = conditionsSetup.Select(x => x == '1');
+            var setup = conditionsChecksSetup.Select(x => x == '1');
+
             _dummyOf.Handlers.Generate(ABCDEFGHIJ.Take(setup.Count()));
             _dummyOf.Conditions.Generate(QRSTUVWXYZ.Take(setup.Count()));
-
             _dummyOf.Conditions.Return(setup);
 
             Enumerable
@@ -208,18 +204,21 @@ namespace ChainLead.Test
                 .Aggregate(_math.FirstThenSecond)
                 .Execute(_token);
 
-            Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
-                Is.EquivalentTo(_dummyOf.Conditions));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
+                    Is.EquivalentTo(_dummyOf.Conditions));
 
-            Assert.That(_dummyOf.Handlers.ThatWereExecutedOnce,
-                Is.EquivalentTo(_dummyOf.Handlers.ApplyMask(setup)));
+                Assert.That(_dummyOf.Handlers.ThatWereExecutedOnce,
+                    Is.EquivalentTo(_dummyOf.Handlers.Filter(setup)));
 
-            Assert.That(_dummyOf.Handlers.ThatWereNeverExecuted,
-                Is.EquivalentTo(_dummyOf.Handlers.ApplyMask(setup.Inverse())));
+                Assert.That(_dummyOf.Handlers.ThatWereNeverExecuted,
+                    Is.EquivalentTo(_dummyOf.Handlers.Filter(setup.Inverse())));
+            });
         }
 
         [Test]
-        public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(
+        public void JoinFirstWithSecond__Conjuncts_Only_TopConditions__Test(
             [GreenCases] GreenCase @case)
         {
             _dummyOf.Handlers.Generate(A, B);
@@ -240,64 +239,71 @@ namespace ChainLead.Test
             _math.JoinFirstWithSecond(a, b)
                  .Execute(_token);
 
-            Assert.That(expectedCondition.WasCheckedOnce);
+            Assert.Multiple(() =>
+            {
+                Assert.That(expectedCondition.WasCheckedOnce);
 
-            Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
-                Is.EquivalentTo(_dummyOf.Conditions[X, Y, X&Y].Except([expectedCondition])));
+                Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
+                    Is.EquivalentTo(_dummyOf.Conditions[X, Y, X & Y].Except([expectedCondition])));
 
-            Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
-                Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
-                  .EqualTo(@case.FinalConditionCheckResult));
+                Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
+                    Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
+                      .EqualTo(@case.FinalConditionCheckResult));
 
-            Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
-                Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And.
-               Not.EqualTo(@case.FinalConditionCheckResult));
+                Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
+                    Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And.
+                   Not.EqualTo(@case.FinalConditionCheckResult));
+            });
         }
 
         [Test]
-        public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(
+        public void JoinFirstWithSecond__Conjuncts_Only_TopConditions__Test(
             [OrangeCases] OrangeCase @case)
         {
-            Dummy.ConditionIndex
-                aTop = new("A TOP"),
-                bTop = new("B TOP"),
-                aBottom = new("A BOTTOM"),
-                bBottom = new("B BOTTOM");
+            var a = (core: OrangeCase.A, top: OrangeCase.A_Top, bottom: OrangeCase.A_Bottom);
+            var b = (core: OrangeCase.B, top: OrangeCase.B_Top, bottom: OrangeCase.B_Bottom);
 
-            _dummyOf.Handlers.Generate(A, B);
-            _dummyOf.Conditions.Generate(aTop, bTop, aTop&bTop, aBottom, bBottom);
+            _dummyOf.Handlers.Generate(a.core, b.core);
+            _dummyOf.Conditions.Generate(a.bottom, b.bottom, a.top, b.top, a.top & b.top);
 
-            _dummyOf.Conditions[aBottom, bBottom, aTop&bTop].Return(@case.CheckSetup);
-            _dummyOf.ConditionMath.And(aTop, bTop).Returns(aTop & bTop);
+            _dummyOf.Conditions[@case.CheckSetup.Keys].Return(@case.CheckSetup.Values);
+            _dummyOf.ConditionMath.And(a.top, b.top).Returns(a.top & b.top);
 
-            IHandler<T> a = _dummyOf.Handler(A);
-            a = _math.Conditional(a, _dummyOf.Condition(aBottom));
-            a = _math.Conditional(a, _dummyOf.Condition(aTop));
+            IHandler<T> aHandler = _dummyOf.Handler(a.core);
+            aHandler = _math.Conditional(aHandler, _dummyOf.Condition(a.bottom));
+            aHandler = _math.Conditional(aHandler, _dummyOf.Condition(a.top));
 
-            IHandler<T> b = _dummyOf.Handler(B);
-            b = _math.Conditional(b, _dummyOf.Condition(bBottom));
-            b = _math.Conditional(b, _dummyOf.Condition(bTop));
+            IHandler<T> bHandler = _dummyOf.Handler(b.core);
+            bHandler = _math.Conditional(bHandler, _dummyOf.Condition(b.bottom));
+            bHandler = _math.Conditional(bHandler, _dummyOf.Condition(b.top));
 
-            var ab = _math.JoinFirstWithSecond(a, b);
-            ab.Execute(_token);
+            _math.JoinFirstWithSecond(aHandler, bHandler)
+                 .Execute(_token);
 
-            var topsConjunctionAndBottoms = _dummyOf.Conditions[aBottom, bBottom, aTop & bTop];
+            var checks = @case.CheckExpectations;
+            var executions = @case.ExecutionExpectations;
 
-            Assert.That(topsConjunctionAndBottoms.ThatWereCheckedOnce,
-                Is.EquivalentTo(topsConjunctionAndBottoms.ApplyMask(@case.CheckExpected)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_dummyOf.Conditions[a.top, b.top].ThatWereNeverChecked,
+                    Is.EquivalentTo(_dummyOf.Conditions[a.top, b.top]));
 
-            Assert.That(topsConjunctionAndBottoms.ThatWereNeverChecked,
-                Is.EquivalentTo(topsConjunctionAndBottoms.ApplyMask(@case.CheckExpected.Inverse())));
+                Assert.That(_dummyOf.Conditions[a.bottom, b.bottom, a.top & b.top].ThatWereCheckedOnce,
+                    Is.EquivalentTo(_dummyOf.Conditions[checks.Keys].Filter(checks.Values)));
 
-            Assert.That(_dummyOf.Handlers[A, B].ThatWereExecutedOnce,
-                Is.EquivalentTo(_dummyOf.Handlers[A, B].ApplyMask(@case.ExecutionExpected)));
+                Assert.That(_dummyOf.Conditions[a.bottom, b.bottom, a.top & b.top].ThatWereNeverChecked,
+                    Is.EquivalentTo(_dummyOf.Conditions[checks.Keys].Filter(checks.Values.Inverse())));
 
-            Assert.That(_dummyOf.Handlers[A, B].ThatWereNeverExecuted,
-                Is.EquivalentTo(_dummyOf.Handlers[A, B].ApplyMask(@case.ExecutionExpected.Inverse())));
+                Assert.That(_dummyOf.Handlers[A, B].ThatWereExecutedOnce,
+                    Is.EquivalentTo(_dummyOf.Handlers[executions.Keys].Filter(executions.Values)));
+
+                Assert.That(_dummyOf.Handlers[A, B].ThatWereNeverExecuted,
+                    Is.EquivalentTo(_dummyOf.Handlers[executions.Keys].Filter(executions.Values.Inverse())));
+            });
         }
 
         [Test]
-        public void JoinFirstWithSecond__ConjunctsOnlyTopConditions(
+        public void JoinFirstWithSecond__Conjuncts_Only_TopConditions__Test(
             [YellowCases] YellowCase @case)
         {
             _dummyOf.Handlers.Generate(A, B);
@@ -325,24 +331,27 @@ namespace ChainLead.Test
             _math.JoinFirstWithSecond(a, b)
                  .Execute(_token);
 
-            var expectedToCheck = _dummyOf.Conditions[@case.CheckExpected];
-            var expectedToExecute = _dummyOf.Handlers[@case.ExecuteExpected];
+            var expectedToCheck = _dummyOf.Conditions[@case.ExpectedToCheck];
+            var expectedToExecute = _dummyOf.Handlers[@case.ExpectedToExecute];
 
-            Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
-                Is.EquivalentTo(expectedToCheck));
-            
-            Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
-                Is.EquivalentTo(_dummyOf.Conditions.Except(expectedToCheck)));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
+                    Is.EquivalentTo(expectedToCheck));
 
-            Assert.That(_dummyOf.Handlers.ThatWereExecutedOnce,
-                Is.EquivalentTo(expectedToExecute));
+                Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
+                    Is.EquivalentTo(_dummyOf.Conditions.Except(expectedToCheck)));
 
-            Assert.That(_dummyOf.Handlers.ThatWereNeverExecuted,
-                Is.EquivalentTo(_dummyOf.Handlers.Except(expectedToExecute)));
+                Assert.That(_dummyOf.Handlers.ThatWereExecutedOnce,
+                    Is.EquivalentTo(expectedToExecute));
+
+                Assert.That(_dummyOf.Handlers.ThatWereNeverExecuted,
+                    Is.EquivalentTo(_dummyOf.Handlers.Except(expectedToExecute)));
+            });
         }
 
         [Test]
-        public void MergeFirstWithSecond__ConjunctsAllConditions(
+        public void MergeFirstWithSecond__Conjuncts_All_Conditions__Test(
             [WhiteCases] WhiteCase @case,
             [Values(true, false)] bool finalConditionResult)
         {
@@ -375,20 +384,23 @@ namespace ChainLead.Test
 
             ab.Execute(_token);
 
-            Assert.That(_dummyOf.Conditions[abConditions].ThatWereCheckedOnce, 
-                Is.EquivalentTo(_dummyOf.Conditions[abConditions]));
+            Assert.Multiple(() =>
+            {
+                Assert.That(_dummyOf.Conditions[abConditions].ThatWereCheckedOnce,
+                    Is.EquivalentTo(_dummyOf.Conditions[abConditions]));
 
-            Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
-                Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
-                  .EqualTo(finalConditionResult));
+                Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
+                    Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
+                      .EqualTo(finalConditionResult));
 
-            Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
-                Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And.
-               Not.EqualTo(finalConditionResult));
+                Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
+                    Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And.
+                   Not.EqualTo(finalConditionResult));
+            });
         }
 
         [Test]
-        public void JoinSomeWithSingleConditionalHandler__PutsConditionOnTopOfResult(
+        public void Join_Some_With_SingleConditionalHandler__Puts_Condition_OnTop_OfResult__Test(
             [Values(false, true)] bool order,
             [Values(false, true)] bool checkResult)
         {
@@ -409,19 +421,22 @@ namespace ChainLead.Test
             _math.MergeFirstWithSecond(first, second)
                  .Execute(_token);
 
-            Assert.That(_dummyOf.Condition(X).WasCheckedOnce);
+            Assert.Multiple(() =>
+            {
+                Assert.That(_dummyOf.Condition(X).WasCheckedOnce);
 
-            Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
-                Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
-                  .EqualTo(checkResult));
+                Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
+                    Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
+                      .EqualTo(checkResult));
 
-            Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
-                Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And.
-               Not.EqualTo(checkResult));
+                Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
+                    Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And.
+                   Not.EqualTo(checkResult));
+            });
         }
 
         [Test]
-        public void CorrectConditionsCascadeTest(
+        public void CorrectConditionsCascade__Test(
             [BlackCases] BlackCase @case)
         {
             _dummyOf.Handlers.Generate(A, B);
@@ -451,7 +466,7 @@ namespace ChainLead.Test
         }
 
         [Test]
-        public void AppendWithAtomizedConditionalHandler__IsTheSameAs__WithRegularHandler(
+        public void AppendWith_AtomizedConditionalHandler__IsTheSameAsWith_RegularHandler__Test(
             [AllAppends] string append,
             [Values(false, true)] bool isFirstArgument,
             [Values(false, true)] bool bottomCheckResult)
@@ -499,7 +514,7 @@ namespace ChainLead.Test
         }
 
         [Test]
-        public void AppendedTwoAtomizedConditionalHandlers__IsTheSameAs__AppendedTwoRegularHandlers(
+        public void AppendedTwoAtomizedConditionalHandlers__IsTheSameAs_AppendedTwoRegularHandlers__Test(
             [AllAppends] string append,
             [Values(false, true)] bool aBottomCheckResult,
             [Values(false, true)] bool bBottomCheckResult)
@@ -540,13 +555,10 @@ namespace ChainLead.Test
                 Is.EqualTo(expectedLog));
         }
 
-        static bool NotNull(object? x) => x != null;
-
-        static U Denullify<U>(U? x) where U : class => x!;
-
         class AppendOf(Func<IHandler<T>, IHandler<T>, IHandler<T>> f)
         {
-            public IHandler<T> Of(IHandler<T> a, IHandler<T> b) => f(a, b);
+            public IHandler<T> Of(IHandler<T> left, IHandler<T> right) => 
+                f(left, right);
         }
     }
 }

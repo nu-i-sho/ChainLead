@@ -6,7 +6,6 @@
     using static ChainLead.Test.Cases.MultipleHandlers;
     using static ChainLead.Test.Dummy.Common;
 
-
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
     public class MultipleHandlersTest<T>(
@@ -27,7 +26,7 @@
         }
 
         [Test]
-        public void PackAllConditionsTrueTest(
+        public void Pack__AllConditionsTrue__Test(
             [IIndices] string i_s,
             [JIndices] string j_s)
         {
@@ -45,7 +44,7 @@
         }
 
         [Test]
-        public void JoinAllConditionsTrueTest(
+        public void Join__AllConditionsTrue__Test(
             [IIndices] string i_s, 
             [JIndices] string j_s)
         {
@@ -65,7 +64,7 @@
         }
 
         [Test]
-        public void InjectAllConditionsTrueTest(
+        public void Inject__AllConditionsTrue__Test(
             [IIndices] string i_s,
             [JIndices] string j_s)
         {
@@ -83,24 +82,24 @@
         }
 
         [Test]
-        public void CoverAllConditionsTrueTest(
+        public void Cover__AllConditionsTrue__Test(
             [IIndices] string i_s,
             [JIndices] string j_s) =>
-                CoverWrapOrThenAllConditionsTrueTest(_math.CoverChain, i_s, j_s);
+                AppendAllConditionsTrueTest(_math.CoverChain, i_s, j_s);
 
         [Test]
-        public void WrapAllConditionsTrueTest(
+        public void Wrap__AllConditionsTrue__Test(
             [IIndices] string i_s,
             [JIndices] string j_s) =>
-                CoverWrapOrThenAllConditionsTrueTest(_math.WrapChain, i_s, j_s);
+                AppendAllConditionsTrueTest(_math.WrapChain, i_s, j_s);
 
         [Test]
-        public void ThenAllConditionsTrueTest(
+        public void Then__AllConditionsTrue__Test(
             [IIndices] string i_s,
             [JIndices] string j_s) =>
-                CoverWrapOrThenAllConditionsTrueTest(_math.ThenChain, i_s, j_s);
+                AppendAllConditionsTrueTest(_math.ThenChain, i_s, j_s);
 
-        void CoverWrapOrThenAllConditionsTrueTest(
+        void AppendAllConditionsTrueTest(
             Func<IEnumerable<IHandler<T>>, IHandler<T>> append,
             string i_s,
             string j_s)
@@ -119,7 +118,7 @@
         }
 
         [Test]
-        public void MergeAllConditionsTrueTest(
+        public void Merge__AllConditionsTrue__Test(
             [IIndices] string i_s,
             [JIndices] string j_s)
         {
@@ -181,10 +180,10 @@
             });
 
         static Dummy.HandlerIndex HandlerIndex(char i) =>
-            new($"[{i}]");
+            new(new string([i]));
 
         static Dummy.ConditionIndex ConditionIndex(char i, char j) =>
-            new($"[{i}][{j}]");
+            new(new string([i, j]));
 
         static Dummy.ChainElementIndex Index(char i) => HandlerIndex(i);
 

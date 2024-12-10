@@ -1,6 +1,7 @@
 ﻿namespace ChainLead.Test
 {
     using ChainLead.Contracts;
+    using ChainLead.Contracts.Syntax;
     using ChainLead.Test.Types;
 
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
@@ -83,32 +84,32 @@
                 public ITestingHandlerMath Create(IConditionMath conditionMath) =>
                     new Product(new Implementation.HandlerMath(conditionMath));
 
-                public override string ToString() => "Original";
+                public override string ToString() => "like _math.PackFirstInSecond(a, b)";
 
                 class Product(IHandlerMath math) : 
                     OriginalMathFactory.Product(math),
                     ITestingHandlerMath
                 {
-                    public IHandler<T> FirstCoverSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Math.FirstCoverSecond(a, b);
+                    public IHandler<T> FirstCoverSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        Math.FirstCoverSecond(prev, next);
 
-                    public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Math.FirstThenSecond(a, b);
+                    public IHandler<T> FirstThenSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        Math.FirstThenSecond(prev, next);
 
-                    public IHandler<T> FirstWrapSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Math.FirstWrapSecond(a, b);
+                    public IHandler<T> FirstWrapSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        Math.FirstWrapSecond(prev, next);
 
-                    public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Math.InjectFirstIntoSecond(a, b);
+                    public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        Math.InjectFirstIntoSecond(prev, next);
 
-                    public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Math.JoinFirstWithSecond(a, b);
+                    public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        Math.JoinFirstWithSecond(prev, next);
 
-                    public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Math.MergeFirstWithSecond(a, b);
+                    public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        Math.MergeFirstWithSecond(prev, next);
 
-                    public IHandler<T> PackFirstInSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Math.PackFirstInSecond(a, b);
+                    public IHandler<T> PackFirstInSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        Math.PackFirstInSecond(prev, next);
                 }
             }
 
@@ -118,32 +119,32 @@
                 public ITestingHandlerMath Create(IConditionMath conditionMath) =>
                     new Product(conditionMath);
 
-                public override string ToString() => "Syntax like FirstThenSecond[a, b]";
+                public override string ToString() => "like PackFirstInSecond(a, b)";
 
                 class Product(IConditionMath conditionMath)
                         : SyntaxMathFactory.Product(conditionMath),
                     ITestingHandlerMath
                 {
-                    public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Contracts.Syntax.ChainLeadSyntax.FirstThenSecond(a, b);
+                    public IHandler<T> FirstThenSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        ChainLeadSyntax.FirstThenSecond(prev, next);
 
-                    public IHandler<T> FirstCoverSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Contracts.Syntax.ChainLeadSyntax.FirstCoverSecond(a, b);
+                    public IHandler<T> FirstCoverSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        ChainLeadSyntax.FirstCoverSecond(prev, next);
 
-                    public IHandler<T> FirstWrapSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Contracts.Syntax.ChainLeadSyntax.FirstWrapSecond(a, b);
+                    public IHandler<T> FirstWrapSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        ChainLeadSyntax.FirstWrapSecond(prev, next);
 
-                    public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Contracts.Syntax.ChainLeadSyntax.InjectFirstIntoSecond(a, b);
+                    public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        ChainLeadSyntax.InjectFirstIntoSecond(prev, next);
 
-                    public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Contracts.Syntax.ChainLeadSyntax.JoinFirstWithSecond(a, b);
+                    public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        ChainLeadSyntax.JoinFirstWithSecond(prev, next);
 
-                    public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Contracts.Syntax.ChainLeadSyntax.MergeFirstWithSecond(a, b);
+                    public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        ChainLeadSyntax.MergeFirstWithSecond(prev, next);
 
-                    public IHandler<T> PackFirstInSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Contracts.Syntax.ChainLeadSyntax.PackFirstInSecond(a, b);
+                    public IHandler<T> PackFirstInSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        ChainLeadSyntax.PackFirstInSecond(prev, next);
                 }
             }
 
@@ -153,32 +154,32 @@
                 public ITestingHandlerMath Create(IConditionMath conditionMath) =>
                     new Product(conditionMath);
 
-                public override string ToString() => "Syntax like Pack[a].In[b]";
+                public override string ToString() => "like Pack(a).In(b)";
 
                 class Product(IConditionMath conditionMath)
                         : SyntaxMathFactory.Product(conditionMath),
                     ITestingHandlerMath
                 {
-                    public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        a.Then(b);
+                    public IHandler<T> FirstThenSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        prev.Then(next);
 
-                    public IHandler<T> FirstCoverSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Use(a).ToCover(b);
+                    public IHandler<T> FirstCoverSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        Use(prev).ToCover(next);
 
-                    public IHandler<T> FirstWrapSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Use(a).ToWrap(b);
+                    public IHandler<T> FirstWrapSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        Use(prev).ToWrap(next);
 
-                    public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Inject(a).Into(b);
+                    public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        Inject(prev).Into(next);
 
-                    public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Join(a).With(b);
+                    public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        Join(prev).With(next);
 
-                    public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Merge(a).With(b);
+                    public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        Merge(prev).With(next);
 
-                    public IHandler<T> PackFirstInSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        Pack(a).In(b);
+                    public IHandler<T> PackFirstInSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        Pack(prev).In(next);
                 }
             }
 
@@ -188,32 +189,32 @@
                 public ITestingHandlerMath Create(IConditionMath conditionMath) =>
                     new Product(conditionMath);
 
-                public override string ToString() => "Syntax like PackXIn[a].WhereXIs[b]";
+                public override string ToString() => "like PackXIn(b).WhereXIs(a)";
 
                 class Product(IConditionMath conditionMath)
                         : SyntaxMathFactory.Product(conditionMath),
                     ITestingHandlerMath
                 {
-                    public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        XThen(b).WhereXIs(a);
+                    public IHandler<T> FirstThenSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        XThen(next).WhereXIs(prev);
 
-                    public IHandler<T> FirstCoverSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        XCover(b).WhereXIs(a);
+                    public IHandler<T> FirstCoverSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        XCover(next).WhereXIs(prev);
 
-                    public IHandler<T> FirstWrapSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        XWrap(b).WhereXIs(a);
+                    public IHandler<T> FirstWrapSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        XWrap(next).WhereXIs(prev);
 
-                    public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        InjectXInto(b).WhereXIs(a);
+                    public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        InjectXInto(next).WhereXIs(prev);
 
-                    public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        JoinXWith(b).WhereXIs(a);
+                    public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        JoinXWith(next).WhereXIs(prev);
 
-                    public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        MergeXWith(b).WhereXIs(a);
+                    public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        MergeXWith(next).WhereXIs(prev);
 
-                    public IHandler<T> PackFirstInSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        PackXIn(b).WhereXIs(a);
+                    public IHandler<T> PackFirstInSecond<T>(IHandler<T> prev, IHandler<T> next) =>
+                        PackXIn(next).WhereXIs(prev);
                 }
             }
 
@@ -253,12 +254,12 @@
                     nameof(BlackCases));
 
             public record BlueCase(
-                Dummy.HandlerIndex[] ChainIndices,
+                Dummy.HandlerIndex[] Chain,
                 string NameForEasyFind = "")
             {
                 public override string ToString()
                 {
-                    var name = ViewOf(ChainIndices);
+                    var name = ViewOf(Chain);
                     if (NameForEasyFind != string.Empty)
                         name = $"{NameForEasyFind}: {name}";
 
@@ -274,7 +275,7 @@
             ];
 
             public record RedCase(
-                Dummy.HandlerIndex?[] ChainIndicesWithNullsAsZeros,
+                Dummy.HandlerIndex[] Chain,
                 Dummy.HandlerIndex[] ExpectedExecution,
                 string NameForEasyFind = "")
             {
@@ -282,7 +283,7 @@
                 {
                     var name = string.Join(
                         CaseBlocksSeparator,
-                        ViewOf(ChainIndicesWithNullsAsZeros),
+                        ViewOf(Chain),
                         ViewOf(ExpectedExecution));
                     
                     if (NameForEasyFind != string.Empty)
@@ -290,23 +291,34 @@
 
                     return name;
                 }
+
+                public static readonly Dummy.HandlerIndex Zero = new("ZERO");
+
+                public static bool IsNotZero(Dummy.HandlerIndex x) => x != Zero;
             }
 
-            public static RedCase[] RedCases =>
-            [
-                new([null, A], [A], "Sunday"),
-                new([A, null], [A], "Monday"),
-                new([null, A, null], [A], "Tuesday"),
-                new([null, null, null, null, A, null, null, null], [A], "Wednesday"),
+            public static IEnumerable<RedCase> RedCases
+            {
+                get
+                {
+                    var zero = RedCase.Zero;
 
-                new([A, B, C, D, null, I, J, null, I, null, null, E, I, H, null, F, F, I, null, null],
-                    [A, B, C, D, I, J, I, E, I, H, F, F, I],
-                    "Thursday"),
+                    yield return new([zero, A], [A], "Sunday");
+                    yield return new([A, zero], [A], "Monday");
+                    yield return new([zero, A, zero], [A], "Tuesday");
+                    yield return new([zero, zero, zero, zero, A, zero, zero, zero], [A], "Wednesday");
 
-                new([A, null, A, null, A, null, A, null, A, null, A, null, A, A, A, A, null, null, null, A, null, A, A, A],
-                    [A, A, A, A, A, A, A, A, A, A, A, A, A, A],
-                    "Friday")
-            ];
+                    yield return new(
+                        [A, B, C, D, zero, I, J, zero, I, zero, zero, E, I, H, zero, F, F, I, zero, zero],
+                        [A, B, C, D, I, J, I, E, I, H, F, F, I],
+                        "Thursday");
+
+                    yield return new(
+                        [A, zero, A, zero, A, zero, A, zero, A, zero, A, zero, A, A, A, A, zero, zero, zero, A, zero, A, A, A],
+                        [A, A, A, A, A, A, A, A, A, A, A, A, A, A],
+                        "Friday");
+                }
+            }
 
             public record GreenCase(
                 bool AIsConditional,
@@ -345,9 +357,9 @@
             }
 
             public record OrangeCase(
-                bool[] CheckSetup,
-                bool[] CheckExpected,
-                bool[] ExecutionExpected,
+                Dictionary<Dummy.ConditionIndex, bool> CheckSetup,
+                Dictionary<Dummy.ConditionIndex, bool> CheckExpectations,
+                Dictionary<Dummy.HandlerIndex, bool> ExecutionExpectations,
                 string NameForEasyFind = "")
             {
                 public override string ToString()
@@ -355,66 +367,83 @@
                     var name = string.Join(
                         CaseBlocksSeparator,
                         ViewOf(CheckSetup),
-                        ViewOf(CheckExpected),
-                        ViewOf(ExecutionExpected));
+                        ViewOf(CheckExpectations),
+                        ViewOf(ExecutionExpectations));
                 
                     if (NameForEasyFind != string.Empty)
                         name = $"{NameForEasyFind}: {name}";
 
                     return name;
                 }
+
+                public static readonly Dummy.HandlerIndex
+                    A = Dummy.HandlerIndex.A,
+                    B = Dummy.HandlerIndex.B;
+
+                public static readonly Dummy.ConditionIndex
+                    A_Top = new("A TOP"),
+                    B_Top = new("B TOP"),
+                    A_Bottom = new("A BOTTOM"),
+                    B_Bottom = new("B BOTTOM");
             }
 
             public static IEnumerable<OrangeCase> OrangeCases
             {
                 get
                 {
+                    var a = OrangeCase.A;
+                    var b = OrangeCase.B;
+                    var a_bottom = OrangeCase.A_Bottom;
+                    var b_bottom = OrangeCase.B_Bottom;
+                    var a_top = OrangeCase.A_Top;
+                    var b_top = OrangeCase.B_Top;
+
                     yield return new(
-                        CheckSetup:    [false, false, false],
-                        CheckExpected: [false, false, true],
-                        ExecutionExpected: [false, false],
+                        CheckSetup:            new() { { a_bottom, false }, { b_bottom, false }, { a_top & b_top, false } },
+                        CheckExpectations:     new() { { a_bottom, false }, { b_bottom, false }, { a_top & b_top, true } },
+                        ExecutionExpectations: new() { { a, false }, { b, false } },
                         NameForEasyFind: "West");
 
                     yield return new(
-                        CheckSetup:    [false, true, false],
-                        CheckExpected: [false, false, true],
-                        ExecutionExpected: [false, false],
-                        NameForEasyFind: "Northwest"); 
+                        CheckSetup:            new() { { a_bottom, false }, { b_bottom, true },  { a_top & b_top, false } },
+                        CheckExpectations:     new() { { a_bottom, false }, { b_bottom, false }, { a_top & b_top, true } },
+                        ExecutionExpectations: new() { { a, false }, { b, false } },
+                        NameForEasyFind: "Northwest");
 
                     yield return new(
-                        CheckSetup:    [true,  false, false],
-                        CheckExpected: [false, false, true],
-                        ExecutionExpected: [false, false],
+                        CheckSetup:            new() { { a_bottom, true },  { b_bottom, false }, { a_top & b_top, false } },
+                        CheckExpectations:     new() { { a_bottom, false }, { b_bottom, false }, { a_top & b_top, true } },
+                        ExecutionExpectations: new() { { a, false }, { b, false } },
                         NameForEasyFind: "North");
 
                     yield return new(
-                        CheckSetup:    [true,  true,  false],
-                        CheckExpected: [false, false, true],
-                        ExecutionExpected: [false, false],
+                        CheckSetup:            new() { { a_bottom, true },  { b_bottom, true },  { a_top & b_top, false } },
+                        CheckExpectations:     new() { { a_bottom, false }, { b_bottom, false }, { a_top & b_top, true } },
+                        ExecutionExpectations: new() { { a, false }, { b, false } },
                         NameForEasyFind: "Northeast");
 
                     yield return new(
-                        CheckSetup:    [false, false, true],
-                        CheckExpected: [true,  true,  true],
-                        ExecutionExpected: [false, false],
+                        CheckSetup:            new() { { a_bottom, false }, { b_bottom, false }, { a_top & b_top, true } },
+                        CheckExpectations:     new() { { a_bottom, true },  { b_bottom, true },  { a_top & b_top, true } },
+                        ExecutionExpectations: new() { { a, false }, { b, false } },
                         NameForEasyFind: "East");
 
                     yield return new(
-                        CheckSetup:    [false, true, true],
-                        CheckExpected: [true,  true, true],
-                        ExecutionExpected: [false, true],
+                        CheckSetup:            new() { { a_bottom, false }, { b_bottom, true }, { a_top & b_top, true } },
+                        CheckExpectations:     new() { { a_bottom, true },  { b_bottom, true }, { a_top & b_top, true } },
+                        ExecutionExpectations: new() { { a, false }, { b, true } },
                         NameForEasyFind: "Southeast");
 
                     yield return new(
-                        CheckSetup:    [true, false, true],
-                        CheckExpected: [true, true,  true],
-                        ExecutionExpected: [true, false],
+                        CheckSetup:            new() { { a_bottom, true }, { b_bottom, false }, { a_top & b_top, true } },
+                        CheckExpectations:     new() { { a_bottom, true }, { b_bottom, true },  { a_top & b_top, true } },
+                        ExecutionExpectations: new() { { a, true }, { b, false } },
                         NameForEasyFind: "South");
 
                     yield return new(
-                        CheckSetup:    [true, true, true],
-                        CheckExpected: [true, true, true],
-                        ExecutionExpected: [true, true],
+                        CheckSetup:            new() { { a_bottom, true }, { b_bottom, true }, { a_top & b_top, true } },
+                        CheckExpectations:     new() { { a_bottom, true }, { b_bottom, true }, { a_top & b_top, true } },
+                        ExecutionExpectations: new() { { a, true }, { b, true } },
                         NameForEasyFind: "Southwest");
                 }
             }
@@ -423,8 +452,8 @@
                 Dummy.ConditionIndex[] AConditions,
                 Dummy.ConditionIndex[] BConditions,
                 Dictionary<Dummy.ConditionIndex, bool> ChecksSetup,
-                Dummy.ConditionIndex[] CheckExpected,
-                Dummy.HandlerIndex[] ExecuteExpected,
+                Dummy.ConditionIndex[] ExpectedToCheck,
+                Dummy.HandlerIndex[] ExpectedToExecute,
                 string NameForEasyFind = "")
             {
                 public static readonly Dummy.ConditionIndex TopAnd = new("TOP &");
@@ -436,8 +465,8 @@
                         ViewOf(AConditions),
                         ViewOf(BConditions),
                         ViewOf(ChecksSetup),
-                        ViewOf(CheckExpected),
-                        ViewOf(ExecuteExpected));
+                        ViewOf(ExpectedToCheck),
+                        ViewOf(ExpectedToExecute));
 
                     if (NameForEasyFind != string.Empty)
                         name = $"{NameForEasyFind}: {name}";
@@ -450,388 +479,390 @@
             {
                 get
                 {
+                    var topAnd = YellowCase.TopAnd;
+
                     yield return new(
-                        AConditions:     [],
-                        BConditions:     [],
-                        ChecksSetup:     [],
-                        CheckExpected:   [],
-                        ExecuteExpected: [A, B],
+                        AConditions:       [],
+                        BConditions:       [],
+                        ChecksSetup:       [],
+                        ExpectedToCheck:   [],
+                        ExpectedToExecute: [A, B],
                         NameForEasyFind: "James");
 
                     yield return new(
-                        AConditions:     [X],
-                        BConditions:     [],
-                        ChecksSetup:  new() { { X, false } },
-                        CheckExpected:   [X],
-                        ExecuteExpected: [],
+                        AConditions:       [X],
+                        BConditions:       [],
+                        ChecksSetup:       new() { { X, false } },
+                        ExpectedToCheck:   [X],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Michael");
 
                     yield return new(
-                        AConditions:     [X],
-                        BConditions:     [],
-                        ChecksSetup:  new() { { X, true } },
-                        CheckExpected:   [X],
-                        ExecuteExpected: [A, B],
+                        AConditions:       [X],
+                        BConditions:       [],
+                        ChecksSetup:       new() { { X, true } },
+                        ExpectedToCheck:   [X],
+                        ExpectedToExecute: [A, B],
                         NameForEasyFind: "Robert");
 
                     yield return new(
-                        AConditions:     [X, Y],
-                        BConditions:     [],
-                        ChecksSetup:  new() { { Y, false } },
-                        CheckExpected:   [Y],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y],
+                        BConditions:       [],
+                        ChecksSetup:       new() { { Y, false } },
+                        ExpectedToCheck:   [Y],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "John");
 
                     yield return new(
-                        AConditions:     [X, Y],
-                        BConditions:     [],
-                        ChecksSetup:  new() { { Y, true }, { X, false } },
-                        CheckExpected:   [Y, X],
-                        ExecuteExpected: [B],
+                        AConditions:       [X, Y],
+                        BConditions:       [],
+                        ChecksSetup:       new() { { Y, true }, { X, false } },
+                        ExpectedToCheck:   [Y, X],
+                        ExpectedToExecute: [B],
                         NameForEasyFind: "David");
 
                     yield return new(
-                        AConditions:     [X, Y],
-                        BConditions:     [],
-                        ChecksSetup:  new() { { Y, true }, { X, true } },
-                        CheckExpected:   [Y, X],
-                        ExecuteExpected: [A, B],
+                        AConditions:       [X, Y],
+                        BConditions:       [],
+                        ChecksSetup:       new() { { Y, true }, { X, true } },
+                        ExpectedToCheck:   [Y, X],
+                        ExpectedToExecute: [A, B],
                         NameForEasyFind: "William");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [],
-                        ChecksSetup:  new() { { Z, false } },
-                        CheckExpected:   [Z],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [],
+                        ChecksSetup:       new() { { Z, false } },
+                        ExpectedToCheck:   [Z],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Richard");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [],
-                        ChecksSetup:  new() { { Z, true }, { Y, false } },
-                        CheckExpected:   [Z, Y],
-                        ExecuteExpected: [B],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [],
+                        ChecksSetup:       new() { { Z, true }, { Y, false } },
+                        ExpectedToCheck:   [Z, Y],
+                        ExpectedToExecute: [B],
                         NameForEasyFind: "Joseph");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [],
-                        ChecksSetup:  new() { { Z, true }, { Y, true }, { X, false } },
-                        CheckExpected:   [Z, Y, X],
-                        ExecuteExpected: [B],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [],
+                        ChecksSetup:       new() { { Z, true }, { Y, true }, { X, false } },
+                        ExpectedToCheck:   [Z, Y, X],
+                        ExpectedToExecute: [B],
                         NameForEasyFind: "Thomas");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [],
-                        ChecksSetup:  new() { { Z, true }, { Y, true }, { X, true } },
-                        CheckExpected:   [Z, Y, X],
-                        ExecuteExpected: [A, B],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [],
+                        ChecksSetup:       new() { { Z, true }, { Y, true }, { X, true } },
+                        ExpectedToCheck:   [Z, Y, X],
+                        ExpectedToExecute: [A, B],
                         NameForEasyFind: "Christopher");
 
                     yield return new(
-                        AConditions:     [X],
-                        BConditions:     [U],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
-                        CheckExpected:   [YellowCase.TopAnd],
-                        ExecuteExpected: [],
+                        AConditions:       [X],
+                        BConditions:       [U],
+                        ChecksSetup:       new() { { topAnd, false } },
+                        ExpectedToCheck:   [topAnd],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Charles");
 
                     yield return new(
-                        AConditions:     [X, Y],
-                        BConditions:     [U],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
-                        CheckExpected:   [YellowCase.TopAnd],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y],
+                        BConditions:       [U],
+                        ChecksSetup:       new() { { topAnd, false } },
+                        ExpectedToCheck:   [topAnd],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Daniel");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
-                        CheckExpected:   [YellowCase.TopAnd],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U],
+                        ChecksSetup:       new() { { topAnd, false } },
+                        ExpectedToCheck:   [topAnd],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Matthew");
 
                     yield return new(
-                        AConditions:     [X],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
-                        CheckExpected:   [YellowCase.TopAnd],
-                        ExecuteExpected: [],
+                        AConditions:       [X],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, false } },
+                        ExpectedToCheck:   [topAnd],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Anthony");
 
                     yield return new(
-                        AConditions:     [X],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
-                        CheckExpected:   [YellowCase.TopAnd],
-                        ExecuteExpected: [],
+                        AConditions:       [X],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, false } },
+                        ExpectedToCheck:   [topAnd],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Mark");
 
                     yield return new(
-                        AConditions:     [X, Y],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
-                        CheckExpected:   [YellowCase.TopAnd],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, false } },
+                        ExpectedToCheck:   [topAnd],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Donald");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
-                        CheckExpected:   [YellowCase.TopAnd],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, false } },
+                        ExpectedToCheck:   [topAnd],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Steven");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
-                        CheckExpected:   [YellowCase.TopAnd],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, false } },
+                        ExpectedToCheck:   [topAnd],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Andrew");
 
                     yield return new(
-                        AConditions:     [X, Y],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
-                        CheckExpected:   [YellowCase.TopAnd],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, false } },
+                        ExpectedToCheck:   [topAnd],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Paul");
 
                     yield return new(
-                        AConditions:     [X],
-                        BConditions:     [U],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true } },
-                        CheckExpected:   [YellowCase.TopAnd],
-                        ExecuteExpected: [A, B],
+                        AConditions:       [X],
+                        BConditions:       [U],
+                        ChecksSetup:       new() { { topAnd, true } },
+                        ExpectedToCheck:   [topAnd],
+                        ExpectedToExecute: [A, B],
                         NameForEasyFind: "Joshua");
 
                     yield return new(
-                        AConditions:     [X, Y],
-                        BConditions:     [U],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { X, false } },
-                        CheckExpected:   [YellowCase.TopAnd, X],
-                        ExecuteExpected: [B],
+                        AConditions:       [X, Y],
+                        BConditions:       [U],
+                        ChecksSetup:       new() { { topAnd, true }, { X, false } },
+                        ExpectedToCheck:   [topAnd, X],
+                        ExpectedToExecute: [B],
                         NameForEasyFind: "Kenneth");
 
                     yield return new(
-                        AConditions:     [X, Y],
-                        BConditions:     [U],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { X, true } },
-                        CheckExpected:   [YellowCase.TopAnd, X],
-                        ExecuteExpected: [A, B],
+                        AConditions:       [X, Y],
+                        BConditions:       [U],
+                        ChecksSetup:       new() { { topAnd, true }, { X, true } },
+                        ExpectedToCheck:   [topAnd, X],
+                        ExpectedToExecute: [A, B],
                         NameForEasyFind: "Kevin");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, false } },
-                        CheckExpected:   [YellowCase.TopAnd, Y],
-                        ExecuteExpected: [B],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, false } },
+                        ExpectedToCheck:   [topAnd, Y],
+                        ExpectedToExecute: [B],
                         NameForEasyFind: "Brian");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, X],
-                        ExecuteExpected: [B],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, true }, { X, false } },
+                        ExpectedToCheck:   [topAnd, Y, X],
+                        ExpectedToExecute: [B],
                         NameForEasyFind: "Timothy");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, true } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, X],
-                        ExecuteExpected: [A, B],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, true }, { X, true } },
+                        ExpectedToCheck:   [topAnd, Y, X],
+                        ExpectedToExecute: [A, B],
                         NameForEasyFind: "Ronald");
 
                     yield return new(
-                        AConditions:     [X],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { U, false } },
-                        CheckExpected:   [YellowCase.TopAnd, U],
-                        ExecuteExpected: [A],
+                        AConditions:       [X],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, true }, { U, false } },
+                        ExpectedToCheck:   [topAnd, U],
+                        ExpectedToExecute: [A],
                         NameForEasyFind: "George");
 
                     yield return new(
-                        AConditions:     [X],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { U, true } },
-                        CheckExpected:   [YellowCase.TopAnd, U],
-                        ExecuteExpected: [A, B],
+                        AConditions:       [X],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, true }, { U, true } },
+                        ExpectedToCheck:   [topAnd, U],
+                        ExpectedToExecute: [A, B],
                         NameForEasyFind: "Jason");
 
                     yield return new(
-                        AConditions:     [X],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { V, true }, { U, false } },
-                        CheckExpected:   [YellowCase.TopAnd, V, U],
-                        ExecuteExpected: [A],
+                        AConditions:       [X],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, true }, { V, true }, { U, false } },
+                        ExpectedToCheck:   [topAnd, V, U],
+                        ExpectedToExecute: [A],
                         NameForEasyFind: "Edward");
 
                     yield return new(
-                        AConditions:     [X],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { V, true }, { U, true } },
-                        CheckExpected:   [YellowCase.TopAnd, V, U],
-                        ExecuteExpected: [A, B],
+                        AConditions:       [X],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, true }, { V, true }, { U, true } },
+                        ExpectedToCheck:   [topAnd, V, U],
+                        ExpectedToExecute: [A, B],
                         NameForEasyFind: "Jeffrey");
 
                     yield return new(
-                        AConditions:     [X, Y],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { X, false }, { U, false } },
-                        CheckExpected:   [YellowCase.TopAnd, X, U],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, true }, { X, false }, { U, false } },
+                        ExpectedToCheck:   [topAnd, X, U],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Ryan");
 
                     yield return new(
-                        AConditions:     [X, Y],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { X, true }, { U, false } },
-                        CheckExpected:   [YellowCase.TopAnd, X, U],
-                        ExecuteExpected: [A],
+                        AConditions:       [X, Y],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, true }, { X, true }, { U, false } },
+                        ExpectedToCheck:   [topAnd, X, U],
+                        ExpectedToExecute: [A],
                         NameForEasyFind: "Jacob");
 
                     yield return new(
-                        AConditions:     [X, Y],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { X, true }, { U, false } },
-                        CheckExpected:   [YellowCase.TopAnd, X, U],
-                        ExecuteExpected: [A],
+                        AConditions:       [X, Y],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, true }, { X, true }, { U, false } },
+                        ExpectedToCheck:   [topAnd, X, U],
+                        ExpectedToExecute: [A],
                         NameForEasyFind: "Nicholas");
 
                     yield return new(
-                        AConditions:     [X, Y],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { X, true }, { U, true } },
-                        CheckExpected:   [YellowCase.TopAnd, X, U],
-                        ExecuteExpected: [A, B],
+                        AConditions:       [X, Y],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, true }, { X, true }, { U, true } },
+                        ExpectedToCheck:   [topAnd, X, U],
+                        ExpectedToExecute: [A, B],
                         NameForEasyFind: "Gary");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, false }, { U, false } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, U],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, false }, { U, false } },
+                        ExpectedToCheck:   [topAnd, Y, U],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Eric");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false }, { U, false } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, X, U],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, true }, { X, false }, { U, false } },
+                        ExpectedToCheck:   [topAnd, Y, X, U],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Jonathan");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, true }, { U, false } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, X, U],
-                        ExecuteExpected: [A],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, true }, { X, true }, { U, false } },
+                        ExpectedToCheck:   [topAnd, Y, X, U],
+                        ExpectedToExecute: [A],
                         NameForEasyFind: "Stephen");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, false }, { U, true } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, U],
-                        ExecuteExpected: [B],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, false }, { U, true } },
+                        ExpectedToCheck:   [topAnd, Y, U],
+                        ExpectedToExecute: [B],
                         NameForEasyFind: "Larry");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false }, { U, true } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, X, U],
-                        ExecuteExpected: [B],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, true }, { X, false }, { U, true } },
+                        ExpectedToCheck:   [topAnd, Y, X, U],
+                        ExpectedToExecute: [B],
                         NameForEasyFind: "Justin");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, true }, { U, true } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, X, U],
-                        ExecuteExpected: [A, B],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, true }, { X, true }, { U, true } },
+                        ExpectedToCheck:   [topAnd, Y, X, U],
+                        ExpectedToExecute: [A, B],
                         NameForEasyFind: "Scott");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, false }, { V, false } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, V],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, false }, { V, false } },
+                        ExpectedToCheck:   [topAnd, Y, V],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Brandon");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false }, { V, false } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, X, V],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, true }, { X, false }, { V, false } },
+                        ExpectedToCheck:   [topAnd, Y, X, V],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Benjamin");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false }, { V, true }, { U, false } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, X, V, U],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, true }, { X, false }, { V, true }, { U, false } },
+                        ExpectedToCheck:   [topAnd, Y, X, V, U],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Samuel");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false }, { V, false } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, X, V],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, true }, { X, false }, { V, false } },
+                        ExpectedToCheck:   [topAnd, Y, X, V],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Gregory");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, true }, { V, true }, { U, false } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, X, V, U],
-                        ExecuteExpected: [A],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, true }, { X, true }, { V, true }, { U, false } },
+                        ExpectedToCheck:   [topAnd, Y, X, V, U],
+                        ExpectedToExecute: [A],
                         NameForEasyFind: "Alexander");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, false }, { V, true }, { U, false } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, V, U],
-                        ExecuteExpected: [],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, false }, { V, true }, { U, false } },
+                        ExpectedToCheck:   [topAnd, Y, V, U],
+                        ExpectedToExecute: [],
                         NameForEasyFind: "Patrick");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, false }, { V, true }, { U, true } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, V, U],
-                        ExecuteExpected: [B],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, false }, { V, true }, { U, true } },
+                        ExpectedToCheck:   [topAnd, Y, V, U],
+                        ExpectedToExecute: [B],
                         NameForEasyFind: "Frank");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false }, { V, true }, { U, true } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, X, V, U],
-                        ExecuteExpected: [B],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, true }, { X, false }, { V, true }, { U, true } },
+                        ExpectedToCheck:   [topAnd, Y, X, V, U],
+                        ExpectedToExecute: [B],
                         NameForEasyFind: "Raymond");
 
                     yield return new(
-                        AConditions:     [X, Y, Z],
-                        BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, true }, { V, true }, { U, true } },
-                        CheckExpected:   [YellowCase.TopAnd, Y, X, V, U],
-                        ExecuteExpected: [A, B],
+                        AConditions:       [X, Y, Z],
+                        BConditions:       [U, V, W],
+                        ChecksSetup:       new() { { topAnd, true }, { Y, true }, { X, true }, { V, true }, { U, true } },
+                        ExpectedToCheck:   [topAnd, Y, X, V, U],
+                        ExpectedToExecute: [A, B],
                         NameForEasyFind: "Jack");
                 }
             }
@@ -2463,9 +2494,6 @@
                 x ? "I" : "O";
 
             static string ViewOf(Dummy.ChainElementIndex?[] x) => WithHandleEmptyCollection(x, x =>
-                $"[{x.Select(ViewOf).Aggregate(string.Concat)}]");
-
-            static string ViewOf(bool[] x) => WithHandleEmptyCollection(x, x =>
                 $"[{x.Select(ViewOf).Aggregate(string.Concat)}]");
 
             static string ViewOf<TIndex>(Dictionary<TIndex, bool> x)

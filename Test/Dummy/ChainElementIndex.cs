@@ -14,12 +14,12 @@
 
             public static ChainElementIndex Make(char value) => new(value.ToString());
 
-            public override string ToString() => View;
+            public sealed override string ToString() => View;
 
-            public override bool Equals(object? obj) =>
-                obj is ChainElementIndex index && index.View == View;
-
-            public override int GetHashCode() =>
+            public sealed override bool Equals(object? obj) =>
+                obj is ChainElementIndex index && View == index.View;
+            
+            public sealed override int GetHashCode() =>
                 View.GetHashCode();
         }
     }
