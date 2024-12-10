@@ -14,7 +14,7 @@
                 ValuesAttribute("AB", "ABC", "ABCD", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
             public class JIndicesAttribute() :
-                ValuesAttribute("012", "01234", "01234567890");
+                ValuesAttribute("012", "01234", "0123456789");
 
             public class DirectTestFixtureAttribute(Type t)
                 : TestFixtureAttribute(t, new DirectChainingMathFactory());

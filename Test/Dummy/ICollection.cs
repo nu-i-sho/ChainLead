@@ -7,7 +7,8 @@
             where TDummy : IChainElement<TIndex>
             where TIndex : ChainElementIndex
         {
-            TDummy Get(TIndex i) => this.First(x => x.Index.Equals(i));
+            TDummy Get(TIndex i) => 
+                this.First(x => x.Index.Equals(i));
 
             IEnumerable<TIndex> Indices => this.Select(x => x.Index);
 

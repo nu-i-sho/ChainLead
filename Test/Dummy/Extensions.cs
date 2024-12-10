@@ -73,7 +73,7 @@ namespace ChainLead.Test
             IConditionCollection<T> otherDummies) =>
                 dummies[dummies.Indices.Except(otherDummies.Indices)];
 
-        public static IHandlerCollection<T> ApplyMask<T>(
+        public static IHandlerCollection<T> Filter<T>(
             this IHandlerCollection<T> dummies,
             IEnumerable<bool> mask) =>
                 dummies[dummies.Indices
@@ -81,7 +81,7 @@ namespace ChainLead.Test
                     .Where(x => x.set)
                     .Select(x => x.item)];
 
-        public static IConditionCollection<T> ApplyMask<T>(
+        public static IConditionCollection<T> Filter<T>(
             this IConditionCollection<T> dummies,
             IEnumerable<bool> mask) =>
                 dummies[dummies.Indices

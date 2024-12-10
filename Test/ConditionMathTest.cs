@@ -3,6 +3,7 @@
     using ChainLead.Contracts;
     using ChainLead.Implementation;
     using ChainLead.Test.Utils;
+
     using static ChainLead.Test.Cases.Common;
     using static ChainLead.Test.Dummy.ConditionIndex;
 
@@ -18,51 +19,52 @@
         {
             _token = TokensProvider.GetRandom<T>();
             
-            _dummyOf = new(_token);
+            _dummyOf = new Dummy.Container<T>(_token);
             _dummyOf.Conditions.Generate(X, Y);
             
             _math = new ConditionMath();
         }
 
         [Test]
-        public void TrueCheckReturnsTrue() =>
+        public void TrueCheck__ReturnsTrue() =>
             Assert.That(_math.True<T>().Check(_token));
 
         [Test]
-        public void FalseCheckReturnsFalse() =>
+        public void FalseCheck__ReturnsFalse() =>
             Assert.That(_math.False<T>().Check(_token),
                 Is.False);
 
         [Test]
-        public void TrueIsPredictableTrue() =>
+        public void True__IsPredictableTrue() =>
             Assert.That(_math.IsPredictableTrue(_math.True<T>()));
 
         [Test]
-        public void TrueIsNotPredictableFalse() =>
+        public void True__IsNotPredictableFalse() =>
             Assert.That(_math.IsPredictableFalse(_math.True<T>()),
                 Is.False);
 
         [Test]
-        public void SomeConditionIsNotPredictableFalse() =>
+        public void SomeCondition__IsNotPredictableFalse() =>
             Assert.That(_math.IsPredictableFalse(_dummyOf.Condition(X)),
                 Is.False);
 
+
         [Test]
-        public void FalseIsPredictableFalse() =>
+        public void False__IsPredictableFalse() =>
             Assert.That(_math.IsPredictableFalse(_math.False<T>()));
 
         [Test]
-        public void FalseIsNotPredictableTrue() =>
+        public void False__IsNotPredictableTrue() =>
             Assert.That(_math.IsPredictableTrue(_math.False<T>()),
                 Is.False);
 
         [Test]
-        public void SomeConditionIsNotPredictableTrue() =>
+        public void SomeCondition__IsNotPredictableTrue() =>
             Assert.That(_math.IsPredictableTrue(_dummyOf.Condition(X)),
                 Is.False);
 
         [Test]
-        public void FalseAndSomethingIsPredictableFalse(
+        public void False_And_Something__IsPredictableFalse(
             [Values(false, true, null)] bool? another)
         {
             var falseAndSomething = _math.And(_math.False<T>(), Some(another));
@@ -72,7 +74,7 @@
         }
 
         [Test]
-        public void FalseAndSomethingIsNotPredictableTrue(
+        public void False_And_Something__IsNotPredictableTrue(
             [Values(false, true, null)] bool? another)
         {
             var falseAndSomething = _math.And(_math.False<T>(), Some(another));
@@ -83,7 +85,7 @@
         }
 
         [Test]
-        public void FalseAndSomethingCheckIsFalse(
+        public void False_And_Something_Check__IsFalse(
             [Values(false, true, null)] bool? another)
         {
             _dummyOf.Condition(X).Returns(true);
@@ -94,7 +96,7 @@
         }
 
         [Test]
-        public void SomethingAndFalseIsPredictableFalse(
+        public void Something_And_False__IsPredictableFalse(
              [Values(false, true, null)] bool? another)
         {
             var somethingAndFalse = _math.And(Some(another), _math.False<T>());
@@ -104,7 +106,7 @@
         }
 
         [Test]
-        public void SomethingAndFalseIsNotPredictableTrue(
+        public void Something_And_False__Is_Not_PredictableTrue(
             [Values(false, true, null)] bool? another)
         {
             var somethingAndFalse = _math.And(Some(another), _math.False<T>());
@@ -115,7 +117,7 @@
         }
 
         [Test]
-        public void SomethingAndFalseCheckIsFalse(
+        public void Something_And_False__Check_IsFalse(
             [Values(false, true, null)] bool? another)
         {
             var somethingAndFalse = _math.And(Some(another), _math.False<T>());
@@ -125,7 +127,7 @@
         }
 
         [Test]
-        public void SomethingAndFalseCheckDoesNotCallCheckOfSomething()
+        public void Something_And_False_Check__DoesNotCall_CheckOfSomething()
         {
             var somethingAndFalse = _math.And(_dummyOf.Condition(X), _math.False<T>());
             somethingAndFalse.Check(_token);
@@ -134,7 +136,7 @@
         }
 
         [Test]
-        public void FalseAndSomethingCheckDoesNotCallCheckOfSomething()
+        public void False_And_Something_Check__DoesNotCall_CheckOfSomething()
         {
             var falseAndSomething = _math.And(_math.False<T>(), _dummyOf.Condition(X));
             falseAndSomething.Check(_token);
@@ -143,7 +145,7 @@
         }
 
         [Test]
-        public void FalseOrSomethingButNotFalseIsNotPredictableFalse(
+        public void False_Or_Something_ButNotFalse__Is_Not_PredictableFalse(
             [Values(true, null)] bool? another)
         {
             var falseOrSomething = _math.Or(_math.False<T>(), Some(another));
@@ -154,7 +156,7 @@
         }
 
         [Test]
-        public void FalseOrFalseIsPredictableFalse()
+        public void False_Or_False__IsPredictableFalse()
         {
             var falseOrFalse = _math.Or(_math.False<T>(), _math.False<T>());
             var isPredictableFalse = _math.IsPredictableFalse(falseOrFalse);
@@ -163,7 +165,7 @@
         }
 
         [Test]
-        public void FalseOrSomethingButNotTrueIsNotNotPredictableTrue(
+        public void False_Or_Something_ButNotTrue__Is_Not_PredictableTrue(
             [Values(false, null)] bool? another)
         {
             var falseOrSomething = _math.Or(_math.False<T>(), Some(another));
@@ -174,7 +176,7 @@
         }
 
         [Test]
-        public void FalseOrTrueIsPredictableTrue()
+        public void False_Or_True__IsPredictableTrue()
         {
             var falseOrTrue = _math.Or(_math.False<T>(), _math.True<T>());
             var isPredictableTrue = _math.IsPredictableTrue(falseOrTrue);
@@ -183,7 +185,7 @@
         }
 
         [Test]
-        public void FalseOrSomethingCheckIsSomethingCheckResult(
+        public void False_Or_Something_Check__IsSomethingCheckResult(
             [Values(false, true)] bool anotherCheckResult)
         {
             _dummyOf.Condition(X).Returns(anotherCheckResult);
@@ -194,7 +196,7 @@
         }
 
         [Test]
-        public void FalseOrSomethingCheckCallsCheckFromSomething()
+        public void False_Or_Something_Check__Calls_CheckFromSomething()
         {
             _dummyOf.Condition(X).Returns(true);
 
@@ -205,7 +207,7 @@
         }
 
         [Test]
-        public void FalseOrSomethingIsSomething()
+        public void False_Or_Something__IsSomething()
         {
             var falseOrSomething = _math.Or(_math.False<T>(), _dummyOf.Condition(X));
             
@@ -214,7 +216,7 @@
         }
 
         [Test]
-        public void SomethingOrFalseButNotFalseIsNotPredictableFalse(
+        public void Something_Or_False_ButNotFalse__Is_Not_PredictableFalse(
             [Values(true, null)] bool? another)
         {
             var somethingOrFalse = _math.Or(Some(another), _math.False<T>());
@@ -225,7 +227,7 @@
         }
 
         [Test]
-        public void SomethingButNotTrueOrFalseIsNotNotPredictableTrue(
+        public void Something_ButNotTrue_Or_False__Is_Not_PredictableTrue(
             [Values(false, null)] bool? another)
         {
             var somethingOrFalse = _math.Or(Some(another), _math.False<T>());
@@ -236,7 +238,7 @@
         }
 
         [Test]
-        public void TrueOrFalseIsPredictableTrue()
+        public void True_Or_False__IsPredictableTrue()
         {
             var trueOrFalse = _math.Or(_math.True<T>(), _math.False<T>());
             var isPredictableTrue = _math.IsPredictableTrue(trueOrFalse);
@@ -245,7 +247,7 @@
         }
 
         [Test]
-        public void SomethingOrFalseCheckIsSomethingCheckResult(
+        public void Something_Or_False_Check__IsSomethingCheckResult(
             [Values(false, true)] bool anotherCheckResult)
         {
             _dummyOf.Condition(X).Returns(anotherCheckResult);
@@ -256,7 +258,7 @@
         }
 
         [Test]
-        public void SomethingOrFalseCheckCallsCheckFromSomething()
+        public void Something_Or_False_Check__Calls_CheckFromSomething()
         {
             _dummyOf.Condition(X).Returns(true);
 
@@ -267,7 +269,7 @@
         }
 
         [Test]
-        public void SomethingOrFalseIsSomething()
+        public void Something_Or_False__IsSomething()
         {
             var somethingOrFalse = _math.Or(_dummyOf.Condition(X), _math.False<T>());
 
@@ -276,7 +278,7 @@
         }
 
         [Test]
-        public void TrueOrSomethingIsPredictableTrue(
+        public void True_Or_Something__IsPredictableTrue(
             [Values(false, true, null)] bool? another)
         {
             var trueOrSomething = _math.Or(_math.True<T>(), Some(another));
@@ -286,7 +288,7 @@
         }
 
         [Test]
-        public void TrueOrSomethingIsNotPredictableFalse(
+        public void True_Or_Something__Is_Not_PredictableFalse(
             [Values(false, true, null)] bool? another)
         {
             var trueOrSomething = _math.Or(_math.True<T>(), Some(another));
@@ -297,7 +299,7 @@
         }
 
         [Test]
-        public void TrueOrSomethingCheckIsTrue(
+        public void True_Or_Something_Check__IsTrue(
             [Values(false, true, null)] bool? another)
         {
             var trueOrSomething = _math.Or(_math.True<T>(), Some(another));
@@ -306,7 +308,7 @@
         }
 
         [Test]
-        public void TrueOrSomethingCheckDoesNotCallCheckFromSomething()
+        public void True_Or_Something_Check__DoesNotCall_CheckFromSomething()
         {
             var trueOrSomething = _math.Or(_math.True<T>(), _dummyOf.Condition(X));
             trueOrSomething.Check(_token);
@@ -315,7 +317,7 @@
         }
 
         [Test]
-        public void SomethingOrTrueIsPredictableTrue(
+        public void Something_Or_True__IsPredictableTrue(
             [Values(false, true, null)] bool? another)
         {
             var somethingOrTrue = _math.Or(Some(another), _math.True<T>());
@@ -325,7 +327,7 @@
         }
 
         [Test]
-        public void SomethingOrTrueIsNotPredictableFalse(
+        public void Something_Or_True__Is_Not_PredictableFalse(
             [Values(false, true, null)] bool? another)
         {
             var somethingOrTrue = _math.Or(Some(another), _math.True<T>());
@@ -336,7 +338,7 @@
         }
 
         [Test]
-        public void SomethingOrTrueCheckIsTrue(
+        public void Something_Or_True_Check__IsTrue(
             [Values(false, true, null)] bool? another)
         {
             var somethingOrTrue = _math.Or(Some(another), _math.True<T>());
@@ -345,7 +347,7 @@
         }
 
         [Test]
-        public void SomethingOrTrueCheckDoesNotCallCheckFromSomething()
+        public void Something_Or_True_Check__DoesNotCall_CheckFromSomething()
         {
             var somethingOrTrue = _math.Or(_dummyOf.Condition(X), _math.True<T>());
             somethingOrTrue.Check(_token);
@@ -354,7 +356,7 @@
         }
 
         [Test]
-        public void SomethingAndTrueIsSomething()
+        public void Something_And_True__IsSomething()
         {
             var somethingAndTrue = _math.And(_dummyOf.Condition(X), _math.True<T>());
             
@@ -363,7 +365,7 @@
         }
 
         [Test]
-        public void TrueAndSomethingIsSomething()
+        public void True_And_Something__IsSomething()
         {
             var trueAndSomething = _math.And(_math.True<T>(), _dummyOf.Condition(X));
 
@@ -372,7 +374,7 @@
         }
 
         [Test]
-        public void TrueAndSomethingCheckIsSomethingCheckResult(
+        public void True_And_Something_Check__IsSomethingCheckResult(
             [Values(false, true)] bool anotherCheckResult)
         {
             _dummyOf.Condition(X).Returns(anotherCheckResult);
@@ -383,7 +385,7 @@
         }
 
         [Test]
-        public void TrueAndSomethingCheckCallsCheckFromSomething()
+        public void True_And_Something_Check__Calls_CheckFromSomething()
         {
             _dummyOf.Condition(X).Returns(true);
 
@@ -394,7 +396,7 @@
         }
 
         [Test]
-        public void SomethingAndTrueCheckIsSomethingCheckResult(
+        public void Something_And_True_Check__IsSomethingCheckResult(
             [Values(false, true)] bool anotherCheckResult)
         {
             _dummyOf.Condition(X).Returns(anotherCheckResult);
@@ -405,7 +407,7 @@
         }
 
         [Test]
-        public void SomethingAndTrueCheckCallsCheckFromSomething()
+        public void Something_And_True_Check__Calls_CheckFromSomething()
         {
             _dummyOf.Condition(X).Returns(true);
 
@@ -416,7 +418,7 @@
         }
 
         [Test]
-        public void NotTrueIsPredictableFalse()
+        public void NotTrue__IsPredictableFalse()
         {
             var notTrue = _math.Not(_math.True<T>());
 
@@ -424,7 +426,7 @@
         }
 
         [Test]
-        public void NotTrueIsNotPredictableTrue()
+        public void NotTrue__Is_Not_PredictableTrue()
         {
             var notTrue = _math.Not(_math.True<T>());
             
@@ -433,7 +435,7 @@
         }
 
         [Test]
-        public void NotFalseIsPredictableTrue()
+        public void NotFalse__IsPredictableTrue()
         {
             var notFalse = _math.Not(_math.False<T>());
 
@@ -441,7 +443,7 @@
         }
 
         [Test]
-        public void NotFalseIsNotPredictableFalse()
+        public void NotFalse__Is_Not_PredictableFalse()
         {
             var notFalse = _math.Not(_math.False<T>());
             
@@ -450,7 +452,7 @@
         }
 
         [Test]
-        public void NotTrueCheckIsFalse()
+        public void NotTrue_Check__IsFalse()
         {
             var notTrue = _math.Not(_math.True<T>());
 
@@ -459,7 +461,7 @@
         }
 
         [Test]
-        public void NotFalseCheckIsTrue()
+        public void NotFalse_Check__IsTrue()
         {
             var notFalse = _math.Not(_math.False<T>());
             
@@ -467,7 +469,7 @@
         }
 
         [Test]
-        public void MakeConditionCallsEncapsulatedFunc()
+        public void MakeCondition__Calls_EncapsulatedFunc()
         {
             bool called = false;
             var condition = _math.MakeCondition<T>(_ => called = true);
@@ -477,7 +479,7 @@
         }
 
         [Test]
-        public void MakeConditionReturnsEncapsulatedFuncResult(
+        public void MakeCondition__Returns_EncapsulatedFuncResult(
             [Values(false, true)] bool funcResult)
         {
             var condition = _math.MakeCondition<T>(_ => funcResult);

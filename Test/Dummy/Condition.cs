@@ -46,6 +46,12 @@
 
             public override string ToString() => $"c<{index.View}>";
 
+            public override bool Equals(object? obj) =>
+                obj is Condition<T> handler && Index == handler.Index;
+
+            public override int GetHashCode() =>
+                index.GetHashCode();
+
             public ICondition<T> Pure => this;
 
             int CallsCount { get; set; } = 0;

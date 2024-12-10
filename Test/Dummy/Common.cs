@@ -2,7 +2,7 @@
 {
     public static partial class Dummy
     {
-        public static class Common
+        public class Common
         {
             public record AnyArg;
 

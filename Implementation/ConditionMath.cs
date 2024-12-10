@@ -1,6 +1,6 @@
 ﻿namespace ChainLead.Implementation
 {
-    //// DO NOT using ChainLead.Contracts.Syntax;
+    //// DO NOT using ChainLead.Contracts.Syntax; HERE
     using ChainLead.Contracts;
     using System;
 
