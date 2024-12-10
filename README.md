@@ -38,7 +38,7 @@ public static IHandler<State> Hamburger =>
 *(You can see this code in context and more [here](https://github.com/nu-i-sho/ChainLead/blob/main/Test/BurgerExampleAsTest.cs).)*
 
 ## For using ChainLead
-it is necessary to configure the library (syntax) language by providing the implementations of chain mathematics. But do it once in your solution assembly point (where Dependency Injection is configured). 
+it is necessary to configure the library (syntax) language by providing the implementations of chain mathematics.
 ```CSharp
 using ChainLead.Contracts;
 using ChainLead.Implementation;
@@ -54,7 +54,18 @@ using ChainLead.Contracts.Syntax;
 ...
 
 ```
-*(Yes, I know that it is bad practice to have mutable static data. I compromised with that to provide some library language features (provided by static classes only) without losing the support of DIP (from SOLID). So, just configure it once, and you will have no problems with that.)*
+
+Also, it is possible to configure it within the dependencies container.
+
+```CSharp
+using ChainLead.Contracts.Syntax.DI;
+using ChainLead.Implementation.DI;
+
+services
+    .AddConditionMath()
+    .AddHandlerMath()
+    .ConfigureChainLeadSyntax();
+``` 
 
 Use the following 'usings' in source files where you build the chains to make the library syntax available.   
 ```CSharp
