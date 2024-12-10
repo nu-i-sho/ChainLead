@@ -75,7 +75,7 @@
                     return new Product();
                 }
 
-                public override string ToString() => "like Use[a].ToMerge[b].ThenMerge[c]";
+                public override string ToString() => "like Use(a).ToMerge(b).ThenMerge(c)";
 
                 class Product : IMultipleHandlersMath
                 {
@@ -158,7 +158,7 @@
                     return new Product();
                 }
 
-                public override string ToString() => "like MergeXWith[b].ThenWith[c].WhereXIs[a]";
+                public override string ToString() => "like MergeXWith(b).ThenWith(c).WhereXIs(a)";
 
                 class Product : IMultipleHandlersMath
                 {

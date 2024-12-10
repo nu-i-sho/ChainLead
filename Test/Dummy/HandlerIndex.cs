@@ -18,7 +18,7 @@
 
             public static new HandlerIndex Make(char value) => new(value.ToString());
 
-            public static HandlerIndex operator +(HandlerIndex left, HandlerIndex right) =>
+            public static HandlerIndex operator >>(HandlerIndex left, HandlerIndex right) =>
                 new(left.Value + right.Value);
         }
     }

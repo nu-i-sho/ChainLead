@@ -1,0 +1,5 @@
+﻿[ConditionMath.cs]
+
+# S927: Parameter names should match base declaration and other partial definitions
+# It is OK to use the parameter name "_" to highlight that it isn't used in a function.
+dotnet_diagnostic.S927.severity = none

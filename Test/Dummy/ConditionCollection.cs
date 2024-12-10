@@ -1,7 +1,7 @@
-﻿using System.Collections;
-
-namespace ChainLead.Test
+﻿namespace ChainLead.Test
 {
+    using System.Collections;
+
     public static partial class Dummy
     {
         public class ConditionCollection<T>(T token) :

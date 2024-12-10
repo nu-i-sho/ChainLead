@@ -474,8 +474,11 @@
             bool called = false;
             var condition = _math.MakeCondition<T>(_ => called = true);
 
-            Assert.That(condition.Check(_token));
-            Assert.That(called);
+            Assert.Multiple(() =>
+            {
+                Assert.That(condition.Check(_token));
+                Assert.That(called);
+            });
         }
 
         [Test]

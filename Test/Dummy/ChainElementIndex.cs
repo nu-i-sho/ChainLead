@@ -1,7 +1,5 @@
 ﻿namespace ChainLead.Test
 {
-    using System.Diagnostics.CodeAnalysis;
-
     public static partial class Dummy
     {
         public class ChainElementIndex(string value)

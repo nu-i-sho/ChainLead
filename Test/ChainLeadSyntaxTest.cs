@@ -13,7 +13,7 @@
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     public class ChainLeadSyntaxTest<T>
     {
-        readonly Dummy.HandlerIndex AB = A + B, ABC = A + B + C;
+        readonly Dummy.HandlerIndex AB = A >> B, ABC = A >> B >> C;
 
         Dummy.Container<T> _dummyOf;
         List<Dummy.HandlerIndex> _executionLog;
