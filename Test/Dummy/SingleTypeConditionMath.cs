@@ -6,7 +6,7 @@
     public static partial class Dummy
     {
         public class SingleTypeConditionMath<T>(
-                ICollection<Condition<T>, ConditionIndex> conditions)
+                IConditionCollection<T> conditions)
             : IConditionMath
         {
             readonly Dictionary<string, Func<ConditionIndex, ConditionIndex, ConditionIndex>> _anyAppendSetup = [];

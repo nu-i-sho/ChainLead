@@ -7,15 +7,9 @@
             where TDummy : IChainElement<TIndex>
             where TIndex : ChainElementIndex
         {
-            TDummy Get(TIndex i) => 
-                this.First(x => x.Index.Equals(i));
-
             IEnumerable<TIndex> Indices => this.Select(x => x.Index);
 
-            ICollection<TDummy, TIndex> this[TIndex first, TIndex second, params TIndex[] tail] =>
-                this[Enumerable.Concat([first, second], tail)];
-
-            ICollection<TDummy, TIndex> this[IEnumerable<TIndex> indices] { get; }
+            TDummy Get(TIndex i);
 
             void LogInto(IList<ChainElementIndex> acc)
             {

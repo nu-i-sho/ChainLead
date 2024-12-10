@@ -9,13 +9,15 @@
         {
             public T Token => token;
 
-            public ICollection<Handler<T>, HandlerIndex> this[IEnumerable<HandlerIndex> indices]
+            public IEnumerable<HandlerIndex> Indices => Keys;
+
+            public IHandlerCollection<T> this[IEnumerable<HandlerIndex> indices]
             { 
                 get
                 {
                     var slice = new HandlerCollection<T>(token);
                     foreach (var i in indices) 
-                        slice.Add(i, ((IHandlerCollection<T>)this).Get(i));
+                        slice.Add(i, Get(i));
 
                     return slice;
                 }
@@ -27,7 +29,7 @@
                     Add(h.Index, h);
             }
 
-            Handler<T> ICollection<Handler<T>, HandlerIndex>.Get(HandlerIndex i) => this[i];
+            public Handler<T> Get(HandlerIndex i) => this[i];
 
             public void Generate(HandlerIndex i) =>
                 Add(i, new Handler<T>(this, i, token));

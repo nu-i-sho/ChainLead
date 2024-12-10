@@ -1,7 +1,7 @@
-﻿namespace ChainLead.Test
-{
-    using System.Collections;
+﻿using System.Collections;
 
+namespace ChainLead.Test
+{
     public static partial class Dummy
     {
         public class ConditionCollection<T>(T token) :
@@ -9,13 +9,15 @@
         {
             public T Token => token;
 
-            public ICollection<Condition<T>, ConditionIndex> this[IEnumerable<ConditionIndex> indices]
+            public IEnumerable<ConditionIndex> Indices => Keys;
+
+            public IConditionCollection<T> this[IEnumerable<ConditionIndex> indices]
             {
                 get
                 {
                     var slice = new ConditionCollection<T>(token);
                     foreach (var i in indices)
-                        slice.Add(i, ((IConditionCollection<T>)this).Get(i));
+                        slice.Add(i, Get(i));
 
                     return slice;
                 }
@@ -27,10 +29,10 @@
                     Add(c.Index, c);
             }
 
+            public Condition<T> Get(ConditionIndex i) => this[i];
+
             public void Generate(ConditionIndex i) =>
                 Add(i, new Condition<T>(i, token));
-
-            Condition<T> ICollection<Condition<T>, ConditionIndex>.Get(ConditionIndex i) => this[i];
 
             IEnumerator<Condition<T>> IEnumerable<Condition<T>>.GetEnumerator() =>
                 Values.GetEnumerator();

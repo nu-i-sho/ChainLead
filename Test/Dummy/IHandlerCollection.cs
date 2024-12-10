@@ -1,6 +1,4 @@
-﻿using Newtonsoft.Json.Linq;
-
-namespace ChainLead.Test
+﻿namespace ChainLead.Test
 {
     public static partial class Dummy
     {
@@ -9,16 +7,12 @@ namespace ChainLead.Test
         {
             T Token { get; }
 
-            new IHandlerCollection<T> this[
+            IHandlerCollection<T> this[IEnumerable<HandlerIndex> indices] { get; }
+
+            IHandlerCollection<T> this[
                 HandlerIndex first, HandlerIndex second,
                 params HandlerIndex[] tail] =>
-                    (IHandlerCollection<T>)
-                    ((ICollection<Handler<T>, HandlerIndex>)this)[first, second, tail];    
-
-            new IHandlerCollection<T> this[
-                IEnumerable<HandlerIndex> indices] =>
-                    (IHandlerCollection<T>)
-                    ((ICollection<Handler<T>, HandlerIndex>)this)[indices];
+                    this[Enumerable.Concat([first, second], tail)];
 
             IHandlerCollection<T> ThatWereExecutedOnce =>
                 this.Where(x => x.WasExecutedOnce);

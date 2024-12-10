@@ -1,8 +1,7 @@
-﻿using ChainLead.Contracts;
-using static ChainLead.Test.Dummy;
-
-namespace ChainLead.Test
+﻿namespace ChainLead.Test
 {
+    using ChainLead.Contracts;
+
     public static partial class Dummy
     {
         public static IHandlerCollection<T> Where<T>(
@@ -21,7 +20,7 @@ namespace ChainLead.Test
 
         public static IHandlerCollection<T> Concat<T>(
             this IHandlerCollection<T> dummies,
-            IHandlerCollection<T> otherDummies)
+            IEnumerable<Handler<T>> otherDummies)
         {
             var concatenation = new HandlerCollection<T>(dummies.Token);
             concatenation.AddRange(dummies);
@@ -31,7 +30,7 @@ namespace ChainLead.Test
 
         public static IConditionCollection<T> Concat<T>(
             this IConditionCollection<T> dummies,
-            IConditionCollection<T> otherDummies)
+            IEnumerable<Condition<T>> otherDummies)
         {
             var concatenation = new ConditionCollection<T>(dummies.Token);
             concatenation.AddRange(dummies);
@@ -65,13 +64,13 @@ namespace ChainLead.Test
 
         public static IHandlerCollection<T> Except<T>(
             this IHandlerCollection<T> dummies,
-            IHandlerCollection<T> otherDummies) =>
-                dummies[dummies.Indices.Except(otherDummies.Indices)];
+            IEnumerable<Handler<T>> otherDummies) =>
+                dummies[dummies.Indices.Except(otherDummies.Select(x => x.Index))];
 
         public static IConditionCollection<T> Except<T>(
             this IConditionCollection<T> dummies,
-            IConditionCollection<T> otherDummies) =>
-                dummies[dummies.Indices.Except(otherDummies.Indices)];
+            IEnumerable<Condition<T>> otherDummies) =>
+                dummies[dummies.Indices.Except(otherDummies.Select(x => x.Index))];
 
         public static IHandlerCollection<T> Filter<T>(
             this IHandlerCollection<T> dummies,

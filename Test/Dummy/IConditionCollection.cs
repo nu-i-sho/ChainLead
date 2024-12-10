@@ -7,16 +7,12 @@
         {
             T Token { get; }
 
-            new IConditionCollection<T> this[
+            IConditionCollection<T> this[IEnumerable<ConditionIndex> indices] { get; }
+
+            IConditionCollection<T> this[
                 ConditionIndex first, ConditionIndex second,
                 params ConditionIndex[] tail] =>
-                    (IConditionCollection<T>)
-                    ((ICollection<Condition<T>, ConditionIndex>)this)[first, second, tail];
-
-            new IConditionCollection<T> this[
-                IEnumerable<ConditionIndex> indices] =>
-                    (IConditionCollection<T>)
-                    ((ICollection<Condition<T>, ConditionIndex>)this)[indices];
+                    this[Enumerable.Concat([first, second], tail)];
 
             ICollection<Condition<T>, ConditionIndex> ThatWereCheckedOnce =>
                 this.Where(x => x.WasCheckedOnce);

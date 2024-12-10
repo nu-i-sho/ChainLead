@@ -5,7 +5,7 @@
     public static partial class Dummy
     {
         public class SingleTypeHandlerMath<T>(
-                ICollection<Handler<T>, HandlerIndex> handlers) 
+                IHandlerCollection<T> handlers) 
             : IHandlerMath
         {
             readonly Dictionary<(string, HandlerIndex, HandlerIndex), HandlerIndex> _appendsSetup = [];
