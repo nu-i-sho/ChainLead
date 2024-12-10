@@ -377,13 +377,13 @@ var handler = new[]
 
 ## Atomizing
 #### `Atomize`
-Handlers are structured, and ChainLead can see their structures and change them. But outside of ChainLead, all these details are invisible and all handlers provide nothing more than declared in `IHandler<T>`. And there is no ability to access the handler's structure outside ChainLead.
+Handlers have structure, and ChainLead can see their structures and change them. But outside of ChainLead, all these details are invisible and all handlers provide nothing more than declared in `IHandler<T>`. There is no ability to access the handler's structure outside ChainLead.
 
 ![Handlers (in/out)side ChainLead](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/7.svg)
 
-If you want to close the handler structure for ChainLead too, you can easily do it with `Atomize`.
+If you want to hide the handler structure for ChainLead too, you can easily do it with `Atomize`.
 
 ![Handlers (in/out)side ChainLead](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/8.svg)
 
-So, as an example, if you want to close the ability to inject something into your handler (under the attached condition) you can atomize this handler. Also, atomized `Zero` loses the attributes of `Zero` and starts to be recognized by ChainLead as a regular handler (which does nothing).
+So, as an example, if you want to restrict the ability to inject something into your handler (under the attached condition) you can atomize this handler. Also, atomized `Zero` loses the attributes of `Zero` and starts to be recognized by ChainLead as a regular handler (which does nothing).
 
