@@ -211,8 +211,7 @@
         readonly Func<IHandler<T>, IHandler<T>, IHandler<T>> _append;
         readonly Func<IHandler<T>, IHandler<T>> _call;
 
-        Acc(
-            Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
+        Acc(Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
             Func<IHandler<T>, IHandler<T>> call)
         {
            _append = append;

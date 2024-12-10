@@ -2,34 +2,56 @@
 {
     public static partial class Dummy
     {
-        public interface ICollection<TDummy, TIndex> 
+        public interface ICollection<out TDummy, TIndex> 
                 : IEnumerable<TDummy>
-            where TDummy : IDummy<TIndex>
-            where TIndex : Dummy.Index
+            where TDummy : IChainElement<TIndex>
+            where TIndex : ChainElementIndex
         {
-            TDummy Get(TIndex i);
+            TDummy Get(TIndex i) => this.First(x => x.Index.Equals(i));
 
-            ICollection<TDummy, TIndex> this[
-                TIndex first,
-                TIndex second,
-                params TIndex[] tail]
+            IEnumerable<TIndex> Indices => this.Select(x => x.Index);
+
+            ICollection<TDummy, TIndex> this[TIndex first, TIndex second, params TIndex[] tail] =>
+                this[Enumerable.Concat([first, second], tail)];
+
+            ICollection<TDummy, TIndex> this[IEnumerable<TIndex> indices] { get; }
+
+            void LogInto(IList<ChainElementIndex> acc)
             {
-                get;
+                foreach (var x in this)
+                    x.LogsInto(acc);
             }
 
-            public ICollection<TDummy, TIndex> this[
-                IEnumerable<TIndex> indices]
+            void LogInto(IList<TIndex> acc)
             {
-                get;
+                foreach (var x in this)
+                    x.LogsInto(acc);
+            }
+
+            void AddCallback(Action f)
+            {
+                foreach (var x in this)
+                    x.AddCallback(f);
             }
 
             public interface IMutable : ICollection<TDummy, TIndex>
             {
-                void Add(TIndex i);
+                void Generate(TIndex i);
 
-                void AddRange(TIndex first, TIndex second, params TIndex[] tail);
+                void Generate(TIndex first, TIndex second, params TIndex[] tail)
+                {
+                    Generate(first);
+                    Generate(second);
 
-                void AddRange(IEnumerable<TIndex> indices);
+                    foreach (var i in tail)
+                        Generate(i);
+                }
+
+                void Generate(IEnumerable<TIndex> indices)
+                {
+                    foreach (var i in indices)
+                        Generate(i);
+                }
             }
         }
     }

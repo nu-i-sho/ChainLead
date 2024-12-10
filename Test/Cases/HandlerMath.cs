@@ -4,86 +4,71 @@
     using ChainLead.Test.Types;
 
     using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
-    using static ChainLead.Test.Dummy.HandlerIndex.Common;
-    using static ChainLead.Test.Dummy.ConditionIndex.Common;
+    using static ChainLead.Test.Cases.SingleHandler;
+    using static ChainLead.Test.Dummy.ConditionIndex;
+    using static ChainLead.Test.Dummy.HandlerIndex;
 
     public static partial class Cases
     {
         public static class HandlerMath
         {
             public class AllAppendsAttribute()
-                : ValueSourceAttribute(
-                    typeof(Appends),
-                    nameof(Appends.All));
-
-            public class Appends
-            {
-                public static readonly string[] All =
-                [
+                : ValuesAttribute(
                     nameof(IHandlerMath.FirstThenSecond),
                     nameof(IHandlerMath.PackFirstInSecond),
                     nameof(IHandlerMath.InjectFirstIntoSecond),
                     nameof(IHandlerMath.FirstCoverSecond),
                     nameof(IHandlerMath.FirstWrapSecond),
                     nameof(IHandlerMath.JoinFirstWithSecond),
-                    nameof(IHandlerMath.MergeFirstWithSecond)
-                ];
-            }
+                    nameof(IHandlerMath.MergeFirstWithSecond));
 
-            public const string Original = "Original";
-            public const string Syntax = "Syntax";
-            public const string Separated = "Separated";
-            public const string Reversed = "Reversed";
+            public class OriginalTestFixtureAttribute(Type t)
+                : TestFixtureAttribute(t, new OriginalHandlerMathFactory());
 
-            public class TestFixtureAttribute(Type t, string mathName)
-                : NUnit.Framework.TestFixtureAttribute(t, GetMathFactory(mathName))
-            {
-                static IHandlerMathFactory GetMathFactory(string name) =>
-                    name switch
-                    {
-                        Original => new OriginalHandlerMathFactory(),
-                        Syntax => new SyntaxHandlerMathFactory(),
-                        Separated => new SeparatedSyntaxHandlerMathFactory(),
-                        Reversed => new ReversedSyntaxHandlerMathFactory(),
-                        _ => throw new ArgumentOutOfRangeException(nameof(name))
-                    };
-            }
+            public class _I_Attribute() : OriginalTestFixtureAttribute(typeof(int));
+            public class _II_Attribute() : OriginalTestFixtureAttribute(typeof(string));
+            public class _III_Attribute() : OriginalTestFixtureAttribute(typeof(Class));
+            public class _IV_Attribute() : OriginalTestFixtureAttribute(typeof(Struct));
+            public class _V_Attribute() : OriginalTestFixtureAttribute(typeof(ReadonlyStruct));
+            public class _VI_Attribute() : OriginalTestFixtureAttribute(typeof(Record));
+            public class _VII_Attribute() : OriginalTestFixtureAttribute(typeof(RecordStruct));
+            public class _VIII_Attribute() : OriginalTestFixtureAttribute(typeof(ReadonlyRecordStruct));
 
-            public class _I_Attribute() : TestFixtureAttribute(typeof(int), Original);
-            public class _II_Attribute() : TestFixtureAttribute(typeof(string), Original);
-            public class _III_Attribute() : TestFixtureAttribute(typeof(Class), Original);
-            public class _IV_Attribute() : TestFixtureAttribute(typeof(Struct), Original);
-            public class _V_Attribute() : TestFixtureAttribute(typeof(ReadonlyStruct), Original);
-            public class _VI_Attribute() : TestFixtureAttribute(typeof(Record), Original);
-            public class _VII_Attribute() : TestFixtureAttribute(typeof(RecordStruct), Original);
-            public class _VIII_Attribute() : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Original);
+            public class SyntaxTestFixtureAttribute(Type t)
+                : TestFixtureAttribute(t, new SyntaxHandlerMathFactory());
 
-            public class _IX_Attribute() : TestFixtureAttribute(typeof(int), Syntax);
-            public class _X_Attribute() : TestFixtureAttribute(typeof(string), Syntax);
-            public class _XI_Attribute() : TestFixtureAttribute(typeof(Class), Syntax);
-            public class _XII_Attribute() : TestFixtureAttribute(typeof(Struct), Syntax);
-            public class _XIII_Attribute() : TestFixtureAttribute(typeof(ReadonlyStruct), Syntax);
-            public class _XIV_Attribute() : TestFixtureAttribute(typeof(Record), Syntax);
-            public class _XV_Attribute() : TestFixtureAttribute(typeof(RecordStruct), Syntax);
-            public class _XVI_Attribute() : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Syntax);
+            public class _IX_Attribute() : SyntaxTestFixtureAttribute(typeof(int));
+            public class _X_Attribute() : SyntaxTestFixtureAttribute(typeof(string));
+            public class _XI_Attribute() : SyntaxTestFixtureAttribute(typeof(Class));
+            public class _XII_Attribute() : SyntaxTestFixtureAttribute(typeof(Struct));
+            public class _XIII_Attribute() : SyntaxTestFixtureAttribute(typeof(ReadonlyStruct));
+            public class _XIV_Attribute() : SyntaxTestFixtureAttribute(typeof(Record));
+            public class _XV_Attribute() : SyntaxTestFixtureAttribute(typeof(RecordStruct));
+            public class _XVI_Attribute() : SyntaxTestFixtureAttribute(typeof(ReadonlyRecordStruct));
 
-            public class _XVII_Attribute() : TestFixtureAttribute(typeof(int), Separated);
-            public class _XVIII_Attribute() : TestFixtureAttribute(typeof(string), Separated);
-            public class _XIX_Attribute() : TestFixtureAttribute(typeof(Class), Separated);
-            public class _XX_Attribute() : TestFixtureAttribute(typeof(Struct), Separated);
-            public class _XXI_Attribute() : TestFixtureAttribute(typeof(ReadonlyStruct), Separated);
-            public class _XXII_Attribute() : TestFixtureAttribute(typeof(Record), Separated);
-            public class _XXIII_Attribute() : TestFixtureAttribute(typeof(RecordStruct), Separated);
-            public class _XXIV_Attribute() : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Separated);
+            public class SeparatedTestFixtureAttribute(Type t)
+                : TestFixtureAttribute(t, new SeparatedSyntaxHandlerMathFactory());
 
-            public class _XXV_Attribute() : TestFixtureAttribute(typeof(int), Reversed);
-            public class _XXVI_Attribute() : TestFixtureAttribute(typeof(string), Reversed);
-            public class _XXVII_Attribute() : TestFixtureAttribute(typeof(Class), Reversed);
-            public class _XXVIII_Attribute() : TestFixtureAttribute(typeof(Struct), Reversed);
-            public class _XXIX_Attribute() : TestFixtureAttribute(typeof(ReadonlyStruct), Reversed);
-            public class _XXX_Attribute() : TestFixtureAttribute(typeof(Record), Reversed);
-            public class _XXXI_Attribute() : TestFixtureAttribute(typeof(RecordStruct), Reversed);
-            public class _XXXII_Attribute() : TestFixtureAttribute(typeof(ReadonlyRecordStruct), Reversed);
+            public class _XVII_Attribute() : SeparatedTestFixtureAttribute(typeof(int));
+            public class _XVIII_Attribute() : SeparatedTestFixtureAttribute(typeof(string));
+            public class _XIX_Attribute() : SeparatedTestFixtureAttribute(typeof(Class));
+            public class _XX_Attribute() : SeparatedTestFixtureAttribute(typeof(Struct));
+            public class _XXI_Attribute() : SeparatedTestFixtureAttribute(typeof(ReadonlyStruct));
+            public class _XXII_Attribute() : SeparatedTestFixtureAttribute(typeof(Record));
+            public class _XXIII_Attribute() : SeparatedTestFixtureAttribute(typeof(RecordStruct));
+            public class _XXIV_Attribute() : SeparatedTestFixtureAttribute(typeof(ReadonlyRecordStruct));
+
+            public class ReversedTestFixtureAttribute(Type t)
+                : TestFixtureAttribute(t, new ReversedSyntaxHandlerMathFactory());
+
+            public class _XXV_Attribute() : ReversedTestFixtureAttribute(typeof(int));
+            public class _XXVI_Attribute() : ReversedTestFixtureAttribute(typeof(string));
+            public class _XXVII_Attribute() : ReversedTestFixtureAttribute(typeof(Class));
+            public class _XXVIII_Attribute() : ReversedTestFixtureAttribute(typeof(Struct));
+            public class _XXIX_Attribute() : ReversedTestFixtureAttribute(typeof(ReadonlyStruct));
+            public class _XXX_Attribute() : ReversedTestFixtureAttribute(typeof(Record));
+            public class _XXXI_Attribute() : ReversedTestFixtureAttribute(typeof(RecordStruct));
+            public class _XXXII_Attribute() : ReversedTestFixtureAttribute(typeof(ReadonlyRecordStruct));
 
             public interface IHandlerMathFactory
             {
@@ -100,30 +85,30 @@
 
                 public override string ToString() => "Original";
 
-                class Product(IHandlerMath math)
-                    : SingleHandler.OriginalMathFactory.Product(math),
+                class Product(IHandlerMath math) : 
+                    OriginalMathFactory.Product(math),
                     ITestingHandlerMath
                 {
                     public IHandler<T> FirstCoverSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.FirstCoverSecond(a, b);
+                        Math.FirstCoverSecond(a, b);
 
                     public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.FirstThenSecond(a, b);
+                        Math.FirstThenSecond(a, b);
 
                     public IHandler<T> FirstWrapSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.FirstWrapSecond(a, b);
+                        Math.FirstWrapSecond(a, b);
 
                     public IHandler<T> InjectFirstIntoSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.InjectFirstIntoSecond(a, b);
+                        Math.InjectFirstIntoSecond(a, b);
 
                     public IHandler<T> JoinFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.JoinFirstWithSecond(a, b);
+                        Math.JoinFirstWithSecond(a, b);
 
                     public IHandler<T> MergeFirstWithSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.MergeFirstWithSecond(a, b);
+                        Math.MergeFirstWithSecond(a, b);
 
                     public IHandler<T> PackFirstInSecond<T>(IHandler<T> a, IHandler<T> b) =>
-                        math.PackFirstInSecond(a, b);
+                        Math.PackFirstInSecond(a, b);
                 }
             }
 
@@ -136,7 +121,7 @@
                 public override string ToString() => "Syntax like FirstThenSecond[a, b]";
 
                 class Product(IConditionMath conditionMath)
-                    : SingleHandler.SyntaxMathFactory.Product(conditionMath),
+                        : SyntaxMathFactory.Product(conditionMath),
                     ITestingHandlerMath
                 {
                     public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
@@ -171,7 +156,7 @@
                 public override string ToString() => "Syntax like Pack[a].In[b]";
 
                 class Product(IConditionMath conditionMath)
-                    : SingleHandler.SyntaxMathFactory.Product(conditionMath),
+                        : SyntaxMathFactory.Product(conditionMath),
                     ITestingHandlerMath
                 {
                     public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
@@ -206,7 +191,7 @@
                 public override string ToString() => "Syntax like PackXIn[a].WhereXIs[b]";
 
                 class Product(IConditionMath conditionMath)
-                    : SingleHandler.SyntaxMathFactory.Product(conditionMath),
+                        : SyntaxMathFactory.Product(conditionMath),
                     ITestingHandlerMath
                 {
                     public IHandler<T> FirstThenSecond<T>(IHandler<T> a, IHandler<T> b) =>
@@ -442,6 +427,8 @@
                 Dummy.HandlerIndex[] ExecuteExpected,
                 string NameForEasyFind = "")
             {
+                public static readonly Dummy.ConditionIndex TopAnd = new("TOP &");
+
                 public override string ToString()
                 {
                     var name = string.Join(
@@ -546,304 +533,304 @@
                     yield return new(
                         AConditions:     [X],
                         BConditions:     [U],
-                        ChecksSetup:  new() { { R, false } },
-                        CheckExpected:   [R],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
+                        CheckExpected:   [YellowCase.TopAnd],
                         ExecuteExpected: [],
                         NameForEasyFind: "Charles");
 
                     yield return new(
                         AConditions:     [X, Y],
                         BConditions:     [U],
-                        ChecksSetup:  new() { { R, false } },
-                        CheckExpected:   [R],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
+                        CheckExpected:   [YellowCase.TopAnd],
                         ExecuteExpected: [],
                         NameForEasyFind: "Daniel");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U],
-                        ChecksSetup:  new() { { R, false } },
-                        CheckExpected:   [R],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
+                        CheckExpected:   [YellowCase.TopAnd],
                         ExecuteExpected: [],
                         NameForEasyFind: "Matthew");
 
                     yield return new(
                         AConditions:     [X],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, false } },
-                        CheckExpected:   [R],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
+                        CheckExpected:   [YellowCase.TopAnd],
                         ExecuteExpected: [],
                         NameForEasyFind: "Anthony");
 
                     yield return new(
                         AConditions:     [X],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, false } },
-                        CheckExpected:   [R],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
+                        CheckExpected:   [YellowCase.TopAnd],
                         ExecuteExpected: [],
                         NameForEasyFind: "Mark");
 
                     yield return new(
                         AConditions:     [X, Y],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, false } },
-                        CheckExpected:   [R],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
+                        CheckExpected:   [YellowCase.TopAnd],
                         ExecuteExpected: [],
                         NameForEasyFind: "Donald");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, false } },
-                        CheckExpected:   [R],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
+                        CheckExpected:   [YellowCase.TopAnd],
                         ExecuteExpected: [],
                         NameForEasyFind: "Steven");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, false } },
-                        CheckExpected:   [R],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
+                        CheckExpected:   [YellowCase.TopAnd],
                         ExecuteExpected: [],
                         NameForEasyFind: "Andrew");
 
                     yield return new(
                         AConditions:     [X, Y],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, false } },
-                        CheckExpected:   [R],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, false } },
+                        CheckExpected:   [YellowCase.TopAnd],
                         ExecuteExpected: [],
                         NameForEasyFind: "Paul");
 
                     yield return new(
                         AConditions:     [X],
                         BConditions:     [U],
-                        ChecksSetup:  new() { { R, true } },
-                        CheckExpected:   [R],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true } },
+                        CheckExpected:   [YellowCase.TopAnd],
                         ExecuteExpected: [A, B],
                         NameForEasyFind: "Joshua");
 
                     yield return new(
                         AConditions:     [X, Y],
                         BConditions:     [U],
-                        ChecksSetup:  new() { { R, true }, { X, false } },
-                        CheckExpected:   [R, X],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { X, false } },
+                        CheckExpected:   [YellowCase.TopAnd, X],
                         ExecuteExpected: [B],
                         NameForEasyFind: "Kenneth");
 
                     yield return new(
                         AConditions:     [X, Y],
                         BConditions:     [U],
-                        ChecksSetup:  new() { { R, true }, { X, true } },
-                        CheckExpected:   [R, X],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { X, true } },
+                        CheckExpected:   [YellowCase.TopAnd, X],
                         ExecuteExpected: [A, B],
                         NameForEasyFind: "Kevin");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U],
-                        ChecksSetup:  new() { { R, true }, { Y, false } },
-                        CheckExpected:   [R, Y],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, false } },
+                        CheckExpected:   [YellowCase.TopAnd, Y],
                         ExecuteExpected: [B],
                         NameForEasyFind: "Brian");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U],
-                        ChecksSetup:  new() { { R, true }, { Y, true }, { X, false } },
-                        CheckExpected:   [R, Y, X],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, X],
                         ExecuteExpected: [B],
                         NameForEasyFind: "Timothy");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U],
-                        ChecksSetup:  new() { { R, true }, { Y, true }, { X, true } },
-                        CheckExpected:   [R, Y, X],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, true } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, X],
                         ExecuteExpected: [A, B],
                         NameForEasyFind: "Ronald");
 
                     yield return new(
                         AConditions:     [X],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, true }, { U, false } },
-                        CheckExpected:   [R, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { U, false } },
+                        CheckExpected:   [YellowCase.TopAnd, U],
                         ExecuteExpected: [A],
                         NameForEasyFind: "George");
 
                     yield return new(
                         AConditions:     [X],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, true }, { U, true } },
-                        CheckExpected:   [R, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { U, true } },
+                        CheckExpected:   [YellowCase.TopAnd, U],
                         ExecuteExpected: [A, B],
                         NameForEasyFind: "Jason");
 
                     yield return new(
                         AConditions:     [X],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, true }, { V, true }, { U, false } },
-                        CheckExpected:   [R, V, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { V, true }, { U, false } },
+                        CheckExpected:   [YellowCase.TopAnd, V, U],
                         ExecuteExpected: [A],
                         NameForEasyFind: "Edward");
 
                     yield return new(
                         AConditions:     [X],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, true }, { V, true }, { U, true } },
-                        CheckExpected:   [R, V, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { V, true }, { U, true } },
+                        CheckExpected:   [YellowCase.TopAnd, V, U],
                         ExecuteExpected: [A, B],
                         NameForEasyFind: "Jeffrey");
 
                     yield return new(
                         AConditions:     [X, Y],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, true }, { X, false }, { U, false } },
-                        CheckExpected:   [R, X, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { X, false }, { U, false } },
+                        CheckExpected:   [YellowCase.TopAnd, X, U],
                         ExecuteExpected: [],
                         NameForEasyFind: "Ryan");
 
                     yield return new(
                         AConditions:     [X, Y],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, true }, { X, true }, { U, false } },
-                        CheckExpected:   [R, X, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { X, true }, { U, false } },
+                        CheckExpected:   [YellowCase.TopAnd, X, U],
                         ExecuteExpected: [A],
                         NameForEasyFind: "Jacob");
 
                     yield return new(
                         AConditions:     [X, Y],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, true }, { X, true }, { U, false } },
-                        CheckExpected:   [R, X, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { X, true }, { U, false } },
+                        CheckExpected:   [YellowCase.TopAnd, X, U],
                         ExecuteExpected: [A],
                         NameForEasyFind: "Nicholas");
 
                     yield return new(
                         AConditions:     [X, Y],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, true }, { X, true }, { U, true } },
-                        CheckExpected:   [R, X, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { X, true }, { U, true } },
+                        CheckExpected:   [YellowCase.TopAnd, X, U],
                         ExecuteExpected: [A, B],
                         NameForEasyFind: "Gary");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, true }, { Y, false }, { U, false } },
-                        CheckExpected:   [R, Y, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, false }, { U, false } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, U],
                         ExecuteExpected: [],
                         NameForEasyFind: "Eric");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, true }, { Y, true }, { X, false }, { U, false } },
-                        CheckExpected:   [R, Y, X, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false }, { U, false } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, X, U],
                         ExecuteExpected: [],
                         NameForEasyFind: "Jonathan");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, true }, { Y, true }, { X, true }, { U, false } },
-                        CheckExpected:   [R, Y, X, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, true }, { U, false } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, X, U],
                         ExecuteExpected: [A],
                         NameForEasyFind: "Stephen");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, true }, { Y, false }, { U, true } },
-                        CheckExpected:   [R, Y, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, false }, { U, true } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, U],
                         ExecuteExpected: [B],
                         NameForEasyFind: "Larry");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, true }, { Y, true }, { X, false }, { U, true } },
-                        CheckExpected:   [R, Y, X, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false }, { U, true } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, X, U],
                         ExecuteExpected: [B],
                         NameForEasyFind: "Justin");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V],
-                        ChecksSetup:  new() { { R, true }, { Y, true }, { X, true }, { U, true } },
-                        CheckExpected:   [R, Y, X, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, true }, { U, true } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, X, U],
                         ExecuteExpected: [A, B],
                         NameForEasyFind: "Scott");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, true }, { Y, false }, { V, false } },
-                        CheckExpected:   [R, Y, V],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, false }, { V, false } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, V],
                         ExecuteExpected: [],
                         NameForEasyFind: "Brandon");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, true }, { Y, true }, { X, false }, { V, false } },
-                        CheckExpected:   [R, Y, X, V],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false }, { V, false } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, X, V],
                         ExecuteExpected: [],
                         NameForEasyFind: "Benjamin");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, true }, { Y, true }, { X, false }, { V, true }, { U, false } },
-                        CheckExpected:   [R, Y, X, V, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false }, { V, true }, { U, false } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, X, V, U],
                         ExecuteExpected: [],
                         NameForEasyFind: "Samuel");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, true }, { Y, true }, { X, false }, { V, false } },
-                        CheckExpected:   [R, Y, X, V],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false }, { V, false } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, X, V],
                         ExecuteExpected: [],
                         NameForEasyFind: "Gregory");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, true }, { Y, true }, { X, true }, { V, true }, { U, false } },
-                        CheckExpected:   [R, Y, X, V, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, true }, { V, true }, { U, false } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, X, V, U],
                         ExecuteExpected: [A],
                         NameForEasyFind: "Alexander");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, true }, { Y, false }, { V, true }, { U, false } },
-                        CheckExpected:   [R, Y, V, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, false }, { V, true }, { U, false } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, V, U],
                         ExecuteExpected: [],
                         NameForEasyFind: "Patrick");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, true }, { Y, false }, { V, true }, { U, true } },
-                        CheckExpected:   [R, Y, V, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, false }, { V, true }, { U, true } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, V, U],
                         ExecuteExpected: [B],
                         NameForEasyFind: "Frank");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, true }, { Y, true }, { X, false }, { V, true }, { U, true } },
-                        CheckExpected:   [R, Y, X, V, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, false }, { V, true }, { U, true } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, X, V, U],
                         ExecuteExpected: [B],
                         NameForEasyFind: "Raymond");
 
                     yield return new(
                         AConditions:     [X, Y, Z],
                         BConditions:     [U, V, W],
-                        ChecksSetup:  new() { { R, true }, { Y, true }, { X, true }, { V, true }, { U, true } },
-                        CheckExpected:   [R, Y, X, V, U],
+                        ChecksSetup:  new() { { YellowCase.TopAnd, true }, { Y, true }, { X, true }, { V, true }, { U, true } },
+                        CheckExpected:   [YellowCase.TopAnd, Y, X, V, U],
                         ExecuteExpected: [A, B],
                         NameForEasyFind: "Jack");
                 }
@@ -913,7 +900,7 @@
                 Dummy.ConditionIndex[] AConditions,
                 Dummy.ConditionIndex[] BConditions,
                 Dictionary<Dummy.ConditionIndex, bool> ChecksSetup,
-                Dummy.Index[] ExpectedCallsOrder,
+                Dummy.ChainElementIndex[] ExpectedCallsOrder,
                 string NameForEasyFind = "")
             {
                 public override string ToString()
@@ -2469,20 +2456,20 @@
 
             const char CaseBlocksSeparator = '•';
 
-            static string ViewOf(Dummy.Index? x) =>
+            static string ViewOf(Dummy.ChainElementIndex? x) =>
                 x?.Value ?? ".";
 
             static string ViewOf(bool x) =>
                 x ? "I" : "O";
 
-            static string ViewOf(Dummy.Index?[] x) => WithHandleEmptyCollection(x, x =>
+            static string ViewOf(Dummy.ChainElementIndex?[] x) => WithHandleEmptyCollection(x, x =>
                 $"[{x.Select(ViewOf).Aggregate(string.Concat)}]");
 
             static string ViewOf(bool[] x) => WithHandleEmptyCollection(x, x =>
                 $"[{x.Select(ViewOf).Aggregate(string.Concat)}]");
 
             static string ViewOf<TIndex>(Dictionary<TIndex, bool> x)
-                where TIndex : Dummy.Index => WithHandleEmptyCollection(x, x =>
+                where TIndex : Dummy.ChainElementIndex => WithHandleEmptyCollection(x, x =>
                 $"[{x.Select(x => $"{{{ViewOf(x.Key)}-{ViewOf(x.Value)}}}")
                      .Aggregate(string.Concat)}]");
 

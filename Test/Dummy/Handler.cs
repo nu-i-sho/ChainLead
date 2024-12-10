@@ -5,15 +5,13 @@
     public static partial class Dummy
     {
         public class Handler<T>(
-                HandlerCollection<T> handlers,
+                IHandlerCollection<T> handlers,
                 HandlerIndex index,
                 T token) :
-            IDummy<HandlerIndex>,
+            IChainElement<HandlerIndex>,
             IHandler<T>
         {
             public HandlerIndex Index => index;
-
-            public string Name => index.View;
 
             public void SetImplementation(Action<T> f) =>
                 Implementation = f;
@@ -21,11 +19,11 @@
             public void AddCallback(Action f) =>
                 Callback += f;
 
-            public void LogsInto(IList<HandlerIndex> acc) =>
-                AddCallback(() => acc.Add(Index));
+            public void LogsInto(IList<HandlerIndex> log) =>
+                AddCallback(() => log.Add(Index));
 
-            public void LogsInto(IList<Index> acc) =>
-                AddCallback(() => acc.Add(Index));
+            public void LogsInto(IList<ChainElementIndex> log) =>
+                AddCallback(() => log.Add(Index));
 
             public void DelegatesTo(params HandlerIndex[] indexes) =>
                 AddCallback(() =>
@@ -34,10 +32,10 @@
                         handlers.Get(i).Execute(token);
                 });
 
-            public bool WasExecutedOnce() =>
+            public bool WasExecutedOnce =>
                 CallsCount == 1;
 
-            public bool WasNeverExecuted() =>
+            public bool WasNeverExecuted =>
                 CallsCount == 0;
 
             public TimesContinuation WasExecuted(int times) =>
@@ -48,33 +46,29 @@
                 public bool Times => answer;
             }
 
-            public ElseNeverContinuation WasExecutedOnceWhen(bool condition) =>
-                new(condition
-                    ? WasExecutedOnce()
-                    : WasNeverExecuted());
+            public ElseNeverContinuation WasExecutedOnceWhen(
+                bool executedCondition) =>
+                 new(executedCondition 
+                        ? WasExecutedOnce
+                        : WasNeverExecuted);
 
             public class ElseNeverContinuation(bool answer)
             {
                 public bool ElseNever => answer;
             }
 
-            public bool VerifyExecution(bool wasExecutedOnceElseNever) =>
-                wasExecutedOnceElseNever
-                    ? WasExecutedOnce()
-                    : WasNeverExecuted();
-
-            public override string ToString() => Name;
+            public override string ToString() => $"h[{index.View}]";
 
             public IHandler<T> Pure => this;
 
-            private int CallsCount { get; set; } = 0;
+            int CallsCount { get; set; } = 0;
 
-            private Action<T> Implementation { get; set; } = _ =>
+            Action<T> Implementation { get; set; } = _ =>
             {
                 /* INITIALY DO NOTHING */
             };
 
-            private Action Callback { get; set; } = () =>
+            Action Callback { get; set; } = () =>
             {
                 /* INITIALY DO NOTHING */
             };

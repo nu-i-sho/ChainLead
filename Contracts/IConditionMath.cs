@@ -12,9 +12,9 @@
 
         bool IsPredictableFalse<T>(ICondition<T> condition);
 
-        ICondition<T> And<T>(ICondition<T> a, ICondition<T> b);
+        ICondition<T> And<T>(ICondition<T> left, ICondition<T> right);
 
-        ICondition<T> Or<T>(ICondition<T> a, ICondition<T> b);
+        ICondition<T> Or<T>(ICondition<T> left, ICondition<T> right);
 
         ICondition<T> Not<T>(ICondition<T> condition);
     }

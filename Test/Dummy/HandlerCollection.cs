@@ -1,22 +1,23 @@
 ﻿namespace ChainLead.Test
 {
-    using System.Collections.Generic;
-
     public static partial class Dummy
     {
-        public class HandlerCollection<T> :
-            Collection<Handler<T>, HandlerIndex>.Mutable
+        public class HandlerCollection<T>(T token) :
+            List<Handler<T>>, IHandlerCollection<T>.IMutable
         {
-            readonly T _token;
+            public T Token => token;
 
-            public HandlerCollection(T token)
-                : base() => _token = token;
-
-            public HandlerCollection(IEnumerable<Handler<T>> items, T token)
-                : base(items) => _token = token;
-
-            public override void Add(HandlerIndex i) =>
-                Add(new Handler<T>(this, i, _token));
+            public ICollection<Handler<T>, HandlerIndex> this[IEnumerable<HandlerIndex> indices]
+            { 
+                get
+                {
+                    var slice = new HandlerCollection<T>(token);
+                    slice.AddRange(indices.Select(((IHandlerCollection<T>)this).Get));
+                    return slice;
+                }
+            }
+            public void Generate(HandlerIndex i) =>
+                Add(new Handler<T>(this, i, token));
         }
     }
 }

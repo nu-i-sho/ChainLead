@@ -4,7 +4,7 @@
     using ChainLead.Implementation;
     using ChainLead.Test.Utils;
     using static ChainLead.Test.Cases.Common;
-    using static ChainLead.Test.Dummy.ConditionIndex.Common;
+    using static ChainLead.Test.Dummy.ConditionIndex;
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     public class ConditionMathTest<T>
@@ -17,7 +17,10 @@
         public void Setup()
         {
             _token = TokensProvider.GetRandom<T>();
+            
             _dummyOf = new(_token);
+            _dummyOf.Conditions.Generate(X, Y);
+            
             _math = new ConditionMath();
         }
 
@@ -127,8 +130,7 @@
             var somethingAndFalse = _math.And(_dummyOf.Condition(X), _math.False<T>());
             somethingAndFalse.Check(_token);
 
-            Assert.That(_dummyOf.Condition(X)
-                  .WasNeverChecked());
+            Assert.That(_dummyOf.Condition(X).WasNeverChecked);
         }
 
         [Test]
@@ -137,8 +139,7 @@
             var falseAndSomething = _math.And(_math.False<T>(), _dummyOf.Condition(X));
             falseAndSomething.Check(_token);
 
-            Assert.That(_dummyOf.Condition(X)
-                  .WasNeverChecked());
+            Assert.That(_dummyOf.Condition(X).WasNeverChecked);
         }
 
         [Test]
@@ -200,8 +201,7 @@
             var falseOrSomething = _math.Or(_math.False<T>(), _dummyOf.Condition(X));
             falseOrSomething.Check(_token);
 
-            Assert.That(_dummyOf.Condition(X)
-                  .WasCheckedOnce());
+            Assert.That(_dummyOf.Condition(X).WasCheckedOnce);
         }
 
         [Test]
@@ -263,8 +263,7 @@
             var somethingOrFalse = _math.Or(_dummyOf.Condition(X), _math.False<T>());
             somethingOrFalse.Check(_token);
 
-            Assert.That(_dummyOf.Condition(X)
-                  .WasCheckedOnce());
+            Assert.That(_dummyOf.Condition(X).WasCheckedOnce);
         }
 
         [Test]
@@ -312,8 +311,7 @@
             var trueOrSomething = _math.Or(_math.True<T>(), _dummyOf.Condition(X));
             trueOrSomething.Check(_token);
 
-            Assert.That(_dummyOf.Condition(X)
-                  .WasNeverChecked());
+            Assert.That(_dummyOf.Condition(X).WasNeverChecked);
         }
 
         [Test]
@@ -352,8 +350,7 @@
             var somethingOrTrue = _math.Or(_dummyOf.Condition(X), _math.True<T>());
             somethingOrTrue.Check(_token);
 
-            Assert.That(_dummyOf.Condition(X)
-                  .WasNeverChecked());
+            Assert.That(_dummyOf.Condition(X).WasNeverChecked);
         }
 
         [Test]
@@ -393,8 +390,7 @@
             var trueAndSomething = _math.And(_math.True<T>(), _dummyOf.Condition(X));
             trueAndSomething.Check(_token);
 
-            Assert.That(_dummyOf.Condition(X)
-                  .WasCheckedOnce());
+            Assert.That(_dummyOf.Condition(X).WasCheckedOnce);
         }
 
         [Test]
@@ -416,8 +412,7 @@
             var somethingAndTrue = _math.And(_dummyOf.Condition(X), _math.True<T>());
             somethingAndTrue.Check(_token);
 
-            Assert.That(_dummyOf.Condition(X)
-                  .WasCheckedOnce());
+            Assert.That(_dummyOf.Condition(X).WasCheckedOnce);
         }
 
         [Test]

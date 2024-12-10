@@ -1,11 +1,9 @@
 ﻿namespace ChainLead.Test
 {
-    using ChainLead.Contracts;
     using ChainLead.Test.Utils;
-
     using static ChainLead.Test.Cases.SingleHandler;
-    using static ChainLead.Test.Dummy.ConditionIndex.Common;
-    using static ChainLead.Test.Dummy.HandlerIndex.Common;
+    using static ChainLead.Test.Dummy.ConditionIndex;
+    using static ChainLead.Test.Dummy.HandlerIndex;
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
@@ -20,7 +18,10 @@
         public void Setup()
         {
             _token = TokensProvider.GetRandom<T>();
+
             _dummyOf = new(_token);
+            _dummyOf.Handlers.Generate(A);
+
             _math = mathFactory.Create(_dummyOf.ConditionMath);
         }
 
@@ -47,6 +48,7 @@
         [Test]
         public void ConditionalZeroIsZero()
         {
+            _dummyOf.Conditions.Generate(X);
             var conditionalZero = _math.Conditional(
                 _math.Zero<T>(), 
                 _dummyOf.Condition(X));
@@ -57,6 +59,7 @@
         [Test]
         public void WhenConditionReturnsTrue__HandlerIsExecuted()
         {
+            _dummyOf.Conditions.Generate(X);
             _dummyOf.Condition(X).Returns(true);
 
             _math.Conditional(
@@ -64,13 +67,13 @@
                     _dummyOf.Condition(X))
                  .Execute(_token);
 
-            Assert.That(_dummyOf.Handler(A)
-                  .WasExecutedOnce());
+            Assert.That(_dummyOf.Handler(A).WasExecutedOnce);
         }
 
         [Test]
         public void WhenConditionReturnsFalse__HandlerIsNotExecuted()
         {
+            _dummyOf.Conditions.Generate(X);
             _dummyOf.Condition(X).Returns(false);
 
             _math.Conditional(
@@ -78,27 +81,25 @@
                     _dummyOf.Condition(X))
                  .Execute(_token);
 
-            Assert.That(_dummyOf.Handler(A)
-                  .WasNeverExecuted());
+            Assert.That(_dummyOf.Handler(A).WasNeverExecuted);
         }
 
         [Test]
         public void WhenTopConditionReturnsFalse__AllOtherChecksAndExecutionsAreNotCalled()
         {
+            _dummyOf.Conditions.Generate(X, Y, Z);
             _dummyOf.Condition(Z).Returns(false);
 
             _dummyOf.Conditions[X, Y, Z]
                 .Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional)
                 .Execute(_token);
 
-            Assert.That(_dummyOf.Condition(Z)
-                  .WasCheckedOnce());
+            Assert.That(_dummyOf.Condition(Z).WasCheckedOnce);
 
-            Assert.That(_dummyOf.Conditions[X, Y]
-                  .WereNeverChecked());
+            Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
+                Is.EquivalentTo(_dummyOf.Conditions[X, Y]));
 
-            Assert.That(_dummyOf.Handler(A)
-                  .WasNeverExecuted());
+            Assert.That(_dummyOf.Handler(A).WasNeverExecuted);
         }
 
         [Test]
@@ -106,23 +107,28 @@
             [Values(0, 1, 2, 5)] int trueCount,
             [Values(0, 1, 2, 5)] int falseCount)
         {
+            _dummyOf.Conditions.Generate(QRSTUVWXYZ.Take(trueCount + falseCount));
+
             var trues = _dummyOf.Conditions.Take(trueCount);
             var falses = _dummyOf.Conditions.Skip(trueCount).Take(falseCount);
+
+            var falsesThenTrues = falses.Concat(trues);
+            var truesThenFalses = falsesThenTrues.Reverse();
 
             trues.Return(true);
             falses.Return(false);
 
-            var all = falses.Concat(trues);
-            all.Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional)
-               .Execute(_token);
+            falsesThenTrues
+                .Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional)
+                .Execute(_token);
 
             var checkedCount = trueCount + int.Min(1, falseCount);
 
-            Assert.That(all.Reverse().Take(checkedCount)
-                  .EachWasCheckedOnce());
+            Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
+                Is.EquivalentTo(truesThenFalses.Take(checkedCount)));
 
-            Assert.That(all.Reverse().Skip(checkedCount)
-                  .WereNeverChecked());
+            Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
+                Is.EquivalentTo(truesThenFalses.Skip(checkedCount)));
 
             Assert.That(_dummyOf.Handler(A)
                   .WasExecutedOnceWhen(falseCount == 0)
@@ -134,7 +140,8 @@
         {
             List<Dummy.ConditionIndex> checksLog = [];
 
-            _dummyOf.Conditions[X, Y, Z].AddLoggingInto(checksLog);
+            _dummyOf.Conditions.Generate(X, Y, Z);
+            _dummyOf.Conditions[X, Y, Z].LogInto(checksLog);
             _dummyOf.Conditions[X, Y, Z].Return(true);
             _dummyOf.Conditions[X, Y, Z]
                 .Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional)

@@ -2,7 +2,7 @@
 {
     public struct Struct(int id)
     {
-        public int Id { get; set; } = id;
+        public int Id => id;
 
         public Member.Class MemberClass { get; set; } = new(id + 10);
         public Member.Struct MemberStruct { get; set; } = new(id + 20);

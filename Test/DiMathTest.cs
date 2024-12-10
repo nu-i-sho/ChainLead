@@ -13,15 +13,15 @@
         [SetUp]
         public void Setup()
         {
-            _dummyOfServiceCollection = new();
+            _dummyOfServiceCollection = [];
         }
 
         [Test]
         public void AddConditionMathAddsNewTokenDescriptor()
         {
             _dummyOfServiceCollection.AddConditionMath();
-            Assert.That(_dummyOfServiceCollection.Count, 
-                Is.EqualTo(1));
+            Assert.That(_dummyOfServiceCollection,
+               Has.Count.EqualTo(1));
         }
 
         [Test]
@@ -52,8 +52,8 @@
         public void AddHandlerMathAddsNewTokenDescriptor()
         {
             _dummyOfServiceCollection.AddHandlerMath();
-            Assert.That(_dummyOfServiceCollection.Count(), 
-                Is.EqualTo(1));
+            Assert.That(_dummyOfServiceCollection, 
+               Has.Count.EqualTo(1));
         }
 
         [Test]

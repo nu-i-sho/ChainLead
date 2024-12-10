@@ -5,14 +5,14 @@
     using ChainLead.Contracts.Syntax.DI;
     using Microsoft.Extensions.DependencyInjection;
     
-    using static ChainLead.Test.Dummy.HandlerIndex.Common;
-    using static ChainLead.Test.Dummy.ConditionIndex.Common;
+    using static ChainLead.Test.Dummy.HandlerIndex;
+    using static ChainLead.Test.Dummy.ConditionIndex;
 
     [TestFixture]
     public class DiChainLeadSyntaxTest
     {
         public record TypeDoesNotMatter;
-        public TypeDoesNotMatter _objectDoesNotMetter = new();
+        public TypeDoesNotMatter _objectDoesNotMatter = new();
 
         DummyServiceCollection _dummyOfServiceCollection;
         DummyServiceProvider _dummyOfServiceProvider;
@@ -21,9 +21,12 @@
         [SetUp]
         public void Setup()
         {
-            _dummyOfServiceCollection = new();
+            _dummyOfServiceCollection = [];
             _dummyOfServiceProvider = new();
-            _dummyOf = new(_objectDoesNotMetter);
+
+            _dummyOf = new(_objectDoesNotMatter);
+            _dummyOf.Handlers.Generate(A);
+            _dummyOf.Conditions.Generate(X);
 
             _dummyOfServiceProvider.AddSetup<IHandlerMath>(_dummyOf.HandlerMath);
             _dummyOfServiceProvider.AddSetup<IConditionMath>(_dummyOf.ConditionMath);
@@ -34,8 +37,8 @@
         {
             _dummyOfServiceCollection.ConfigureChainLeadSyntax();
 
-            Assert.That(_dummyOfServiceCollection.Count, 
-                Is.EqualTo(1));
+            Assert.That(_dummyOfServiceCollection, 
+               Has.Count.EqualTo(1));
         }
 
         [Test]
@@ -102,10 +105,10 @@
 
         public class DummyServiceProvider : IServiceProvider
         {
-            private readonly Dictionary<Type, object> _setup = new();
+            private readonly Dictionary<Type, object> _setup = [];
 
             public void AddSetup<TContract>(TContract impl) =>
-                _setup.Add(typeof(TContract), impl); 
+                _setup.Add(typeof(TContract), impl!); 
 
             public object? GetService(Type serviceType) =>
                 _setup.GetValueOrDefault(serviceType);

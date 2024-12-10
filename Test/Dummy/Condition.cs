@@ -7,18 +7,13 @@
         public class Condition<T>(
                 ConditionIndex index,
                 T token) :
-            IDummy<ConditionIndex>,
+            IChainElement<ConditionIndex>,
             ICondition<T>
         {
             public ConditionIndex Index => index;
 
-            public string Name => index.View;
-
             public void SetImplementation(Func<T, bool> f) =>
                 Implementation = f;
-
-            public void Throws(Exception e) =>
-                Callback += () => throw e;
 
             public void AddCallback(Action f) =>
                 Callback += f;
@@ -26,24 +21,30 @@
             public void LogsInto(IList<ConditionIndex> acc) =>
                 AddCallback(() => acc.Add(Index));
 
-            public void LogsInto(IList<Index> acc) =>
+            public void LogsInto(IList<ChainElementIndex> acc) =>
                 AddCallback(() => acc.Add(Index));
 
             public void Returns(bool value) =>
                 Implementation = _ => value;
 
-            public bool WasCheckedOnce() =>
+            public bool WasCheckedOnce =>
                 CallsCount == 1;
 
-            public bool WasNeverChecked() =>
+            public bool WasNeverChecked =>
                 CallsCount == 0;
 
-            public bool VerifyCheck(bool wasExecutedOnceElseNever) =>
-                wasExecutedOnceElseNever
-                    ? WasCheckedOnce()
-                    : WasNeverChecked();
+            public ElseNeverContinuation WasCheckedOnceWhen(
+                bool checkedCondition) =>
+                 new(checkedCondition 
+                        ? WasCheckedOnce
+                        : WasNeverChecked);
 
-            public override string ToString() => Name;
+            public class ElseNeverContinuation(bool answer)
+            {
+                public bool ElseNever => answer;
+            }
+
+            public override string ToString() => $"c<{index.View}>";
 
             public ICondition<T> Pure => this;
 
