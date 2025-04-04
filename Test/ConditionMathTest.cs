@@ -474,11 +474,10 @@
             bool called = false;
             var condition = _math.MakeCondition<T>(_ => called = true);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(condition.Check(_token));
-                Assert.That(called);
-            });
+            using var _ = Assert.EnterMultipleScope();
+            
+            Assert.That(condition.Check(_token));
+            Assert.That(called);
         }
 
         [Test]

@@ -94,15 +94,14 @@
                 .Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional)
                 .Execute(_token);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Condition(Z).WasCheckedOnce);
+            using var _ = Assert.EnterMultipleScope();
 
-                Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
-                    Is.EquivalentTo(_dummyOf.Conditions[X, Y]));
+            Assert.That(_dummyOf.Condition(Z).WasCheckedOnce);
 
-                Assert.That(_dummyOf.Handler(A).WasNeverExecuted);
-            });
+            Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
+                Is.EquivalentTo(_dummyOf.Conditions[X, Y]));
+
+            Assert.That(_dummyOf.Handler(A).WasNeverExecuted);
         }
 
         [Test]
@@ -127,18 +126,17 @@
 
             var checkedCount = trueCount + int.Min(1, falseCount);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
-                    Is.EquivalentTo(truesThenFalses.Take(checkedCount)));
+            using var _ = Assert.EnterMultipleScope();
 
-                Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
-                    Is.EquivalentTo(truesThenFalses.Skip(checkedCount)));
+            Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
+                Is.EquivalentTo(truesThenFalses.Take(checkedCount)));
 
-                Assert.That(_dummyOf.Handler(A)
-                      .WasExecutedOnceWhen(falseCount == 0)
-                      .ElseNever);
-            });
+            Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
+                Is.EquivalentTo(truesThenFalses.Skip(checkedCount)));
+
+            Assert.That(_dummyOf.Handler(A)
+                  .WasExecutedOnceWhen(falseCount == 0)
+                  .ElseNever);
         }
 
         [Test]

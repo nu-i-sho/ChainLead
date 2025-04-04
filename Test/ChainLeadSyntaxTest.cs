@@ -49,11 +49,10 @@
         {
             _dummyOf.HandlerMath.Zero_Returns(A);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Handler(A).IsZero(), Is.True);
-                Assert.That(_dummyOf.Handler(B).IsZero(), Is.False);
-            });
+            using var _ = Assert.EnterMultipleScope();
+
+            Assert.That(_dummyOf.Handler(A).IsZero(), Is.True);
+            Assert.That(_dummyOf.Handler(B).IsZero(), Is.False);
         }
 
         [Test]
@@ -868,11 +867,10 @@
 
             _dummyOf.ConditionMath.MakeCondition_Returns(X);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(MakeCondition(func).Check(_token));
-                Assert.That(funcCalled);
-            });
+            using var _ = Assert.EnterMultipleScope();
+
+            Assert.That(MakeCondition(func).Check(_token));
+            Assert.That(funcCalled);
         }
 
         [Test]
@@ -883,11 +881,10 @@
 
             _dummyOf.ConditionMath.MakeCondition_Returns(X);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(func.AsCondition().Check(_token));
-                Assert.That(funcCalled);
-            });
+            using var _ = Assert.EnterMultipleScope();
+
+            Assert.That(func.AsCondition().Check(_token));
+            Assert.That(funcCalled);
         }
 
         [Test]
@@ -898,11 +895,10 @@
 
             _dummyOf.ConditionMath.MakeCondition_Returns(X);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(func.AsCondition().Check(_token));
-                Assert.That(funcCalled);
-            });
+            using var _ = Assert.EnterMultipleScope();
+
+            Assert.That(func.AsCondition().Check(_token));
+            Assert.That(funcCalled);
         }
 
         [Test]
@@ -928,12 +924,11 @@
         {
             _dummyOf.ConditionMath.True_Returns(X);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Condition(X).IsPredictableTrue());
-                Assert.That(_dummyOf.Condition(Y).IsPredictableTrue(),
-                    Is.False);
-            });
+            using var _ = Assert.EnterMultipleScope();
+
+            Assert.That(_dummyOf.Condition(X).IsPredictableTrue());
+            Assert.That(_dummyOf.Condition(Y).IsPredictableTrue(),
+                Is.False);
         }
 
         [Test]
@@ -941,12 +936,11 @@
         {
             _dummyOf.ConditionMath.False_Returns(X);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Condition(X).IsPredictableFalse());
-                Assert.That(_dummyOf.Condition(Y).IsPredictableFalse(),
-                    Is.False);
-            });
+            using var _ = Assert.EnterMultipleScope();
+
+            Assert.That(_dummyOf.Condition(X).IsPredictableFalse());
+            Assert.That(_dummyOf.Condition(Y).IsPredictableFalse(),
+                Is.False);
         }
 
         [Test]

@@ -204,17 +204,16 @@ namespace Nuisho.ChainLead.Test
                 .Aggregate(_math.FirstThenSecond)
                 .Execute(_token);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
-                    Is.EquivalentTo(_dummyOf.Conditions));
+            using var _ = Assert.EnterMultipleScope();
 
-                Assert.That(_dummyOf.Handlers.ThatWereExecutedOnce,
-                    Is.EquivalentTo(_dummyOf.Handlers.Filter(setup)));
+            Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
+                Is.EquivalentTo(_dummyOf.Conditions));
 
-                Assert.That(_dummyOf.Handlers.ThatWereNeverExecuted,
-                    Is.EquivalentTo(_dummyOf.Handlers.Filter(setup.Inverse())));
-            });
+            Assert.That(_dummyOf.Handlers.ThatWereExecutedOnce,
+                Is.EquivalentTo(_dummyOf.Handlers.Filter(setup)));
+
+            Assert.That(_dummyOf.Handlers.ThatWereNeverExecuted,
+                Is.EquivalentTo(_dummyOf.Handlers.Filter(setup.Inverse())));
         }
 
         [Test]
@@ -239,21 +238,20 @@ namespace Nuisho.ChainLead.Test
             _math.JoinFirstWithSecond(a, b)
                  .Execute(_token);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(expectedCondition.WasCheckedOnce);
+            using var _ = Assert.EnterMultipleScope();
 
-                Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
-                    Is.EquivalentTo(_dummyOf.Conditions[X, Y, X & Y].Except([expectedCondition])));
+            Assert.That(expectedCondition.WasCheckedOnce);
 
-                Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
-                    Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
-                      .EqualTo(@case.FinalConditionCheckResult));
+            Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
+                Is.EquivalentTo(_dummyOf.Conditions[X, Y, X & Y].Except([expectedCondition])));
 
-                Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
-                    Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And.
-                   Not.EqualTo(@case.FinalConditionCheckResult));
-            });
+            Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
+                Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
+                  .EqualTo(@case.FinalConditionCheckResult));
+
+            Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
+                Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And
+              .Not.EqualTo(@case.FinalConditionCheckResult));
         }
 
         [Test]
@@ -283,23 +281,23 @@ namespace Nuisho.ChainLead.Test
             var checks = @case.CheckExpectations;
             var executions = @case.ExecutionExpectations;
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Conditions[a.top, b.top].ThatWereNeverChecked,
-                    Is.EquivalentTo(_dummyOf.Conditions[a.top, b.top]));
 
-                Assert.That(_dummyOf.Conditions[a.bottom, b.bottom, a.top & b.top].ThatWereCheckedOnce,
-                    Is.EquivalentTo(_dummyOf.Conditions[checks.Keys].Filter(checks.Values)));
+            using var _ = Assert.EnterMultipleScope();
 
-                Assert.That(_dummyOf.Conditions[a.bottom, b.bottom, a.top & b.top].ThatWereNeverChecked,
-                    Is.EquivalentTo(_dummyOf.Conditions[checks.Keys].Filter(checks.Values.Inverse())));
+            Assert.That(_dummyOf.Conditions[a.top, b.top].ThatWereNeverChecked,
+                Is.EquivalentTo(_dummyOf.Conditions[a.top, b.top]));
 
-                Assert.That(_dummyOf.Handlers[A, B].ThatWereExecutedOnce,
-                    Is.EquivalentTo(_dummyOf.Handlers[executions.Keys].Filter(executions.Values)));
+            Assert.That(_dummyOf.Conditions[a.bottom, b.bottom, a.top & b.top].ThatWereCheckedOnce,
+                Is.EquivalentTo(_dummyOf.Conditions[checks.Keys].Filter(checks.Values)));
 
-                Assert.That(_dummyOf.Handlers[A, B].ThatWereNeverExecuted,
-                    Is.EquivalentTo(_dummyOf.Handlers[executions.Keys].Filter(executions.Values.Inverse())));
-            });
+            Assert.That(_dummyOf.Conditions[a.bottom, b.bottom, a.top & b.top].ThatWereNeverChecked,
+                Is.EquivalentTo(_dummyOf.Conditions[checks.Keys].Filter(checks.Values.Inverse())));
+
+            Assert.That(_dummyOf.Handlers[A, B].ThatWereExecutedOnce,
+                Is.EquivalentTo(_dummyOf.Handlers[executions.Keys].Filter(executions.Values)));
+
+            Assert.That(_dummyOf.Handlers[A, B].ThatWereNeverExecuted,
+                Is.EquivalentTo(_dummyOf.Handlers[executions.Keys].Filter(executions.Values.Inverse())));
         }
 
         [Test]
@@ -334,20 +332,19 @@ namespace Nuisho.ChainLead.Test
             var expectedToCheck = _dummyOf.Conditions[@case.ExpectedToCheck];
             var expectedToExecute = _dummyOf.Handlers[@case.ExpectedToExecute];
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
-                    Is.EquivalentTo(expectedToCheck));
+            using var _ = Assert.EnterMultipleScope();
 
-                Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
-                    Is.EquivalentTo(_dummyOf.Conditions.Except(expectedToCheck)));
+            Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
+                Is.EquivalentTo(expectedToCheck));
 
-                Assert.That(_dummyOf.Handlers.ThatWereExecutedOnce,
-                    Is.EquivalentTo(expectedToExecute));
+            Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
+                Is.EquivalentTo(_dummyOf.Conditions.Except(expectedToCheck)));
 
-                Assert.That(_dummyOf.Handlers.ThatWereNeverExecuted,
-                    Is.EquivalentTo(_dummyOf.Handlers.Except(expectedToExecute)));
-            });
+            Assert.That(_dummyOf.Handlers.ThatWereExecutedOnce,
+                Is.EquivalentTo(expectedToExecute));
+
+            Assert.That(_dummyOf.Handlers.ThatWereNeverExecuted,
+                Is.EquivalentTo(_dummyOf.Handlers.Except(expectedToExecute)));
         }
 
         [Test]
@@ -384,19 +381,18 @@ namespace Nuisho.ChainLead.Test
 
             ab.Execute(_token);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Conditions[abConditions].ThatWereCheckedOnce,
-                    Is.EquivalentTo(_dummyOf.Conditions[abConditions]));
+            using var _ = Assert.EnterMultipleScope();
 
-                Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
-                    Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
-                      .EqualTo(finalConditionResult));
+            Assert.That(_dummyOf.Conditions[abConditions].ThatWereCheckedOnce,
+                Is.EquivalentTo(_dummyOf.Conditions[abConditions]));
 
-                Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
-                    Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And.
-                   Not.EqualTo(finalConditionResult));
-            });
+            Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
+                Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
+                  .EqualTo(finalConditionResult));
+
+            Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
+                Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted)
+              .And.Not.EqualTo(finalConditionResult));
         }
 
         [Test]
@@ -421,18 +417,17 @@ namespace Nuisho.ChainLead.Test
             _math.MergeFirstWithSecond(first, second)
                  .Execute(_token);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Condition(X).WasCheckedOnce);
+            using var _ = Assert.EnterMultipleScope();
 
-                Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
-                    Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
-                      .EqualTo(checkResult));
+            Assert.That(_dummyOf.Condition(X).WasCheckedOnce);
 
-                Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
-                    Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And.
-                   Not.EqualTo(checkResult));
-            });
+            Assert.That(_dummyOf.Handler(A).WasExecutedOnce,
+                Is.EqualTo(_dummyOf.Handler(B).WasExecutedOnce).And
+                  .EqualTo(checkResult));
+
+            Assert.That(_dummyOf.Handler(A).WasNeverExecuted,
+                Is.EqualTo(_dummyOf.Handler(B).WasNeverExecuted).And
+               .Not.EqualTo(checkResult));
         }
 
         [Test]
