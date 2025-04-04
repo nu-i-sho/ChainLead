@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Contracts.Syntax
+﻿namespace Nuisho.ChainLead.Contracts.Syntax
 {
     using ChainLead.Contracts;
     using System.Data;

@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Test.Types
+﻿namespace Nuisho.ChainLead.Test.Types
 {
     public readonly struct ReadonlyStruct(int id)
     {

@@ -1,6 +1,6 @@
-﻿namespace ChainLead.Implementation.DI
+﻿namespace Nuisho.ChainLead.Implementation.DI
 {
-    using ChainLead.Contracts;
+    using Nuisho.ChainLead.Contracts;
     using Microsoft.Extensions.DependencyInjection;
 
     public static class Extension

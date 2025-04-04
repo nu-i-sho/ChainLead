@@ -1,13 +1,13 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
-    using ChainLead.Contracts.Syntax;
-    using ChainLead.Test.Types;
+    using Nuisho.ChainLead.Contracts;
+    using Nuisho.ChainLead.Contracts.Syntax;
+    using Nuisho.ChainLead.Test.Types;
 
-    using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
-    using static ChainLead.Test.Cases.SingleHandler;
-    using static ChainLead.Test.Dummy.ConditionIndex;
-    using static ChainLead.Test.Dummy.HandlerIndex;
+    using static Nuisho.ChainLead.Contracts.Syntax.ChainLeadSyntax;
+    using static Nuisho.ChainLead.Test.Cases.SingleHandler;
+    using static Nuisho.ChainLead.Test.Dummy.ConditionIndex;
+    using static Nuisho.ChainLead.Test.Dummy.HandlerIndex;
 
     public static partial class Cases
     {

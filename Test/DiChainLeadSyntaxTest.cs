@@ -1,12 +1,12 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
-    using ChainLead.Contracts.Syntax;
-    using ChainLead.Contracts.Syntax.DI;
+    using Nuisho.ChainLead.Contracts;
+    using Nuisho.ChainLead.Contracts.Syntax;
+    using Nuisho.ChainLead.Contracts.Syntax.DI;
     using Microsoft.Extensions.DependencyInjection;
     
-    using static ChainLead.Test.Dummy.HandlerIndex;
-    using static ChainLead.Test.Dummy.ConditionIndex;
+    using static Nuisho.ChainLead.Test.Dummy.HandlerIndex;
+    using static Nuisho.ChainLead.Test.Dummy.ConditionIndex;
 
     [TestFixture]
     public class DiChainLeadSyntaxTest

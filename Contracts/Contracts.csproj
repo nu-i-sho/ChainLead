@@ -1,16 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <AssemblyName>ChainLead.Contracts</AssemblyName>
-    <RootNamespace>ChainLead.Contracts</RootNamespace>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssemblyName>Nuisho.ChainLead.Contracts</AssemblyName>
+    <RootNamespace>Nuisho.ChainLead.Contracts</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="ChainLead.Test" />
-    <InternalsVisibleTo Include="ChainLead.Implementation" />
+    <InternalsVisibleTo Include="Nuisho.ChainLead.Test" />
+    <InternalsVisibleTo Include="Nuisho.ChainLead.Implementation" />
     <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
   </ItemGroup>
 

@@ -1,6 +1,6 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Test.Types;
+    using Nuisho.ChainLead.Test.Types;
 
     public static partial class Cases
     {

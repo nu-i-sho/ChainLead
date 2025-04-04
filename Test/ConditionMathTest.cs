@@ -1,11 +1,11 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
-    using ChainLead.Implementation;
-    using ChainLead.Test.Utils;
+    using Nuisho.ChainLead.Contracts;
+    using Nuisho.ChainLead.Implementation;
+    using Nuisho.ChainLead.Test.Utils;
 
-    using static ChainLead.Test.Cases.Common;
-    using static ChainLead.Test.Dummy.ConditionIndex;
+    using static Nuisho.ChainLead.Test.Cases.Common;
+    using static Nuisho.ChainLead.Test.Dummy.ConditionIndex;
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     public class ConditionMathTest<T>

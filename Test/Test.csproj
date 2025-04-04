@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <AssemblyName>ChainLead.Test</AssemblyName>
-    <RootNamespace>ChainLead.Test</RootNamespace>
+    <TargetFramework>net9.0</TargetFramework>
+    <AssemblyName>Nuisho.ChainLead.Test</AssemblyName>
+    <RootNamespace>Nuisho.ChainLead.Test</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
 

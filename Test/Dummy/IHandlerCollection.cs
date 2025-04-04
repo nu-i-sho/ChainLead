@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
     public static partial class Dummy
     {

@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Implementation
+﻿namespace Nuisho.ChainLead.Implementation
 {
     //// DO NOT using ChainLead.Contracts.Syntax; HERE
     using ChainLead.Contracts;

@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Contracts
+﻿namespace Nuisho.ChainLead.Contracts
 {
     public interface IHandler<in T>
     {

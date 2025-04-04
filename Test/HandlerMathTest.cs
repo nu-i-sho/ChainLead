@@ -1,15 +1,15 @@
-namespace ChainLead.Test
+namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
-    using ChainLead.Test.Utils;
+    using Nuisho.ChainLead.Contracts;
+    using Nuisho.ChainLead.Test.Utils;
     using NUnit.Framework.Internal;
     using System;
     using System.Linq;
 
-    using static ChainLead.Test.Cases.HandlerMath;
-    using static ChainLead.Test.Dummy.Common;
-    using static ChainLead.Test.Dummy.ConditionIndex;
-    using static ChainLead.Test.Dummy.HandlerIndex;
+    using static Nuisho.ChainLead.Test.Cases.HandlerMath;
+    using static Nuisho.ChainLead.Test.Dummy.Common;
+    using static Nuisho.ChainLead.Test.Dummy.ConditionIndex;
+    using static Nuisho.ChainLead.Test.Dummy.HandlerIndex;
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]

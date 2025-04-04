@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Contracts.Syntax.DI
+﻿namespace Nuisho.ChainLead.Contracts.Syntax.DI
 {
     using Microsoft.Extensions.DependencyInjection;
 

@@ -1,10 +1,10 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
-    using ChainLead.Contracts.Syntax;
-    using ChainLead.Test.Types;
+    using Nuisho.ChainLead.Contracts;
+    using Nuisho.ChainLead.Contracts.Syntax;
+    using Nuisho.ChainLead.Test.Types;
 
-    using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
+    using static Nuisho.ChainLead.Contracts.Syntax.ChainLeadSyntax;
 
     public static partial class Cases
     {
