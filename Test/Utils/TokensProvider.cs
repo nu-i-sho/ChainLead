@@ -1,6 +1,6 @@
 ﻿namespace Nuisho.ChainLead.Test.Utils
 {
-    using Nuisho.ChainLead.Test.Types;
+    using Types;
 
     public static class TokensProvider
     {

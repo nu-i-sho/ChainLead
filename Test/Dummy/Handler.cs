@@ -1,6 +1,6 @@
 ﻿namespace Nuisho.ChainLead.Test
 {
-    using Nuisho.ChainLead.Contracts;
+    using Contracts;
 
     public static partial class Dummy
     {

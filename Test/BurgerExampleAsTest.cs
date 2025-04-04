@@ -1,12 +1,12 @@
 ﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
-    using ChainLead.Contracts.Syntax;
-    using ChainLead.Implementation;
+    using Contracts;
+    using Contracts.Syntax;
+    using Implementation;
     using System.Text;
     using System;
 
-    using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
+    using static Contracts.Syntax.ChainLeadSyntax;
 
     [TestFixture]
     public class BurgerExampleAsTest

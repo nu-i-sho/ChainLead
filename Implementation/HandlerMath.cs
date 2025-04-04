@@ -1,7 +1,7 @@
 ﻿namespace Nuisho.ChainLead.Implementation
 {
     //// DO NOT using ChainLead.Contracts.Syntax; HERE
-    using ChainLead.Contracts;
+    using Contracts;
     using System;
 
     public class HandlerMath(IConditionMath conditionMath)

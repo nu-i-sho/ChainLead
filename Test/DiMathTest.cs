@@ -1,8 +1,8 @@
 ﻿namespace Nuisho.ChainLead.Test
 {
-    using Nuisho.ChainLead.Contracts;
-    using Nuisho.ChainLead.Implementation;
-    using Nuisho.ChainLead.Implementation.DI;
+    using Contracts;
+    using Implementation;
+    using Implementation.DI;
     using Microsoft.Extensions.DependencyInjection;
 
     [TestFixture]

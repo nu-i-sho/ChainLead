@@ -1,6 +1,5 @@
 ﻿namespace Nuisho.ChainLead.Contracts.Syntax
 {
-    using ChainLead.Contracts;
     using System.Data;
 
     public static class ChainLeadSyntax

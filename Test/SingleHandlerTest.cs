@@ -1,9 +1,9 @@
 ﻿namespace Nuisho.ChainLead.Test
 {
-    using Nuisho.ChainLead.Test.Utils;
-    using static Nuisho.ChainLead.Test.Cases.SingleHandler;
-    using static Nuisho.ChainLead.Test.Dummy.ConditionIndex;
-    using static Nuisho.ChainLead.Test.Dummy.HandlerIndex;
+    using Utils;
+    using static Cases.SingleHandler;
+    using static Dummy.ConditionIndex;
+    using static Dummy.HandlerIndex;
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
