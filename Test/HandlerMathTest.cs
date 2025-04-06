@@ -1,10 +1,10 @@
 namespace Nuisho.ChainLead.Test
 {
-    using Contracts;
-    using Utils;
-    using NUnit.Framework.Internal;
     using System;
     using System.Linq;
+    using Contracts;
+    using NUnit.Framework.Internal;
+    using Utils;
 
     using static Cases.HandlerMath;
     using static Dummy.Common;
@@ -15,7 +15,7 @@ namespace Nuisho.ChainLead.Test
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
     [_XVII_][_XVIII_][_XIX_][_XX_][_XXI_][_XXII_][_XXIII_][_XXIV_]
     [_XXV_][_XXVI_][_XXVII_][_XVIII_][_XXIX_][_XXX_][_XXXI_][_XXXII_]
-    public partial class HandlerMathTest<T>(
+    public class HandlerMathTest<T>(
         IHandlerMathFactory mathFactory)
     {
         IHandlerMath _math;
@@ -27,19 +27,19 @@ namespace Nuisho.ChainLead.Test
         public void Setup()
         {
             _token = TokensProvider.GetRandom<T>();
-            _dummyOf = new(_token);
+            _dummyOf = new (_token);
             _math = mathFactory.Create(_dummyOf.ConditionMath);
 
             _do = append =>
                   append switch
                   {
-                      nameof(IHandlerMath.FirstThenSecond) => new(_math.FirstThenSecond),
-                      nameof(IHandlerMath.PackFirstInSecond) => new(_math.PackFirstInSecond),
-                      nameof(IHandlerMath.InjectFirstIntoSecond) => new(_math.InjectFirstIntoSecond),
-                      nameof(IHandlerMath.FirstCoverSecond) => new(_math.FirstCoverSecond),
-                      nameof(IHandlerMath.FirstWrapSecond) => new(_math.FirstWrapSecond),
-                      nameof(IHandlerMath.JoinFirstWithSecond) => new(_math.JoinFirstWithSecond),
-                      nameof(IHandlerMath.MergeFirstWithSecond) => new(_math.MergeFirstWithSecond),
+                      nameof(IHandlerMath.FirstThenSecond) => new (_math.FirstThenSecond),
+                      nameof(IHandlerMath.PackFirstInSecond) => new (_math.PackFirstInSecond),
+                      nameof(IHandlerMath.InjectFirstIntoSecond) => new (_math.InjectFirstIntoSecond),
+                      nameof(IHandlerMath.FirstCoverSecond) => new (_math.FirstCoverSecond),
+                      nameof(IHandlerMath.FirstWrapSecond) => new (_math.FirstWrapSecond),
+                      nameof(IHandlerMath.JoinFirstWithSecond) => new (_math.JoinFirstWithSecond),
+                      nameof(IHandlerMath.MergeFirstWithSecond) => new (_math.MergeFirstWithSecond),
                       _ => throw new ArgumentOutOfRangeException(nameof(append))
                   };
         }
@@ -49,9 +49,9 @@ namespace Nuisho.ChainLead.Test
             [AllAppends] string append)
         {
             var chain = _do(append).Of(
-                _math.Zero<T>(), 
+                _math.Zero<T>(),
                 _math.Zero<T>());
-            
+
             Assert.That(_math.IsZero(chain));
         }
 
@@ -61,7 +61,7 @@ namespace Nuisho.ChainLead.Test
         {
             _dummyOf.Handlers.Generate(A, B);
 
-            List<Dummy.HandlerIndex> 
+            List<Dummy.HandlerIndex>
                 abExecution = [],
                 baExecution = [],
                 execution = [];
@@ -108,18 +108,18 @@ namespace Nuisho.ChainLead.Test
         {
             _dummyOf.Handlers.Generate(A, B, C);
 
-            List<Dummy.HandlerIndex> 
+            List<Dummy.HandlerIndex>
                 ab_cExecution = [],
                 a_bcExecution = [],
                 execution = [];
 
             _dummyOf.Handlers[A, B, C].LogInto(execution);
 
-            IHandler<T> 
+            IHandler<T>
                 a = _dummyOf.Handler(A),
                 b = _dummyOf.Handler(B),
                 c = _dummyOf.Handler(C),
-                
+
                 ab = _do(append).Of(a, b),
                 bc = _do(append).Of(b, c),
 
@@ -146,7 +146,7 @@ namespace Nuisho.ChainLead.Test
             List<Dummy.HandlerIndex> execution = [];
 
             _dummyOf.Handlers.Generate(@case.Chain.Distinct());
-            _dummyOf.Handlers.LogInto(execution); 
+            _dummyOf.Handlers.LogInto(execution);
 
             var chain = @case.Chain
                 .Select(_dummyOf.Handlers.Get).Cast<IHandler<T>>()
@@ -217,12 +217,12 @@ namespace Nuisho.ChainLead.Test
         }
 
         [Test]
-        public void JoinFirstWithSecond__Conjuncts_Only_TopConditions__Test(
+        public void JoinFirstWithSecond__Conjuncts_Only_TopConditions__Test1(
             [GreenCases] GreenCase @case)
         {
             _dummyOf.Handlers.Generate(A, B);
-            _dummyOf.Conditions.Generate(X, Y, X&Y);
-            _dummyOf.ConditionMath.And(X, Y).Returns(X&Y);
+            _dummyOf.Conditions.Generate(X, Y, X & Y);
+            _dummyOf.ConditionMath.And(X, Y).Returns(X & Y);
 
             var expectedCondition = _dummyOf.Condition(@case.ExpectedFinalCondition);
             expectedCondition.Returns(@case.FinalConditionCheckResult);
@@ -255,7 +255,7 @@ namespace Nuisho.ChainLead.Test
         }
 
         [Test]
-        public void JoinFirstWithSecond__Conjuncts_Only_TopConditions__Test(
+        public void JoinFirstWithSecond__Conjuncts_Only_TopConditions__Test2(
             [OrangeCases] OrangeCase @case)
         {
             var a = (core: OrangeCase.A, top: OrangeCase.A_Top, bottom: OrangeCase.A_Bottom);
@@ -281,7 +281,6 @@ namespace Nuisho.ChainLead.Test
             var checks = @case.CheckExpectations;
             var executions = @case.ExecutionExpectations;
 
-
             using var _ = Assert.EnterMultipleScope();
 
             Assert.That(_dummyOf.Conditions[a.top, b.top].ThatWereNeverChecked,
@@ -301,11 +300,11 @@ namespace Nuisho.ChainLead.Test
         }
 
         [Test]
-        public void JoinFirstWithSecond__Conjuncts_Only_TopConditions__Test(
+        public void JoinFirstWithSecond__Conjuncts_Only_TopConditions__Test3(
             [YellowCases] YellowCase @case)
         {
             _dummyOf.Handlers.Generate(A, B);
-            
+
             _dummyOf.Conditions.Generate(@case.AConditions);
             _dummyOf.Conditions.Generate(@case.BConditions);
             _dummyOf.Conditions.Generate(YellowCase.TopAnd);
@@ -350,7 +349,7 @@ namespace Nuisho.ChainLead.Test
         [Test]
         public void MergeFirstWithSecond__Conjuncts_All_Conditions__Test(
             [WhiteCases] WhiteCase @case,
-            [Values(true, false)] bool finalConditionResult)
+            [Values] bool finalConditionResult)
         {
             var abConditions = @case.AConditions.Concat(@case.BConditions);
             _dummyOf.Conditions.Generate(abConditions);
@@ -364,7 +363,7 @@ namespace Nuisho.ChainLead.Test
                         _dummyOf.Condition(x).Check(_token);
                         _dummyOf.Condition(y).Check(_token);
                     });
-                    
+
                     return x & y;
                 });
 
@@ -397,8 +396,8 @@ namespace Nuisho.ChainLead.Test
 
         [Test]
         public void Join_Some_With_SingleConditionalHandler__Puts_Condition_OnTop_OfResult__Test(
-            [Values(false, true)] bool order,
-            [Values(false, true)] bool checkResult)
+            [Values] bool order,
+            [Values] bool checkResult)
         {
             _dummyOf.Handlers.Generate(A, B);
             _dummyOf.Conditions.Generate(X);
@@ -407,7 +406,7 @@ namespace Nuisho.ChainLead.Test
             IHandler<T>
                 first = _dummyOf.Handler(B),
                 second = _math.Conditional(
-                    _dummyOf.Handler(A), 
+                    _dummyOf.Handler(A),
                     _dummyOf.Condition(X));
 
             (first, second) = order
@@ -463,19 +462,19 @@ namespace Nuisho.ChainLead.Test
         [Test]
         public void AppendWith_AtomizedConditionalHandler__IsTheSameAsWith_RegularHandler__Test(
             [AllAppends] string append,
-            [Values(false, true)] bool isFirstArgument,
-            [Values(false, true)] bool bottomCheckResult)
+            [Values] bool isFirstArgument,
+            [Values] bool bottomCheckResult)
         {
             Dummy.HandlerIndex
-                atomized = new("ATOMIZED"),
-                atom = new("ATOM");
+                atomized = new ("ATOMIZED"),
+                atom = new ("ATOM");
 
             _dummyOf.Handlers.Generate(atomized, atom);
             _dummyOf.Conditions.Generate(X, Y, Z);
 
             List<Dummy.ChainElementIndex>
                 executionLog = [],
-                expectedLog = 
+                expectedLog =
                     (isFirstArgument, bottomCheckResult) switch
                     {
                         (false, false) => [atom, X, Y, Z],
@@ -485,7 +484,7 @@ namespace Nuisho.ChainLead.Test
                     };
 
             _dummyOf.Handlers.LogInto(executionLog);
-            _dummyOf.Conditions.LogInto(executionLog); 
+            _dummyOf.Conditions.LogInto(executionLog);
 
             _dummyOf.Conditions[X, Y].Return(true);
             _dummyOf.Condition(Z).Returns(bottomCheckResult);
@@ -511,8 +510,8 @@ namespace Nuisho.ChainLead.Test
         [Test]
         public void AppendedTwoAtomizedConditionalHandlers__IsTheSameAs_AppendedTwoRegularHandlers__Test(
             [AllAppends] string append,
-            [Values(false, true)] bool aBottomCheckResult,
-            [Values(false, true)] bool bBottomCheckResult)
+            [Values] bool aBottomCheckResult,
+            [Values] bool bBottomCheckResult)
         {
             _dummyOf.Handlers.Generate(A, B);
             _dummyOf.Conditions.Generate(U, V, W, X, Y, Z);
@@ -524,8 +523,8 @@ namespace Nuisho.ChainLead.Test
                     {
                         (false, false) => [U, V, W,    X, Y, Z   ],
                         (false, true)  => [U, V, W,    X, Y, Z, B],
-                        (true,  false) => [U, V, W, A, X, Y, Z   ], 
-                        (true,  true)  => [U, V, W, A, X, Y, Z, B] 
+                        (true,  false) => [U, V, W, A, X, Y, Z   ],
+                        (true,  true)  => [U, V, W, A, X, Y, Z, B]
                     };
 
             _dummyOf.Handlers.LogInto(executionLog);
@@ -550,9 +549,9 @@ namespace Nuisho.ChainLead.Test
                 Is.EqualTo(expectedLog));
         }
 
-        class AppendOf(Func<IHandler<T>, IHandler<T>, IHandler<T>> f)
+        sealed class AppendOf(Func<IHandler<T>, IHandler<T>, IHandler<T>> f)
         {
-            public IHandler<T> Of(IHandler<T> left, IHandler<T> right) => 
+            public IHandler<T> Of(IHandler<T> left, IHandler<T> right) =>
                 f(left, right);
         }
     }

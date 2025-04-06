@@ -12,11 +12,11 @@
             public IEnumerable<HandlerIndex> Indices => Keys;
 
             public IHandlerCollection<T> this[IEnumerable<HandlerIndex> indices]
-            { 
+            {
                 get
                 {
                     var slice = new HandlerCollection<T>(token);
-                    foreach (var i in indices) 
+                    foreach (var i in indices)
                         slice.Add(i, Get(i));
 
                     return slice;

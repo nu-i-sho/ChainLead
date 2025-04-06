@@ -1,47 +1,112 @@
 ﻿[HandlerMathTest.cs]
 
-# CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 # Initializing NUnit test fixture class members in the setup method is common practice.
+# CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 dotnet_diagnostic.CS8618.severity = none
 
 [MultipleHandlersTest.cs]
 
-# CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 # Initializing NUnit test fixture class members in the setup method is common practice.
+# CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 dotnet_diagnostic.CS8618.severity = none
 
 [SingleHandlerTest.cs]
 
-# CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 # Initializing NUnit test fixture class members in the setup method is common practice.
+# CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 dotnet_diagnostic.CS8618.severity = none
 
+[Dummy/SingleTypeConditionMath.cs]
+# "T, U" pair is OK for generic parameter names.
+# CA1715: Identifiers should have correct prefix
+dotnet_diagnostic.CA1715.severity = none
+
+[Dummy/SingleTypeHandlerMath.cs]
+# "T, U" pair is OK for generic parameter names.
+# CA1715: Identifiers should have correct prefix
+dotnet_diagnostic.CA1715.severity = none
+
 [Cases/*]
-# S101: Types should be named in PascalCase
 # [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_] looks better than [I][II][III][IV][V][VI][VII][VIII]
+# S101: Types should be named in PascalCase
 dotnet_diagnostic.S101.severity = none
-# IDE1006: Naming Styles
 # The same story with [_I_].
+# IDE1006: Naming Styles
 dotnet_diagnostic.IDE1006.severity = none
 
+# All nested classes provide prime constructors and bind them with the base classes' constructors, 
+# which provides enough implementation and no need body
+# SA1106: Code should not contain empty statements
+dotnet_diagnostic.SA1106.severity = none
+
 [Types/*]
-# IDE0251: Make member 'readonly'
 # These types were created as testing dummies. 
+# IDE0251: Make member 'readonly'
 dotnet_diagnostic.IDE0251.severity = none
 
 [*.cs]
 
-# S6608: Prefer indexing instead of "Enumerable" methods on types implementing "IList"
-# Common, "Any()" is better readable. Readability is more prioritized than performance in unit tests. 
+# Common, "Any()" is better readable. Readability is more prioritized than performance in unit tests.
+# S6608: Prefer indexing instead of "Enumerable" methods on types implementing "IList" 
 dotnet_diagnostic.S6608.severity = none
 
-# S3993: Custom attributes should be marked with "System.AttributeUsageAttribute"
 # It is derived from TestFixtureConfigure which is well-known in the unit testing context. 
 # I don't need additional garbage on top of many attributes.
+# S3993: Custom attributes should be marked with "System.AttributeUsageAttribute"
 dotnet_diagnostic.S3993.severity = none
 
-# S2094: Classes should not be empty
-# It is a totally stupid rule. 
-# I need only nominal and object without any implementation as an access token or marker. 
-# It is a cool code trick.
-dotnet_diagnostic.S2094.severity = none
+# CA1707: Identifiers should not contain underscores
+dotnet_diagnostic.CA1707.severity = none
+
+# SA1025: Code should not contain multiple whitespace in a row
+dotnet_diagnostic.SA1025.severity = none
+
+# SA1010: Opening square brackets should be spaced correctly
+dotnet_diagnostic.SA1010.severity = none
+
+# False positive. The latest NUnit recommendation is to use 'Assert.EnterMultipleScope()'
+# NUnit2045: Use Assert.Multiple
+dotnet_diagnostic.NUnit2045.severity = none
+
+# RCS1196: Call extension method as instance method
+dotnet_diagnostic.RCS1196.severity = none
+
+# SA1117: Parameters should be on same line or separate lines
+dotnet_diagnostic.SA1117.severity = none
+
+# CA1305: Specify IFormatProvider
+dotnet_diagnostic.CA1305.severity = none
+
+# SA1134: Attributes should not share line
+dotnet_diagnostic.SA1134.severity = none
+
+# SA1313: Parameter names should begin with lower-case letter
+dotnet_diagnostic.SA1313.severity = none
+
+# It is overengineering for the unit test project.
+# CA2225: Operator overloads have named alternates
+dotnet_diagnostic.CA2225.severity = none
+
+# It is overengineering for the unit test project.
+# CA1851: Possible multiple enumerations of 'IEnumerable' collection
+dotnet_diagnostic.CA1851.severity = none
+
+# NUnit test runner needs access to them.
+# CA1515: Consider making public types internal
+dotnet_diagnostic.CA1515.severity = none
+
+# It is overengineering for the unit test project.
+# CA1310: Specify StringComparison for correctness
+dotnet_diagnostic.CA1310.severity = none
+
+# It is used only for test data generation.
+# CA5394: Do not use insecure randomness
+dotnet_diagnostic.CA5394.severity = none
+
+# It is overengineering for the unit test project.
+# CA1859: Use concrete types when possible for improved performance
+dotnet_diagnostic.CA1859.severity = none
+
+# It is overengineering for the unit test project.
+# RCS1246: Use element access
+dotnet_diagnostic.RCS1246.severity = none

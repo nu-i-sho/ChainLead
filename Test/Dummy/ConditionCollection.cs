@@ -37,7 +37,7 @@
             IEnumerator<Condition<T>> IEnumerable<Condition<T>>.GetEnumerator() =>
                 Values.GetEnumerator();
 
-            IEnumerator IEnumerable.GetEnumerator() => 
+            IEnumerator IEnumerable.GetEnumerator() =>
                 Values.GetEnumerator();
         }
     }

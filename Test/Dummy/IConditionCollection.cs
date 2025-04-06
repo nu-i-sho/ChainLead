@@ -34,9 +34,7 @@
 
             public new interface IMutable :
                 ICollection<Condition<T>, ConditionIndex>.IMutable,
-                IConditionCollection<T>
-            {
-            }
+                IConditionCollection<T>;
         }
     }
 }

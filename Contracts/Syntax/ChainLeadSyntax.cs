@@ -12,9 +12,9 @@
                 $"{nameof(ChainLeadSyntax)} is not configured.");
 
         static IHandlerMath HandlerMath =>
-            _handlerMath ?? throw NotConfigured; 
-        
-        static IConditionMath ConditionMath => 
+            _handlerMath ?? throw NotConfigured;
+
+        static IConditionMath ConditionMath =>
             _conditionMath ?? throw NotConfigured;
 
         public static void Configure(
@@ -58,7 +58,7 @@
         public static bool IsZero<T>(this IHandler<T> handler) =>
             HandlerMath.IsZero(handler);
 
-        public static bool IsPredictableTrue<T>(this ICondition<T> condition) => 
+        public static bool IsPredictableTrue<T>(this ICondition<T> condition) =>
             ConditionMath.IsPredictableTrue(condition);
 
         public static bool IsPredictableFalse<T>(this ICondition<T> condition) =>
@@ -110,7 +110,7 @@
 
         public static Morpheme.IThenIntoReverseCall<T> InjectXInto<T>(IHandler<T> next) =>
             new ThenIntoReverseCallMorpheme<T>(new Acc<T>(
-                HandlerMath.InjectFirstIntoSecond, 
+                HandlerMath.InjectFirstIntoSecond,
                 next));
 
         public static IHandler<T> FirstCoverSecond<T>(
@@ -147,7 +147,7 @@
                 HandlerMath
                     .JoinFirstWithSecond(prev, next);
 
-        public static Morpheme.IWith<T> Join<T>(IHandler<T> prev) => 
+        public static Morpheme.IWith<T> Join<T>(IHandler<T> prev) =>
             new WithMorpheme<T>(
                 HandlerMath.JoinFirstWithSecond,
                 prev);
@@ -163,7 +163,7 @@
                 HandlerMath
                     .MergeFirstWithSecond(prev, next);
 
-        public static Morpheme.IWith<T> Merge<T>(IHandler<T> prev) => 
+        public static Morpheme.IWith<T> Merge<T>(IHandler<T> prev) =>
             new WithMorpheme<T>(
                 HandlerMath.MergeFirstWithSecond,
                 prev);
@@ -237,7 +237,7 @@
     file sealed class ThenReverseCallMorpheme<T>(Acc<T> acc)
         : Morpheme.IThenReverseCall<T>
     {
-        public Morpheme.IThenReverseCall<T> Then(IHandler<T> next) => 
+        public Morpheme.IThenReverseCall<T> Then(IHandler<T> next) =>
            new ThenReverseCallMorpheme<T>(acc.Add(next));
 
         public IHandler<T> WhereXIs(IHandler<T> head) =>
@@ -246,7 +246,7 @@
 
     file sealed class InMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
-            IHandler<T> prev) 
+            IHandler<T> prev)
         : Morpheme.IIn<T>
     {
         public Morpheme.IThenIn<T> In(IHandler<T> next) =>
@@ -255,7 +255,7 @@
 
     file sealed class ThenInMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
-            IHandler<T> prev) 
+            IHandler<T> prev)
         : Morpheme.IThenIn<T>
     {
         IHandler<T> IExtendedHandler<T>.Origin => prev;
@@ -264,7 +264,7 @@
            new ThenInMorpheme<T>(append, append(prev, next));
     }
 
-    file sealed class ThenInReverseCallMorpheme<T>(Acc<T> acc) 
+    file sealed class ThenInReverseCallMorpheme<T>(Acc<T> acc)
         : Morpheme.IThenInReverseCall<T>
     {
         public Morpheme.IThenInReverseCall<T> ThenIn(IHandler<T> next) =>
@@ -276,7 +276,7 @@
 
     file sealed class IntoMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
-            IHandler<T> prev) 
+            IHandler<T> prev)
         : Morpheme.IInto<T>
     {
         public Morpheme.IThenInto<T> Into(IHandler<T> next) =>
@@ -285,7 +285,7 @@
 
     file sealed class ThenIntoMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
-            IHandler<T> prev) 
+            IHandler<T> prev)
         : Morpheme.IThenInto<T>
     {
         IHandler<T> IExtendedHandler<T>.Origin => prev;
@@ -294,7 +294,7 @@
            new ThenIntoMorpheme<T>(append, append(prev, next));
     }
 
-    file sealed class ThenIntoReverseCallMorpheme<T>(Acc<T> acc) 
+    file sealed class ThenIntoReverseCallMorpheme<T>(Acc<T> acc)
         : Morpheme.IThenIntoReverseCall<T>
     {
         public Morpheme.IThenIntoReverseCall<T> ThenInto(IHandler<T> next) =>
@@ -307,7 +307,7 @@
     file sealed class ToCoverOrWrapMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> cover,
             Func<IHandler<T>, IHandler<T>, IHandler<T>> wrap,
-            IHandler<T> prev) 
+            IHandler<T> prev)
         : Morpheme.IToCoverOrWrap<T>
     {
         public Morpheme.IThenCover<T> ToCover(IHandler<T> next) =>
@@ -319,7 +319,7 @@
 
     file sealed class ThenCoverMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
-            IHandler<T> prev) 
+            IHandler<T> prev)
         : Morpheme.IThenCover<T>
     {
         IHandler<T> IExtendedHandler<T>.Origin => prev;
@@ -330,7 +330,7 @@
 
     file sealed class ThenWrapMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
-            IHandler<T> prev) 
+            IHandler<T> prev)
         : Morpheme.IThenWrap<T>
     {
         IHandler<T> IExtendedHandler<T>.Origin => prev;
@@ -339,7 +339,7 @@
            new ThenWrapMorpheme<T>(append, append(prev, next));
     }
 
-    file sealed class ThenCoverReverseCallMorpheme<T>(Acc<T> acc) : 
+    file sealed class ThenCoverReverseCallMorpheme<T>(Acc<T> acc) :
         Morpheme.IThenCoverReverseCall<T>
     {
         public Morpheme.IThenCoverReverseCall<T> ThenCover(IHandler<T> next) =>
@@ -349,7 +349,7 @@
            acc.Close(head);
     }
 
-    file sealed class ThenWrapReverseCallMorpheme<T>(Acc<T> acc) 
+    file sealed class ThenWrapReverseCallMorpheme<T>(Acc<T> acc)
         : Morpheme.IThenWrapReverseCall<T>
     {
         public Morpheme.IThenWrapReverseCall<T> ThenWrap(IHandler<T> next) =>
@@ -361,7 +361,7 @@
 
     file sealed class WithMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
-            IHandler<T> prev) 
+            IHandler<T> prev)
         : Morpheme.IWith<T>
     {
         public Morpheme.IThenWith<T> With(IHandler<T> next) =>
@@ -370,7 +370,7 @@
 
     file sealed class ThenWithMorpheme<T>(
             Func<IHandler<T>, IHandler<T>, IHandler<T>> append,
-            IHandler<T> prev) 
+            IHandler<T> prev)
         : Morpheme.IThenWith<T>
     {
         IHandler<T> IExtendedHandler<T>.Origin => prev;
@@ -379,7 +379,7 @@
            new ThenWithMorpheme<T>(append, append(prev, next));
     }
 
-    file sealed class ThenWithReverseCallMorpheme<T>(Acc<T> acc) 
+    file sealed class ThenWithReverseCallMorpheme<T>(Acc<T> acc)
         : Morpheme.IThenWithReverseCall<T>
     {
         public Morpheme.IThenWithReverseCall<T> ThenWith(IHandler<T> next) =>

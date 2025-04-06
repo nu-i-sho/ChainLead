@@ -35,7 +35,7 @@
 
             public ElseNeverContinuation WasCheckedOnceWhen(
                 bool checkedCondition) =>
-                 new(checkedCondition 
+                new (checkedCondition
                         ? WasCheckedOnce
                         : WasNeverChecked);
 

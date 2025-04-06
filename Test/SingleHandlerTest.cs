@@ -19,7 +19,7 @@
         {
             _token = TokensProvider.GetRandom<T>();
 
-            _dummyOf = new(_token);
+            _dummyOf = new (_token);
             _dummyOf.Handlers.Generate(A);
 
             _math = mathFactory.Create(_dummyOf.ConditionMath);
@@ -41,7 +41,7 @@
             var handler = _math.MakeHandler(action);
             handler.Execute(_token);
 
-            Assert.That(x, 
+            Assert.That(x,
                 Is.EqualTo(_token));
         }
 
@@ -50,7 +50,7 @@
         {
             _dummyOf.Conditions.Generate(X);
             var conditionalZero = _math.Conditional(
-                _math.Zero<T>(), 
+                _math.Zero<T>(),
                 _dummyOf.Condition(X));
 
             Assert.That(_math.IsZero(conditionalZero));
@@ -151,7 +151,7 @@
                 .Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional)
                 .Execute(_token);
 
-            Assert.That(checksLog, 
+            Assert.That(checksLog,
                 Is.EqualTo(new[] { Z, Y, X }));
         }
 

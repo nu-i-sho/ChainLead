@@ -39,7 +39,7 @@
                 CallsCount == 0;
 
             public TimesContinuation WasExecuted(int times) =>
-                new(CallsCount == times);
+                new (CallsCount == times);
 
             public class TimesContinuation(bool answer)
             {
@@ -48,7 +48,7 @@
 
             public ElseNeverContinuation WasExecutedOnceWhen(
                 bool executedCondition) =>
-                 new(executedCondition 
+                new (executedCondition
                         ? WasExecutedOnce
                         : WasNeverExecuted);
 
@@ -64,7 +64,6 @@
 
             public override int GetHashCode() =>
                 index.GetHashCode();
-            
             public IHandler<T> Pure => this;
 
             int CallsCount { get; set; } = 0;

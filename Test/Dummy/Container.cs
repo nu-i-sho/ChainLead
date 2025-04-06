@@ -23,8 +23,8 @@
                 Handlers = new HandlerCollection<T>(token);
                 Conditions = new ConditionCollection<T>(token);
 
-                HandlerMath = new(Handlers);
-                ConditionMath = new(Conditions);
+                HandlerMath = new (Handlers);
+                ConditionMath = new (Conditions);
             }
         }
     }

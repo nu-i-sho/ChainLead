@@ -5,7 +5,7 @@
     public static partial class Dummy
     {
         public class SingleTypeHandlerMath<T>(
-                IHandlerCollection<T> handlers) 
+                IHandlerCollection<T> handlers)
             : IHandlerMath
         {
             readonly Dictionary<(string, HandlerIndex, HandlerIndex), HandlerIndex> _appendsSetup = [];
@@ -23,19 +23,19 @@
             public ReturnsStep FirstThenSecond(HandlerIndex forPrev, HandlerIndex andNext)
             {
                 var forFuncWithArgs = (nameof(IHandlerMath.FirstThenSecond), forPrev, andNext);
-                return new(returnResult => _appendsSetup.Add(forFuncWithArgs, returnResult));
+                return new (returnResult => _appendsSetup.Add(forFuncWithArgs, returnResult));
             }
 
             public ReturnsStep PackFirstInSecond(HandlerIndex forPrev, HandlerIndex andNext)
             {
                 var forFuncWithArgs = (nameof(IHandlerMath.PackFirstInSecond), forPrev, andNext);
-                return new(returnResult => _appendsSetup.Add(forFuncWithArgs, returnResult));
+                return new (returnResult => _appendsSetup.Add(forFuncWithArgs, returnResult));
             }
 
             public ReturnsStep InjectFirstIntoSecond(HandlerIndex forPrev, HandlerIndex andNext)
             {
                 var forFuncWithArgs = (nameof(IHandlerMath.InjectFirstIntoSecond), forPrev, andNext);
-                return new(returnResult => _appendsSetup.Add(forFuncWithArgs, returnResult));
+                return new (returnResult => _appendsSetup.Add(forFuncWithArgs, returnResult));
             }
 
             public ReturnsStep FirstCoverSecond(HandlerIndex forPrev, HandlerIndex andNext)
@@ -47,7 +47,7 @@
             public ReturnsStep FirstWrapSecond(HandlerIndex forPrev, HandlerIndex forNext)
             {
                 var forFuncWithArgs = (nameof(IHandlerMath.FirstWrapSecond), forPrev, forNext);
-                return new(returnResult => _appendsSetup.Add(forFuncWithArgs, returnResult));
+                return new (returnResult => _appendsSetup.Add(forFuncWithArgs, returnResult));
             }
 
             public ReturnsStep JoinFirstWithSecond(HandlerIndex forPrev, HandlerIndex andNext)
@@ -59,21 +59,21 @@
             public ReturnsStep MergeFirstWithSecond(HandlerIndex forPrev, HandlerIndex andNext)
             {
                 var forFuncWithArgs = (nameof(IHandlerMath.MergeFirstWithSecond), forPrev, andNext);
-                return new(returnResult => _appendsSetup.Add(forFuncWithArgs, returnResult));
+                return new (returnResult => _appendsSetup.Add(forFuncWithArgs, returnResult));
             }
 
             public ReturnsStep Conditional(HandlerIndex handler, ConditionIndex condition) =>
-                new(result => _conditionalSetup.Add((handler, condition), result));
+                new (result => _conditionalSetup.Add((handler, condition), result));
 
             public ReturnsStep Atomize(HandlerIndex handler) =>
-                new(result => _atomizeSetup.Add(handler, result));
+                new (result => _atomizeSetup.Add(handler, result));
 
             public class ReturnsStep(Action<HandlerIndex> add)
             {
                 public void Returns(HandlerIndex result) =>
                     add(result);
             }
-            
+
             static HandlerIndex In<U>(IHandler<U> x) => ((Handler<T>)x).Index;
 
             static ConditionIndex In<U>(ICondition<U> x) => ((Condition<T>)x).Index;
@@ -84,7 +84,7 @@
                 Out<U>(_zeroSetup!);
 
             public bool IsZero<U>(IHandler<U> handler) =>
-                _zeroSetup != null && 
+                _zeroSetup != null &&
                 handlers.Get(_zeroSetup).Index == In(handler);
 
             public IHandler<U> MakeHandler<U>(Action<U> action)
