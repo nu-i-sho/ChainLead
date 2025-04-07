@@ -1,6 +1,6 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
+    using Contracts;
 
     public static partial class Dummy
     {
@@ -92,10 +92,10 @@
             this IEnumerable<bool> mask) =>
                 mask.Select(x => !x);
 
-        public static IExtendedHandler<T> AsExtended<T>(this IHandler<T> origin) => 
+        public static IExtendedHandler<T> AsExtended<T>(this IHandler<T> origin) =>
             new Extended<T>(origin);
 
-        class Extended<T>(IHandler<T> origin) : IExtendedHandler<T>
+        sealed class Extended<T>(IHandler<T> origin) : IExtendedHandler<T>
         {
             IHandler<T> IExtendedHandler<T>.Origin => origin;
         }

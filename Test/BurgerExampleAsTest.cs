@@ -1,12 +1,12 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
-    using ChainLead.Contracts.Syntax;
-    using ChainLead.Implementation;
-    using System.Text;
     using System;
+    using System.Text;
+    using Contracts;
+    using Contracts.Syntax;
+    using Implementation;
 
-    using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
+    using static Contracts.Syntax.ChainLeadSyntax;
 
     [TestFixture]
     public class BurgerExampleAsTest
@@ -17,119 +17,119 @@
 
             new[]
             {
-                Hamburger.When(NameIs(hamburger)),
-                Fishburger.When(NameIs(fishBurger)),
-                Chikenburger.When(NameIs(chikenBurger)
-                              .Or(NameIs(doubleChikenBurger))),
-                UncknownBurger
+                HamburgerRecipe.When(NameIs(Hamburger)),
+                FishburgerRecipe.When(NameIs(FishBurger)),
+                ChikenburgerRecipe.When(NameIs(ChikenBurger)
+                                  .Or(NameIs(DoubleChikenBurger))),
+                UncknownBurgerRecipe
             }
             .Select(WithConditionThat(RecipeIsMissing))
             .Aggregate(FirstThenSecond)
             .Execute(state);
 
             return state.Recipe.ToString();
-        }  
+        }
 
-        static IHandler<State> Hamburger =>
+        static IHandler<State> HamburgerRecipe =>
             new[]
             {
-                Cut(bun),
-                Slice(pickle)
-                    .Then(Again.When(OrderIncludeAdditional(pickle))),
-                Dice(onion)
-                    .When(Not(OrderExclude(onion))),
-                Salt(beefPatty),
-                Pepper(beefPatty)
-                    .When(Not(OrderExclude(pepper))),
-                Fry(beefPatty),
-                Fry(bacon)
-                    .When(OrderIncludeAdditional(bacon)),
-                Toast(bun),
-                Put(bottomBun),
-                Put(beefPatty),
-                Add(bacon)
-                    .When(OrderIncludeAdditional(bacon)),
-                Add(tomatoKetchup),
-                Add(pickleSlices)
-                    .Then(Again.When(OrderIncludeAdditional(pickle))),
-                Add(onion)
-                    .When(Not(OrderExclude(onion))),
-                Add(mustard)
-                    .When(Not(OrderExclude(mustard))),
-                Put(topBun)
+                Cut(Bun),
+                Slice(Pickle)
+                    .Then(Again.When(OrderIncludeAdditional(Pickle))),
+                Dice(Onion)
+                    .When(Not(OrderExclude(Onion))),
+                Salt(BeefPatty),
+                Pepper(BeefPatty)
+                    .When(Not(OrderExclude(Spicy))),
+                Fry(BeefPatty),
+                Fry(Bacon)
+                    .When(OrderIncludeAdditional(Bacon)),
+                Toast(Bun),
+                Put(BottomBun),
+                Put(BeefPatty),
+                Add(Bacon)
+                    .When(OrderIncludeAdditional(Bacon)),
+                Add(TomatoKetchup),
+                Add(PickleSlices)
+                    .Then(Again.When(OrderIncludeAdditional(Pickle))),
+                Add(Onion)
+                    .When(Not(OrderExclude(Onion))),
+                Add(Mustard)
+                    .When(Not(OrderExclude(Mustard))),
+                Put(TopBun)
             }
             .Select(Pack(Index).In(Dot).ThenIn(Space).ThenIn)
             .Select(XCover(NewLine).WhereXIs)
             .Aggregate(FirstThenSecond);
 
-        static IHandler<State> Fishburger =>
+        static IHandler<State> FishburgerRecipe =>
             new[]
             {
-                Cut(bun),
-                Cut(fishFillet),
-                Salt(fishFilletPortion),
-                Bread(fishFilletPortion),
-                Slice(cheese),
-                Fry(fishFilletPortion),
-                Toast(bun),
-                Put(bottomBun),
-                Put(fishFilletPortion),
-                Add(cheeseSlice),
-                Add(tartareSauce),
-                Put(topBun)
+                Cut(Bun),
+                Cut(FishFillet),
+                Salt(FishFilletPortion),
+                Bread(FishFilletPortion),
+                Slice(Cheese),
+                Fry(FishFilletPortion),
+                Toast(Bun),
+                Put(BottomBun),
+                Put(FishFilletPortion),
+                Add(CheeseSlice),
+                Add(TartareSauce),
+                Put(TopBun)
             }
             .Select(Pack(Index).In(Dot).ThenIn(Space).ThenIn)
             .Select(XCover(NewLine).WhereXIs)
             .Aggregate(FirstThenSecond);
 
-        static IHandler<State> Chikenburger =>
+        static IHandler<State> ChikenburgerRecipe =>
             new[]
             {
-                Cut(bun),
-                Cut(lettuce)
+                Cut(Bun),
+                Cut(Lettuce)
             }
             .Concat(new[]
             {
-                Salt(chickenPatty),
-                Pepper(chickenPatty)
-                    .When(Not(OrderExclude(pepper))),
-                Bread(chickenPatty),
-                Fry(chickenPatty)
+                Salt(ChickenPatty),
+                Pepper(ChickenPatty)
+                    .When(Not(OrderExclude(Spicy))),
+                Bread(ChickenPatty),
+                Fry(ChickenPatty)
             }
-            .Select(XCover(Again.When(NameStartWith(@double))).WhereXIs))
+            .Select(XCover(Again.When(NameStartWith(Double))).WhereXIs))
             .Concat(
             [
-                Toast(bun),
-                Put(bottomBun),
-                Put(chickenPatty)
-                    .Then(Again.When(NameStartWith(@double))),
-                Add(lettuce),
-                Add(sandwichSauce),
-                Put(topBun)
+                Toast(Bun),
+                Put(BottomBun),
+                Put(ChickenPatty)
+                    .Then(Again.When(NameStartWith(Double))),
+                Add(Lettuce),
+                Add(SandwichSauce),
+                Put(TopBun)
             ])
             .Select(Pack(Index.Then(Dot).Then(Space)).In)
             .Select(XCover(NewLine).WhereXIs)
             .Aggregate(FirstThenSecond);
 
-        static IHandler<State> UncknownBurger =>
+        static IHandler<State> UncknownBurgerRecipe =>
             MakeHandler<State>(x => x.Recipe.Append(
                 $"There is no recipe for {x.Order.Name}"));
 
-        const string @double = "Double";
-        const string hamburger = "Hamburger";
-        const string fishBurger = "Fish-Burger";
-        const string chikenBurger = "Chiken-Burger";
-        const string veganBurger = "Vegan-Burger";
-        const string doubleChikenBurger = $"{@double} {chikenBurger}";
+        const string Double = "Double";
+        const string Hamburger = "Hamburger";
+        const string FishBurger = "Fish-Burger";
+        const string ChikenBurger = "Chiken-Burger";
+        const string VeganBurger = "Vegan-Burger";
+        const string DoubleChikenBurger = $"{Double} {ChikenBurger}";
 
-        class Order(string name, params string[] options)
+        sealed class Order(string name, params string[] options)
         {
             public string Name => name;
 
             public string[] Options => options;
         }
 
-        class State(Order order)
+        sealed class State(Order order)
         {
             public Order Order => order;
 
@@ -138,25 +138,25 @@
             public int StepCounter { get; set; } = 1;
         }
 
-        const string bun = "bun";
-        const string topBun = $"top {bun}";
-        const string bottomBun = $"bottom {bun}";
-        const string pickle = "pickle";
-        const string pickleSlices = $"{pickle} slices";
-        const string onion = "onion";
-        const string pepper = "pepper";
-        const string mustard = "mustard";
-        const string bacon = "bacon";
-        const string beefPatty = "beef patty";
-        const string tomatoKetchup = "tomato ketchup";
-        const string fishFillet = "fish fillet";
-        const string fishFilletPortion = $"{fishFillet} portion";
-        const string cheese = "cheese";
-        const string cheeseSlice = $"{cheese} slice";
-        const string tartareSauce = "tartare sauce";
-        const string chickenPatty = "chicken patty";
-        const string lettuce = "lettuce";
-        const string sandwichSauce = "sandwich sauce";
+        const string Bun = "bun";
+        const string TopBun = $"top {Bun}";
+        const string BottomBun = $"bottom {Bun}";
+        const string Pickle = "pickle";
+        const string PickleSlices = $"{Pickle} slices";
+        const string Onion = "onion";
+        const string Spicy = "spicy";
+        const string Mustard = "mustard";
+        const string Bacon = "bacon";
+        const string BeefPatty = "beef patty";
+        const string TomatoKetchup = "tomato ketchup";
+        const string FishFillet = "fish fillet";
+        const string FishFilletPortion = $"{FishFillet} portion";
+        const string Cheese = "cheese";
+        const string CheeseSlice = $"{Cheese} slice";
+        const string TartareSauce = "tartare sauce";
+        const string ChickenPatty = "chicken patty";
+        const string Lettuce = "lettuce";
+        const string SandwichSauce = "sandwich sauce";
 
         static IHandler<State> Cut(string x) => RecipePoint($"Cut {x}");
 
@@ -216,14 +216,14 @@
         {
             var conditionMath = new ConditionMath();
             var handlerMath = new HandlerMath(conditionMath);
-            
+
             ChainLeadSyntax.Configure(handlerMath, conditionMath);
         }
 
         [Test]
         public void HamburgerRecipeTest()
         {
-            var recipe = GetRecipeFor(new Order(hamburger));
+            var recipe = GetRecipeFor(new (Hamburger));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -240,15 +240,14 @@
                     "11. Add pickle slices",
                     "12. Add onion",
                     "13. Add mustard",
-                    "14. Put top bun"
-                )));
+                    "14. Put top bun")));
         }
 
         [Test]
         public void HamburgerWithExtraPickleSlicesRecipeTest()
         {
-            var recipe = GetRecipeFor(new(hamburger,
-                $"+ {pickle}"));
+            var recipe = GetRecipeFor(new (Hamburger,
+                $"+ {Pickle}"));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -265,16 +264,15 @@
                     "11. Add pickle slices x2",
                     "12. Add onion",
                     "13. Add mustard",
-                    "14. Put top bun"
-                )));
+                    "14. Put top bun")));
         }
 
         [Test]
         public void HamburgerWithAllToppingsRecipeTest()
         {
-            var recipe = GetRecipeFor(new(hamburger,
-                $"+ {pickle}",
-                $"+ {bacon}"));
+            var recipe = GetRecipeFor(new (Hamburger,
+                $"+ {Pickle}",
+                $"+ {Bacon}"));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -293,17 +291,16 @@
                     "13. Add pickle slices x2",
                     "14. Add onion",
                     "15. Add mustard",
-                    "16. Put top bun"
-                )));
+                    "16. Put top bun")));
         }
 
         [Test]
         public void HamburgerWithoutEverythingThatCanBeExcludedRecipeTest()
         {
-            var recipe = GetRecipeFor(new(hamburger,
-                $"- {pepper}",
-                $"- {onion}",
-                $"- {mustard}"));
+            var recipe = GetRecipeFor(new (Hamburger,
+                $"- {Spicy}",
+                $"- {Onion}",
+                $"- {Mustard}"));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -316,19 +313,18 @@
                     "7. Put beef patty",
                     "8. Add tomato ketchup",
                     "9. Add pickle slices",
-                    "10. Put top bun"
-                )));
+                    "10. Put top bun")));
         }
 
         [Test]
         public void HamburgerWithoutEverythingThatCanBeExcludedAndAllToppingsRecipeTest()
         {
-            var recipe = GetRecipeFor(new(hamburger,
-                    $"- {pepper}",
-                    $"- {onion}",
-                    $"- {mustard}",
-                    $"+ {pickle}",
-                    $"+ {bacon}"));
+            var recipe = GetRecipeFor(new (Hamburger,
+                    $"- {Spicy}",
+                    $"- {Onion}",
+                    $"- {Mustard}",
+                    $"+ {Pickle}",
+                    $"+ {Bacon}"));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -343,14 +339,13 @@
                     "9. Add bacon",
                     "10. Add tomato ketchup",
                     "11. Add pickle slices x2",
-                    "12. Put top bun"
-                )));
+                    "12. Put top bun")));
         }
 
         [Test]
         public void FishBurgerRecipeTest()
         {
-            var recipe = GetRecipeFor(new(fishBurger));
+            var recipe = GetRecipeFor(new (FishBurger));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -365,14 +360,13 @@
                     "9. Put fish fillet portion",
                     "10. Add cheese slice",
                     "11. Add tartare sauce",
-                    "12. Put top bun"
-                )));
+                    "12. Put top bun")));
         }
 
         [Test]
         public void ChickenBurgerRecipeTest()
         {
-            var recipe = GetRecipeFor(new(chikenBurger));
+            var recipe = GetRecipeFor(new (ChikenBurger));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -387,14 +381,13 @@
                     "9. Put chicken patty",
                     "10. Add lettuce",
                     "11. Add sandwich sauce",
-                    "12. Put top bun"
-                )));
+                    "12. Put top bun")));
         }
 
         [Test]
         public void DoubleChickenBurgerRecipeTest()
         {
-            var recipe = GetRecipeFor(new(doubleChikenBurger));
+            var recipe = GetRecipeFor(new (DoubleChikenBurger));
 
             Assert.That(recipe,
                 Is.EqualTo(Text(
@@ -409,17 +402,16 @@
                     "9. Put chicken patty x2",
                     "10. Add lettuce",
                     "11. Add sandwich sauce",
-                    "12. Put top bun"
-                )));
+                    "12. Put top bun")));
         }
 
         [Test]
         public void VeganBurgerRecipeTest()
         {
-            var recipe = GetRecipeFor(new(veganBurger));
+            var recipe = GetRecipeFor(new (VeganBurger));
 
             Assert.That(recipe,
-                Is.EqualTo($"There is no recipe for {veganBurger}"));
+                Is.EqualTo($"There is no recipe for {VeganBurger}"));
         }
 
         static string Text(params string[] lines) =>

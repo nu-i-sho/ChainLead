@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
     public static partial class Dummy
     {
@@ -34,9 +34,7 @@
 
             public new interface IMutable :
                 ICollection<Condition<T>, ConditionIndex>.IMutable,
-                IConditionCollection<T>
-            {
-            }
+                IConditionCollection<T>;
         }
     }
 }

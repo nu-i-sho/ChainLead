@@ -1,19 +1,19 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts.Syntax;
-    using ChainLead.Test.Utils;
-    using NUnit.Framework.Internal;
     using System;
-    
-    using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
-    using static ChainLead.Test.Cases.Common;
-    using static ChainLead.Test.Dummy.ConditionIndex;
-    using static ChainLead.Test.Dummy.HandlerIndex;
+    using Contracts.Syntax;
+    using NUnit.Framework.Internal;
+    using Utils;
+
+    using static Cases.Common;
+    using static Contracts.Syntax.ChainLeadSyntax;
+    using static Dummy.ConditionIndex;
+    using static Dummy.HandlerIndex;
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     public class ChainLeadSyntaxTest<T>
     {
-        readonly Dummy.HandlerIndex AB = A >> B, ABC = A >> B >> C;
+        readonly Dummy.HandlerIndex AB = A + B, ABC = A + B + C;
 
         Dummy.Container<T> _dummyOf;
         List<Dummy.HandlerIndex> _executionLog;
@@ -25,15 +25,14 @@
             _token = TokensProvider.GetRandom<T>();
             _executionLog = [];
 
-            _dummyOf = new(_token);
+            _dummyOf = new (_token);
             _dummyOf.Handlers.Generate(A, B, C, AB, ABC);
-            _dummyOf.Conditions.Generate([X, Y, X&Y, X|Y]);
+            _dummyOf.Conditions.Generate([X, Y, X & Y, X | Y]);
 
             ChainLeadSyntax.Configure(
                 _dummyOf.HandlerMath,
                 _dummyOf.ConditionMath);
         }
-
 
         [Test]
         public void Zero_Test()
@@ -49,11 +48,10 @@
         {
             _dummyOf.HandlerMath.Zero_Returns(A);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Handler(A).IsZero(), Is.True);
-                Assert.That(_dummyOf.Handler(B).IsZero(), Is.False);
-            });
+            using var _ = Assert.EnterMultipleScope();
+
+            Assert.That(_dummyOf.Handler(A).IsZero(), Is.True);
+            Assert.That(_dummyOf.Handler(B).IsZero(), Is.False);
         }
 
         [Test]
@@ -88,7 +86,7 @@
             _dummyOf.Handlers[A, B].LogInto(_executionLog);
             _dummyOf.Handler(AB).DelegatesTo(A, B);
             _dummyOf.HandlerMath.FirstThenSecond(A, B).Returns(AB);
-            
+
             _dummyOf.Handler(A)
                 .Then(_dummyOf.Handler(B))
                 .Execute(_token);
@@ -408,7 +406,7 @@
         public void A_Then_B_Then_C_Test()
         {
             _dummyOf.Handlers[A, B, C].LogInto(_executionLog);
-            
+
             _dummyOf.Handler(AB).DelegatesTo(A, B);
             _dummyOf.Handler(ABC).DelegatesTo(AB, C);
 
@@ -417,7 +415,7 @@
 
             _dummyOf.Handler(A)
                 .Then(_dummyOf.Handler(B))
-                .Then(_dummyOf.Handler(C))    
+                .Then(_dummyOf.Handler(C))
                 .Execute(_token);
 
             Assert.That(_executionLog,
@@ -428,7 +426,7 @@
         public void FirstThenSecond_ABC_Test()
         {
             _dummyOf.Handlers[A, B, C].LogInto(_executionLog);
-            
+
             _dummyOf.Handler(AB).DelegatesTo(A, B);
             _dummyOf.Handler(ABC).DelegatesTo(AB, C);
 
@@ -843,7 +841,7 @@
         {
             _dummyOf.HandlerMath.Conditional(A, X).Returns(B);
 
-            Assert.That(_dummyOf.Handler(A).When(_dummyOf.Condition(X)), 
+            Assert.That(_dummyOf.Handler(A).When(_dummyOf.Condition(X)),
                 Is.SameAs(_dummyOf.Handler(B)));
         }
 
@@ -868,11 +866,10 @@
 
             _dummyOf.ConditionMath.MakeCondition_Returns(X);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(MakeCondition(func).Check(_token));
-                Assert.That(funcCalled);
-            });
+            using var _ = Assert.EnterMultipleScope();
+
+            Assert.That(MakeCondition(func).Check(_token));
+            Assert.That(funcCalled);
         }
 
         [Test]
@@ -883,11 +880,10 @@
 
             _dummyOf.ConditionMath.MakeCondition_Returns(X);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(func.AsCondition().Check(_token));
-                Assert.That(funcCalled);
-            });
+            using var _ = Assert.EnterMultipleScope();
+
+            Assert.That(func.AsCondition().Check(_token));
+            Assert.That(funcCalled);
         }
 
         [Test]
@@ -898,11 +894,10 @@
 
             _dummyOf.ConditionMath.MakeCondition_Returns(X);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(func.AsCondition().Check(_token));
-                Assert.That(funcCalled);
-            });
+            using var _ = Assert.EnterMultipleScope();
+
+            Assert.That(func.AsCondition().Check(_token));
+            Assert.That(funcCalled);
         }
 
         [Test]
@@ -928,12 +923,11 @@
         {
             _dummyOf.ConditionMath.True_Returns(X);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Condition(X).IsPredictableTrue());
-                Assert.That(_dummyOf.Condition(Y).IsPredictableTrue(),
-                    Is.False);
-            });
+            using var _ = Assert.EnterMultipleScope();
+
+            Assert.That(_dummyOf.Condition(X).IsPredictableTrue());
+            Assert.That(_dummyOf.Condition(Y).IsPredictableTrue(),
+                Is.False);
         }
 
         [Test]
@@ -941,36 +935,35 @@
         {
             _dummyOf.ConditionMath.False_Returns(X);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Condition(X).IsPredictableFalse());
-                Assert.That(_dummyOf.Condition(Y).IsPredictableFalse(),
-                    Is.False);
-            });
+            using var _ = Assert.EnterMultipleScope();
+
+            Assert.That(_dummyOf.Condition(X).IsPredictableFalse());
+            Assert.That(_dummyOf.Condition(Y).IsPredictableFalse(),
+                Is.False);
         }
 
         [Test]
         public void Or_Test()
         {
-            _dummyOf.ConditionMath.Or(X, Y).Returns(X|Y);
+            _dummyOf.ConditionMath.Or(X, Y).Returns(X | Y);
 
             var aOrB = _dummyOf.Condition(X).Or(
                        _dummyOf.Condition(Y));
 
             Assert.That(aOrB,
-                Is.SameAs(_dummyOf.Condition(X|Y)));
+                Is.SameAs(_dummyOf.Condition(X | Y)));
         }
 
         [Test]
         public void And_Test()
         {
-            _dummyOf.ConditionMath.And(X, Y).Returns(X&Y);
+            _dummyOf.ConditionMath.And(X, Y).Returns(X & Y);
 
             var aAndB = _dummyOf.Condition(X).And(
                         _dummyOf.Condition(Y));
 
             Assert.That(aAndB,
-                Is.SameAs(_dummyOf.Condition(X&Y)));
+                Is.SameAs(_dummyOf.Condition(X & Y)));
         }
 
         [Test]
@@ -998,7 +991,7 @@
 
             var result = Reverse<string>(Log)("World!!!", "Hello ");
 
-            Assert.That(result, 
+            Assert.That(result,
                 Is.EqualTo("Hello World!!!"));
         }
     }

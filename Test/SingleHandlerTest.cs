@@ -1,9 +1,9 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Test.Utils;
-    using static ChainLead.Test.Cases.SingleHandler;
-    using static ChainLead.Test.Dummy.ConditionIndex;
-    using static ChainLead.Test.Dummy.HandlerIndex;
+    using Utils;
+    using static Cases.SingleHandler;
+    using static Dummy.ConditionIndex;
+    using static Dummy.HandlerIndex;
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
@@ -19,7 +19,7 @@
         {
             _token = TokensProvider.GetRandom<T>();
 
-            _dummyOf = new(_token);
+            _dummyOf = new (_token);
             _dummyOf.Handlers.Generate(A);
 
             _math = mathFactory.Create(_dummyOf.ConditionMath);
@@ -41,7 +41,7 @@
             var handler = _math.MakeHandler(action);
             handler.Execute(_token);
 
-            Assert.That(x, 
+            Assert.That(x,
                 Is.EqualTo(_token));
         }
 
@@ -50,7 +50,7 @@
         {
             _dummyOf.Conditions.Generate(X);
             var conditionalZero = _math.Conditional(
-                _math.Zero<T>(), 
+                _math.Zero<T>(),
                 _dummyOf.Condition(X));
 
             Assert.That(_math.IsZero(conditionalZero));
@@ -94,15 +94,14 @@
                 .Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional)
                 .Execute(_token);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Condition(Z).WasCheckedOnce);
+            using var _ = Assert.EnterMultipleScope();
 
-                Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
-                    Is.EquivalentTo(_dummyOf.Conditions[X, Y]));
+            Assert.That(_dummyOf.Condition(Z).WasCheckedOnce);
 
-                Assert.That(_dummyOf.Handler(A).WasNeverExecuted);
-            });
+            Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
+                Is.EquivalentTo(_dummyOf.Conditions[X, Y]));
+
+            Assert.That(_dummyOf.Handler(A).WasNeverExecuted);
         }
 
         [Test]
@@ -127,18 +126,17 @@
 
             var checkedCount = trueCount + int.Min(1, falseCount);
 
-            Assert.Multiple(() =>
-            {
-                Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
-                    Is.EquivalentTo(truesThenFalses.Take(checkedCount)));
+            using var _ = Assert.EnterMultipleScope();
 
-                Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
-                    Is.EquivalentTo(truesThenFalses.Skip(checkedCount)));
+            Assert.That(_dummyOf.Conditions.ThatWereCheckedOnce,
+                Is.EquivalentTo(truesThenFalses.Take(checkedCount)));
 
-                Assert.That(_dummyOf.Handler(A)
-                      .WasExecutedOnceWhen(falseCount == 0)
-                      .ElseNever);
-            });
+            Assert.That(_dummyOf.Conditions.ThatWereNeverChecked,
+                Is.EquivalentTo(truesThenFalses.Skip(checkedCount)));
+
+            Assert.That(_dummyOf.Handler(A)
+                  .WasExecutedOnceWhen(falseCount == 0)
+                  .ElseNever);
         }
 
         [Test]
@@ -153,7 +151,7 @@
                 .Aggregate(_dummyOf.Handler(A).Pure, _math.Conditional)
                 .Execute(_token);
 
-            Assert.That(checksLog, 
+            Assert.That(checksLog,
                 Is.EqualTo(new[] { Z, Y, X }));
         }
 

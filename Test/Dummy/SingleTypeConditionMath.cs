@@ -1,7 +1,7 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
-    using static ChainLead.Test.Dummy.Common;
+    using Contracts;
+    using static Test.Dummy.Common;
 
     public static partial class Dummy
     {
@@ -28,12 +28,12 @@
             public ReturnsStep And(ConditionIndex forLeft, ConditionIndex andRight)
             {
                 var forFuncAndArgs = (nameof(IConditionMath.And), forLeft, andRight);
-                return new(returnResult => _appendSetup.Add(forFuncAndArgs, returnResult));
+                return new (returnResult => _appendSetup.Add(forFuncAndArgs, returnResult));
             }
 
             public ImplementsStep And(AnyArg _, AnyArg __) =>
-                new(implementation => _anyAppendSetup
-                    .Add(nameof(IConditionMath.And), implementation)); 
+                new (implementation => _anyAppendSetup
+                    .Add(nameof(IConditionMath.And), implementation));
 
             public ReturnsStep Or(ConditionIndex forLeft, ConditionIndex andRight)
             {
@@ -42,11 +42,11 @@
             }
 
             public ImplementsStep Or(AnyArg _, AnyArg __) =>
-                new(implementation => _anyAppendSetup
+                new (implementation => _anyAppendSetup
                     .Add(nameof(IConditionMath.Or), implementation));
 
             public ReturnsStep Not(ConditionIndex forCondition) =>
-                new(returnResult => _notSetup.Add(forCondition, returnResult));
+                new (returnResult => _notSetup.Add(forCondition, returnResult));
 
             public class ReturnsStep(Action<ConditionIndex> add)
             {
@@ -71,11 +71,11 @@
             public ICondition<U> False<U>() => Out<U>(_falseSetup!);
 
             public bool IsPredictableTrue<U>(ICondition<U> condition) =>
-                _trueSetup != null && 
+                _trueSetup != null &&
                 conditions.Get(_trueSetup).Index == In(condition);
 
             public bool IsPredictableFalse<U>(ICondition<U> condition) =>
-                _falseSetup != null && 
+                _falseSetup != null &&
                 conditions.Get(_falseSetup).Index == In(condition);
 
             public ICondition<U> MakeCondition<U>(Func<U, bool> predicate)
@@ -91,7 +91,7 @@
 
             public ICondition<U> Or<U>(ICondition<U> left, ICondition<U> right) =>
                 Append(nameof(IConditionMath.Or), left, right);
-                
+
             public ICondition<U> Not<U>(ICondition<U> condition) =>
                 Out<U>(_notSetup[In(condition)]);
 
@@ -115,4 +115,3 @@
         }
     }
 }
-

@@ -1,8 +1,8 @@
-﻿namespace ChainLead.Implementation
+﻿namespace Nuisho.ChainLead.Implementation
 {
     //// DO NOT using ChainLead.Contracts.Syntax; HERE
-    using ChainLead.Contracts;
     using System;
+    using Contracts;
 
     public class ConditionMath : IConditionMath
     {
@@ -48,14 +48,14 @@
         }
     }
 
-    file interface ITrue<in T> : ICondition<T> { }
+    file interface ITrue<in T> : ICondition<T>;
 
     file sealed class True<T> : ITrue<T>
     {
         public bool Check(T _) => true;
     }
 
-    file interface IFalse<in T> : ICondition<T> { }
+    file interface IFalse<in T> : ICondition<T>;
 
     file sealed class False<T> : IFalse<T>
     {
@@ -63,7 +63,7 @@
     }
 
     file sealed class Condition<T>(
-            Func<T, bool> check) 
+            Func<T, bool> check)
         : ICondition<T>
     {
         public bool Check(T state) => check(state);
@@ -71,7 +71,7 @@
 
     file sealed class And<T>(
             ICondition<T> left,
-            ICondition<T> right) 
+            ICondition<T> right)
         : ICondition<T>
     {
         public bool Check(T state) =>
@@ -80,7 +80,7 @@
 
     file sealed class Or<T>(
             ICondition<T> left,
-            ICondition<T> right) 
+            ICondition<T> right)
         : ICondition<T>
     {
         public bool Check(T state) =>
@@ -88,7 +88,7 @@
     }
 
     file sealed class Not<T>(
-            ICondition<T> condition) 
+            ICondition<T> condition)
         : ICondition<T>
     {
         public bool Check(T state) =>

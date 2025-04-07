@@ -1,13 +1,13 @@
-﻿namespace ChainLead.Implementation
+﻿namespace Nuisho.ChainLead.Implementation
 {
     //// DO NOT using ChainLead.Contracts.Syntax; HERE
-    using ChainLead.Contracts;
     using System;
+    using Contracts;
 
     public class HandlerMath(IConditionMath conditionMath)
         : IHandlerMath
     {
-        public IHandler<T> Zero<T>() => 
+        public IHandler<T> Zero<T>() =>
             new Zero<T>();
 
         public bool IsZero<T>(IHandler<T> handler) =>
@@ -73,7 +73,7 @@
                 (_, null) => Conditional(result, prevCondition),
                 (null, _) => Conditional(result, nextCondition),
 
-                _ => Conditional(result, 
+                _ => Conditional(result,
                         conditionMath.And(prevCondition, nextCondition)),
             };
         }
@@ -108,7 +108,7 @@
                 _ => new Conditional<T>(handler, condition)
             };
 
-        (IHandler<T>, ICondition<T>?) SplitHandlerAndCondition<T>(IHandler<T> handler) => 
+        (IHandler<T>, ICondition<T>?) SplitHandlerAndCondition<T>(IHandler<T> handler) =>
             handler switch
             {
                 IExtendedHandler<T> x => SplitHandlerAndCondition(x.Origin),
@@ -146,15 +146,15 @@
     file interface IAtom<in T> : IHandler<T>;
 
     file sealed class Atom<T>(
-            Action<T> imlementation) 
+            Action<T> imlementation)
         : IAtom<T>
     {
-        public void Execute(T state) => 
+        public void Execute(T state) =>
             imlementation(state);
     }
 
     file sealed class Sum<T>(
-            IHandler<T> prev, 
+            IHandler<T> prev,
             IHandler<T> next)
         : IHandler<T>
     {
@@ -170,7 +170,7 @@
 
     file sealed class Conditional<T>(
             IHandler<T> handler,
-            ICondition<T> condition) 
+            ICondition<T> condition)
         : IHandler<T>
     {
         public IHandler<T> Handler => handler;

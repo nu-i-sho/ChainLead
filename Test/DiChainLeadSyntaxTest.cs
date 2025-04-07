@@ -1,18 +1,18 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
-    using ChainLead.Contracts.Syntax;
-    using ChainLead.Contracts.Syntax.DI;
+    using Contracts;
+    using Contracts.Syntax;
+    using Contracts.Syntax.DI;
     using Microsoft.Extensions.DependencyInjection;
-    
-    using static ChainLead.Test.Dummy.HandlerIndex;
-    using static ChainLead.Test.Dummy.ConditionIndex;
+
+    using static Dummy.ConditionIndex;
+    using static Dummy.HandlerIndex;
 
     [TestFixture]
     public class DiChainLeadSyntaxTest
     {
         public record TypeDoesNotMatter;
-        public TypeDoesNotMatter _objectDoesNotMatter = new();
+        readonly TypeDoesNotMatter _objectDoesNotMatter = new ();
 
         DummyServiceCollection _dummyOfServiceCollection;
         DummyServiceProvider _dummyOfServiceProvider;
@@ -22,9 +22,9 @@
         public void Setup()
         {
             _dummyOfServiceCollection = [];
-            _dummyOfServiceProvider = new();
+            _dummyOfServiceProvider = new ();
 
-            _dummyOf = new(_objectDoesNotMatter);
+            _dummyOf = new (_objectDoesNotMatter);
             _dummyOf.Handlers.Generate(A);
             _dummyOf.Conditions.Generate(X);
 
@@ -37,7 +37,7 @@
         {
             _dummyOfServiceCollection.ConfigureChainLeadSyntax();
 
-            Assert.That(_dummyOfServiceCollection, 
+            Assert.That(_dummyOfServiceCollection,
                Has.Count.EqualTo(1));
         }
 
@@ -108,7 +108,7 @@
             private readonly Dictionary<Type, object> _setup = [];
 
             public void AddSetup<TContract>(TContract impl) =>
-                _setup.Add(typeof(TContract), impl!); 
+                _setup.Add(typeof(TContract), impl!);
 
             public object? GetService(Type serviceType) =>
                 _setup.GetValueOrDefault(serviceType);

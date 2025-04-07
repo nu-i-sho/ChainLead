@@ -1,38 +1,38 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
-    using ChainLead.Contracts.Syntax;
-    using ChainLead.Test.Types;
+    using Contracts;
+    using Contracts.Syntax;
+    using Types;
 
-    using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
-    
+    using static Contracts.Syntax.ChainLeadSyntax;
+
     public static partial class Cases
     {
         public static class SingleHandler
         {
-            public class OriginalTestFixtureAttribute(Type t) 
+            public abstract class OriginalTestFixtureAttribute(Type t)
                 : TestFixtureAttribute(t, new OriginalMathFactory());
 
-            public class _I_Attribute() : OriginalTestFixtureAttribute(typeof(int));
-            public class _II_Attribute() : OriginalTestFixtureAttribute(typeof(string));
-            public class _III_Attribute() : OriginalTestFixtureAttribute(typeof(Class));
-            public class _IV_Attribute() : OriginalTestFixtureAttribute(typeof(Struct));
-            public class _V_Attribute() : OriginalTestFixtureAttribute(typeof(ReadonlyStruct));
-            public class _VI_Attribute() : OriginalTestFixtureAttribute(typeof(Record));
-            public class _VII_Attribute() : OriginalTestFixtureAttribute(typeof(RecordStruct));
-            public class _VIII_Attribute() : OriginalTestFixtureAttribute(typeof(ReadonlyRecordStruct));
+            public sealed class _I_Attribute() : OriginalTestFixtureAttribute(typeof(int));
+            public sealed class _II_Attribute() : OriginalTestFixtureAttribute(typeof(string));
+            public sealed class _III_Attribute() : OriginalTestFixtureAttribute(typeof(Class));
+            public sealed class _IV_Attribute() : OriginalTestFixtureAttribute(typeof(Struct));
+            public sealed class _V_Attribute() : OriginalTestFixtureAttribute(typeof(ReadonlyStruct));
+            public sealed class _VI_Attribute() : OriginalTestFixtureAttribute(typeof(Record));
+            public sealed class _VII_Attribute() : OriginalTestFixtureAttribute(typeof(RecordStruct));
+            public sealed class _VIII_Attribute() : OriginalTestFixtureAttribute(typeof(ReadonlyRecordStruct));
 
-            public class SyntaxTestFixtureAttribute(Type t)
+            public abstract class SyntaxTestFixtureAttribute(Type t)
                 : TestFixtureAttribute(t, new SyntaxMathFactory());
 
-            public class _IX_Attribute() : SyntaxTestFixtureAttribute(typeof(int));
-            public class _X_Attribute() : SyntaxTestFixtureAttribute(typeof(string));
-            public class _XI_Attribute() : SyntaxTestFixtureAttribute(typeof(Class));
-            public class _XII_Attribute() : SyntaxTestFixtureAttribute(typeof(Struct));
-            public class _XIII_Attribute() : SyntaxTestFixtureAttribute(typeof(ReadonlyStruct));
-            public class _XIV_Attribute() : SyntaxTestFixtureAttribute(typeof(Record));
-            public class _XV_Attribute() : SyntaxTestFixtureAttribute(typeof(RecordStruct));
-            public class _XVI_Attribute() : SyntaxTestFixtureAttribute(typeof(ReadonlyRecordStruct));
+            public sealed class _IX_Attribute() : SyntaxTestFixtureAttribute(typeof(int));
+            public sealed class _X_Attribute() : SyntaxTestFixtureAttribute(typeof(string));
+            public sealed class _XI_Attribute() : SyntaxTestFixtureAttribute(typeof(Class));
+            public sealed class _XII_Attribute() : SyntaxTestFixtureAttribute(typeof(Struct));
+            public sealed class _XIII_Attribute() : SyntaxTestFixtureAttribute(typeof(ReadonlyStruct));
+            public sealed class _XIV_Attribute() : SyntaxTestFixtureAttribute(typeof(Record));
+            public sealed class _XV_Attribute() : SyntaxTestFixtureAttribute(typeof(RecordStruct));
+            public sealed class _XVI_Attribute() : SyntaxTestFixtureAttribute(typeof(ReadonlyRecordStruct));
 
             public interface ISingleHandlerMathFactory
             {
@@ -54,7 +54,7 @@
                     ICondition<T> condition);
             }
 
-            public class OriginalMathFactory
+            public sealed class OriginalMathFactory
                 : ISingleHandlerMathFactory
             {
                 public ISingleHandlerMath Create(IConditionMath conditionMath) =>

@@ -1,10 +1,10 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
-    using ChainLead.Test.Utils;
+    using Contracts;
+    using Utils;
 
-    using static ChainLead.Test.Cases.MultipleHandlers;
-    using static ChainLead.Test.Dummy.Common;
+    using static Cases.MultipleHandlers;
+    using static Dummy.Common;
 
     [_I_][_II_][_III_][_IV_][_V_][_VI_][_VII_][_VIII_]
     [_IX_][_X_][_XI_][_XII_][_XIII_][_XIV_][_XV_][_XVI_]
@@ -20,7 +20,7 @@
         public void Setup()
         {
             _token = TokensProvider.GetRandom<T>();
-            _dummyOf = new(_token);
+            _dummyOf = new (_token);
             _math = mathFactory.Create(_dummyOf.ConditionMath);
             _callsLog = [];
         }
@@ -45,7 +45,7 @@
 
         [Test]
         public void Join__AllConditionsTrue__Test(
-            [IIndices] string i_s, 
+            [IIndices] string i_s,
             [JIndices] string j_s)
         {
             SetupConditionMathAnd();
@@ -109,7 +109,7 @@
             chain.Execute(_token);
 
             var expectedCallsLog =
-                i_s.SelectMany(i => 
+                i_s.SelectMany(i =>
                     j_s.Reverse().Select(j => Index(i, j))
                        .Concat([Index(i)]));
 
@@ -143,7 +143,7 @@
         {
             List<IHandler<T>> handlers = [];
 
-            foreach(var i in i_s) 
+            foreach (var i in i_s)
             {
                 var handlerIndex = HandlerIndex(i);
                 var conditionIndices = j_s.Select(j => ConditionIndex(i, j));
@@ -180,10 +180,10 @@
             });
 
         static Dummy.HandlerIndex HandlerIndex(char i) =>
-            new(new string([i]));
+            new (new string([i]));
 
         static Dummy.ConditionIndex ConditionIndex(char i, char j) =>
-            new(new string([i, j]));
+            new (new string([i, j]));
 
         static Dummy.ChainElementIndex Index(char i) => HandlerIndex(i);
 

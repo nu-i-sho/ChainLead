@@ -1,6 +1,6 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
+    using Contracts;
 
     public static partial class Dummy
     {
@@ -35,7 +35,7 @@
 
             public ElseNeverContinuation WasCheckedOnceWhen(
                 bool checkedCondition) =>
-                 new(checkedCondition 
+                new (checkedCondition
                         ? WasCheckedOnce
                         : WasNeverChecked);
 

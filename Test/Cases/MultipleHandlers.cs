@@ -1,44 +1,44 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
-    using ChainLead.Contracts.Syntax;
-    using ChainLead.Test.Types;
+    using Contracts;
+    using Contracts.Syntax;
+    using Types;
 
-    using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
+    using static Contracts.Syntax.ChainLeadSyntax;
 
     public static partial class Cases
     {
         public static class MultipleHandlers
         {
-            public class IIndicesAttribute() : 
+            public sealed class IIndicesAttribute() :
                 ValuesAttribute("AB", "ABC", "ABCD", "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
 
-            public class JIndicesAttribute() :
+            public sealed class JIndicesAttribute() :
                 ValuesAttribute("012", "01234", "0123456789");
 
-            public class DirectTestFixtureAttribute(Type t)
+            public abstract class DirectTestFixtureAttribute(Type t)
                 : TestFixtureAttribute(t, new DirectChainingMathFactory());
 
-            public class _I_Attribute() : DirectTestFixtureAttribute(typeof(int));
-            public class _II_Attribute() : DirectTestFixtureAttribute(typeof(string));
-            public class _III_Attribute() : DirectTestFixtureAttribute(typeof(Class));
-            public class _IV_Attribute() : DirectTestFixtureAttribute(typeof(Struct));
-            public class _V_Attribute() : DirectTestFixtureAttribute(typeof(ReadonlyStruct));
-            public class _VI_Attribute() : DirectTestFixtureAttribute(typeof(Record));
-            public class _VII_Attribute() : DirectTestFixtureAttribute(typeof(RecordStruct));
-            public class _VIII_Attribute() : DirectTestFixtureAttribute(typeof(ReadonlyRecordStruct));
+            public sealed class _I_Attribute() : DirectTestFixtureAttribute(typeof(int));
+            public sealed class _II_Attribute() : DirectTestFixtureAttribute(typeof(string));
+            public sealed class _III_Attribute() : DirectTestFixtureAttribute(typeof(Class));
+            public sealed class _IV_Attribute() : DirectTestFixtureAttribute(typeof(Struct));
+            public sealed class _V_Attribute() : DirectTestFixtureAttribute(typeof(ReadonlyStruct));
+            public sealed class _VI_Attribute() : DirectTestFixtureAttribute(typeof(Record));
+            public sealed class _VII_Attribute() : DirectTestFixtureAttribute(typeof(RecordStruct));
+            public sealed class _VIII_Attribute() : DirectTestFixtureAttribute(typeof(ReadonlyRecordStruct));
 
-            public class ReverseTestFixtureAttribute(Type t)
+            public abstract class ReverseTestFixtureAttribute(Type t)
                 : TestFixtureAttribute(t, new ReverseChainingMathFactory());
 
-            public class _IX_Attribute() : ReverseTestFixtureAttribute(typeof(int));
-            public class _X_Attribute() : ReverseTestFixtureAttribute(typeof(string));
-            public class _XI_Attribute() : ReverseTestFixtureAttribute(typeof(Class));
-            public class _XII_Attribute() : ReverseTestFixtureAttribute(typeof(Struct));
-            public class _XIII_Attribute() : ReverseTestFixtureAttribute(typeof(ReadonlyStruct));
-            public class _XIV_Attribute() : ReverseTestFixtureAttribute(typeof(Record));
-            public class _XV_Attribute() : ReverseTestFixtureAttribute(typeof(RecordStruct));
-            public class _XVI_Attribute() : ReverseTestFixtureAttribute(typeof(ReadonlyRecordStruct));
+            public sealed class _IX_Attribute() : ReverseTestFixtureAttribute(typeof(int));
+            public sealed class _X_Attribute() : ReverseTestFixtureAttribute(typeof(string));
+            public sealed class _XI_Attribute() : ReverseTestFixtureAttribute(typeof(Class));
+            public sealed class _XII_Attribute() : ReverseTestFixtureAttribute(typeof(Struct));
+            public sealed class _XIII_Attribute() : ReverseTestFixtureAttribute(typeof(ReadonlyStruct));
+            public sealed class _XIV_Attribute() : ReverseTestFixtureAttribute(typeof(Record));
+            public sealed class _XV_Attribute() : ReverseTestFixtureAttribute(typeof(RecordStruct));
+            public sealed class _XVI_Attribute() : ReverseTestFixtureAttribute(typeof(ReadonlyRecordStruct));
 
             public interface IMultipleHandlersMathFactory
             {
@@ -64,7 +64,7 @@
                 IHandler<T> Conditional<T>(IHandler<T> handler, ICondition<T> condition);
             }
 
-            public class DirectChainingMathFactory
+            public sealed class DirectChainingMathFactory
                 : IMultipleHandlersMathFactory
             {
                 public IMultipleHandlersMath Create(IConditionMath conditionMath)
@@ -77,7 +77,7 @@
 
                 public override string ToString() => "like Use(a).ToMerge(b).ThenMerge(c)";
 
-                class Product : IMultipleHandlersMath
+                sealed class Product : IMultipleHandlersMath
                 {
                     public IHandler<T> ThenChain<T>(IEnumerable<IHandler<T>> handlers)
                     {
@@ -147,7 +147,7 @@
                 }
             }
 
-            public class ReverseChainingMathFactory
+            public sealed class ReverseChainingMathFactory
                 : IMultipleHandlersMathFactory
             {
                 public IMultipleHandlersMath Create(IConditionMath conditionMath)
@@ -160,7 +160,7 @@
 
                 public override string ToString() => "like MergeXWith(b).ThenWith(c).WhereXIs(a)";
 
-                class Product : IMultipleHandlersMath
+                sealed class Product : IMultipleHandlersMath
                 {
                     public IHandler<T> ThenChain<T>(IEnumerable<IHandler<T>> handlers)
                     {

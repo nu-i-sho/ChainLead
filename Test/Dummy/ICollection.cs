@@ -1,8 +1,8 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
     public static partial class Dummy
     {
-        public interface ICollection<out TDummy, TIndex> 
+        public interface ICollection<out TDummy, TIndex>
                 : IEnumerable<TDummy>
             where TDummy : IChainElement<TIndex>
             where TIndex : ChainElementIndex

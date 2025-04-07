@@ -1,4 +1,4 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
     public static partial class Dummy
     {
@@ -22,9 +22,7 @@
 
             public new interface IMutable :
                 ICollection<Handler<T>, HandlerIndex>.IMutable,
-                IHandlerCollection<T>
-            {
-            }
+                IHandlerCollection<T>;
         }
     }
 }

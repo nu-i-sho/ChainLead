@@ -1,0 +1,84 @@
+﻿[*.cs]
+
+# CS8625: Cannot convert null literal to non-nullable reference type.
+dotnet_diagnostic.CS8625.severity = error
+
+# CS8600: Converting null literal or possible null value to non-nullable type.
+dotnet_diagnostic.CS8600.severity = error
+
+# CS8604: Possible null reference argument.
+dotnet_diagnostic.CS8604.severity = error
+
+# CS8602: Dereference of a possibly null reference.
+dotnet_diagnostic.CS8602.severity = error
+
+# CS8618: Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+dotnet_diagnostic.CS8618.severity = error
+
+# The parameter type isn't nullable, so there is null validation at compilation time.
+# CS8625, CS8604, CS8602 and CS8600 are configured as errors
+# CA1062: Validate arguments of public methods
+dotnet_diagnostic.CA1062.severity = none
+
+# CA1716: Identifiers should not match keywords
+dotnet_diagnostic.CA1716.severity = none
+
+# CA1034: Nested types should not be visible
+dotnet_diagnostic.CA1034.severity = none
+
+# SA1400: Access modifier should be declared
+dotnet_diagnostic.SA1400.severity = none
+
+# SA1309: Field names should not begin with underscore
+dotnet_diagnostic.SA1309.severity = none
+
+# SA1202: Elements should be ordered by access
+dotnet_diagnostic.SA1202.severity = none
+
+# SA1128: Put constructor initializers on their own line
+dotnet_diagnostic.SA1128.severity = none
+
+# SA1116: Split parameters should start on line after declaration
+dotnet_diagnostic.SA1116.severity = none
+
+# CA1000: Do not declare static members on generic types
+dotnet_diagnostic.CA1000.severity = none
+
+# SA1009: Closing parenthesis should be spaced correctly
+dotnet_diagnostic.SA1009.severity = none
+
+# SA0001: XML comment analysis is disabled doue to project configuration
+dotnet_diagnostic.SA0001.severity = none
+
+# SA1135: Using directives should be qualified
+dotnet_diagnostic.SA1135.severity = none
+
+# SA1502: Element should not be on a single line
+dotnet_diagnostic.SA1502.severity = none
+
+# It is a totally stupid rule. 
+# I need only nominal and object without any implementation as an access token or marker. 
+# It is a cool code trick.
+# S2094: Classes should not be empty
+dotnet_diagnostic.S2094.severity = none
+
+# CA1820: Test for empty strings using string length
+dotnet_diagnostic.CA1820.severity = none
+
+# SA1132: Do not combine fields
+dotnet_diagnostic.SA1132.severity = none
+
+# SA1413: Use trailing comma in multi-line initializers
+dotnet_diagnostic.SA1413.severity = none
+
+# CA1043: Use Integral Or String Argument For Indexers
+dotnet_diagnostic.CA1043.severity = none
+
+# SA1519: Braces should not be omitted from multi-line child statement
+dotnet_diagnostic.SA1519.severity = none
+
+# RCS1001: Add braces (when expression spans over multiple lines)
+dotnet_diagnostic.RCS1001.severity = none
+
+# SA1204: Static elements should appear before instance elements
+dotnet_diagnostic.SA1204.severity = none

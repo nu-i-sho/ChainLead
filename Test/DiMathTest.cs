@@ -1,15 +1,15 @@
-﻿namespace ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test
 {
-    using ChainLead.Contracts;
-    using ChainLead.Implementation;
-    using ChainLead.Implementation.DI;
+    using Contracts;
+    using Implementation;
+    using Implementation.DI;
     using Microsoft.Extensions.DependencyInjection;
 
     [TestFixture]
     public class DiMathTest
     {
         DummyServiceCollection _dummyOfServiceCollection;
-        
+
         [SetUp]
         public void Setup()
         {
@@ -52,7 +52,7 @@
         public void AddHandlerMath__Adds_NewTokenDescriptor()
         {
             _dummyOfServiceCollection.AddHandlerMath();
-            Assert.That(_dummyOfServiceCollection, 
+            Assert.That(_dummyOfServiceCollection,
                Has.Count.EqualTo(1));
         }
 
