@@ -6,30 +6,30 @@ ChainLead is a library for creating flexible and maintainable process chains wit
 public static IHandler<State> Hamburger =>
     new[]
     {
-        Cut(bun),
-        Slice(pickle)
-            .Then(Again.When(OrderIncludeAdditional(pickle))),
-        Dice(onion)
-            .When(Not(OrderExclude(onion))),
-        Salt(beefPatty),
-        Pepper(beefPatty)
-            .When(Not(OrderExclude(pepper))),
-        Fry(beefPatty),
-        Fry(bacon)
-            .When(OrderIncludeAdditional(bacon)),
-        Toast(bun),
-        Put(bottomBun),
-        Put(beefPatty),
-        Add(bacon)
-            .When(OrderIncludeAdditional(bacon)),
-        Add(tomatoKetchup),
-        Add(pickleSlices)
-            .Then(Again.When(OrderIncludeAdditional(pickle))),
-        Add(onion)
-            .When(Not(OrderExclude(onion))),
-        Add(mustard)
-            .When(Not(OrderExclude(mustard))),
-        Put(topBun)
+        Cut(Bun),
+        Slice(Pickle)
+            .Then(Again.When(OrderIncludeAdditional(Pickle))),
+        Dice(Onion)
+            .When(Not(OrderExclude(Onion))),
+        Salt(BeefPatty),
+        Pepper(BeefPatty)
+            .When(Not(OrderExclude(Spicy))),
+        Fry(BeefPatty),
+        Fry(Bacon)
+            .When(OrderIncludeAdditional(Bacon)),
+        Toast(Bun),
+        Put(BottomBun),
+        Put(BeefPatty),
+        Add(Bacon)
+            .When(OrderIncludeAdditional(Bacon)),
+        Add(TomatoKetchup),
+        Add(PickleSlices)
+            .Then(Again.When(OrderIncludeAdditional(Pickle))),
+        Add(Onion)
+            .When(Not(OrderExclude(Onion))),
+        Add(Mustard)
+            .When(Not(OrderExclude(Mustard))),
+        Put(TopBun)
     }
     .Select(Pack(Index).In(Dot).ThenIn(Space).ThenIn)
     .Select(XCover(NewLine).WhereXIs)
@@ -40,9 +40,9 @@ public static IHandler<State> Hamburger =>
 ## For using ChainLead
 it is necessary to configure the library (syntax) language by providing the implementations of chain mathematics.
 ```CSharp
-using ChainLead.Contracts;
-using ChainLead.Implementation;
-using ChainLead.Contracts.Syntax;
+using Nuisho.ChainLead.Contracts;
+using Nuisho.ChainLead.Implementation;
+using Nuisho.ChainLead.Contracts.Syntax;
 
 ...
     IConditionMath conditionMath = new ConditionMath();
@@ -58,8 +58,8 @@ using ChainLead.Contracts.Syntax;
 Also, it is possible to configure it within the dependencies container.
 
 ```CSharp
-using ChainLead.Contracts.Syntax.DI;
-using ChainLead.Implementation.DI;
+using Nuisho.ChainLead.Contracts.Syntax.DI;
+using Nuisho.ChainLead.Implementation.DI;
 
 services
     .AddConditionMath()
@@ -69,8 +69,8 @@ services
 
 Use the following 'usings' in source files where you build the chains to make the library syntax available.   
 ```CSharp
-using ChainLead.Contracts;
-using static ChainLead.Contracts.Syntax.ChainLeadSyntax;
+using Nuisho.ChainLead.Contracts;
+using static Nuisho.ChainLead.Contracts.Syntax.ChainLeadSyntax;
 ```
 ## Handler creation
 #### `MakeHandler`, `AsHandler`, `Zero`
