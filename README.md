@@ -3,7 +3,7 @@
 ChainLead is a library for creating flexible and maintainable process chains with high human (not engineer) readability, like the following:
 
 ```CSharp
-public static IHandler<State> Hamburger =>
+public static IHandler<State> HamburgerRecipe =>
     new[]
     {
         Cut(Bun),
