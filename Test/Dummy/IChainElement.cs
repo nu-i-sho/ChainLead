@@ -1,17 +1,16 @@
-﻿namespace Nuisho.ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test;
+
+public static partial class Dummy
 {
-    public static partial class Dummy
+    public interface IChainElement<TIndex>
+        where TIndex : ChainElementIndex
     {
-        public interface IChainElement<TIndex>
-            where TIndex : ChainElementIndex
-        {
-            TIndex Index { get; }
+        TIndex Index { get; }
 
-            void LogsInto(IList<ChainElementIndex> log);
+        void LogsInto(IList<ChainElementIndex> log);
 
-            void LogsInto(IList<TIndex> log);
+        void LogsInto(IList<TIndex> log);
 
-            void AddCallback(Action f);
-        }
+        void AddCallback(Action f);
     }
 }

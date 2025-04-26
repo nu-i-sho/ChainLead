@@ -1,7 +1,6 @@
-﻿namespace Nuisho.ChainLead.Contracts
+﻿namespace Nuisho.ChainLead.Contracts;
+
+public interface IHandler<in T>
 {
-    public interface IHandler<in T>
-    {
-        void Execute(T state);
-    }
+    void Execute(T state);
 }

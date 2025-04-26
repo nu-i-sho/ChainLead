@@ -1,117 +1,116 @@
-﻿namespace Nuisho.ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test;
+
+using Contracts;
+using Contracts.Syntax;
+using Contracts.Syntax.DI;
+using Microsoft.Extensions.DependencyInjection;
+
+using static Dummy.ConditionIndex;
+using static Dummy.HandlerIndex;
+
+[TestFixture]
+public class DiChainLeadSyntaxTest
 {
-    using Contracts;
-    using Contracts.Syntax;
-    using Contracts.Syntax.DI;
-    using Microsoft.Extensions.DependencyInjection;
+    public record TypeDoesNotMatter;
+    readonly TypeDoesNotMatter _objectDoesNotMatter = new ();
 
-    using static Dummy.ConditionIndex;
-    using static Dummy.HandlerIndex;
+    DummyServiceCollection _dummyOfServiceCollection;
+    DummyServiceProvider _dummyOfServiceProvider;
+    Dummy.Container<TypeDoesNotMatter> _dummyOf;
 
-    [TestFixture]
-    public class DiChainLeadSyntaxTest
+    [SetUp]
+    public void Setup()
     {
-        public record TypeDoesNotMatter;
-        readonly TypeDoesNotMatter _objectDoesNotMatter = new ();
+        _dummyOfServiceCollection = [];
+        _dummyOfServiceProvider = new ();
 
-        DummyServiceCollection _dummyOfServiceCollection;
-        DummyServiceProvider _dummyOfServiceProvider;
-        Dummy.Container<TypeDoesNotMatter> _dummyOf;
+        _dummyOf = new (_objectDoesNotMatter);
+        _dummyOf.Handlers.Generate(A);
+        _dummyOf.Conditions.Generate(X);
 
-        [SetUp]
-        public void Setup()
-        {
-            _dummyOfServiceCollection = [];
-            _dummyOfServiceProvider = new ();
+        _dummyOfServiceProvider.AddSetup<IHandlerMath>(_dummyOf.HandlerMath);
+        _dummyOfServiceProvider.AddSetup<IConditionMath>(_dummyOf.ConditionMath);
+    }
 
-            _dummyOf = new (_objectDoesNotMatter);
-            _dummyOf.Handlers.Generate(A);
-            _dummyOf.Conditions.Generate(X);
+    [Test]
+    public void ConfigureChainLeadSyntax__Adds_NotNull_ServiceDescriptor()
+    {
+        _dummyOfServiceCollection.ConfigureChainLeadSyntax();
 
-            _dummyOfServiceProvider.AddSetup<IHandlerMath>(_dummyOf.HandlerMath);
-            _dummyOfServiceProvider.AddSetup<IConditionMath>(_dummyOf.ConditionMath);
-        }
+        Assert.That(_dummyOfServiceCollection,
+           Has.Count.EqualTo(1));
+    }
 
-        [Test]
-        public void ConfigureChainLeadSyntax__Adds_NotNull_ServiceDescriptor()
-        {
-            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
+    [Test]
+    public void ConfigureChainLeadSyntax__Adds_CallToken()
+    {
+        _dummyOfServiceCollection.ConfigureChainLeadSyntax();
+        Assert.That(_dummyOfServiceCollection.Last().ServiceType,
+            Is.EqualTo(typeof(Extension.CallToken)));
+    }
 
-            Assert.That(_dummyOfServiceCollection,
-               Has.Count.EqualTo(1));
-        }
+    [Test]
+    public void ConfigureChainLeadSyntax__Adds_CallToken_AsSingleton()
+    {
+        _dummyOfServiceCollection.ConfigureChainLeadSyntax();
+        Assert.That(_dummyOfServiceCollection.Last().Lifetime,
+            Is.EqualTo(ServiceLifetime.Singleton));
+    }
 
-        [Test]
-        public void ConfigureChainLeadSyntax__Adds_CallToken()
-        {
-            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
-            Assert.That(_dummyOfServiceCollection.Last().ServiceType,
-                Is.EqualTo(typeof(Extension.CallToken)));
-        }
+    [Test]
+    public void ConfigureChainLeadSyntax__Adds_CallToken_WithImplementationFactory()
+    {
+        _dummyOfServiceCollection.ConfigureChainLeadSyntax();
+        Assert.That(_dummyOfServiceCollection.Last().ImplementationFactory,
+            Is.Not.Null);
+    }
 
-        [Test]
-        public void ConfigureChainLeadSyntax__Adds_CallToken_AsSingleton()
-        {
-            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
-            Assert.That(_dummyOfServiceCollection.Last().Lifetime,
-                Is.EqualTo(ServiceLifetime.Singleton));
-        }
+    [Test]
+    public void ConfigureChainLeadSyntax__Adds_CallToken_AsImplementationByFactory()
+    {
+        _dummyOfServiceCollection.ConfigureChainLeadSyntax();
 
-        [Test]
-        public void ConfigureChainLeadSyntax__Adds_CallToken_WithImplementationFactory()
-        {
-            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
-            Assert.That(_dummyOfServiceCollection.Last().ImplementationFactory,
-                Is.Not.Null);
-        }
+        var implementation = _dummyOfServiceCollection.Last()
+            .ImplementationFactory!(_dummyOfServiceProvider);
 
-        [Test]
-        public void ConfigureChainLeadSyntax__Adds_CallToken_AsImplementationByFactory()
-        {
-            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
+        Assert.That(implementation,
+            Is.TypeOf<Extension.CallToken>());
+    }
 
-            var implementation = _dummyOfServiceCollection.Last()
-                .ImplementationFactory!(_dummyOfServiceProvider);
+    [Test]
+    public void ConfigureChainLeadSyntax__Configures_HandlerMath_ByInstanceFromProvider()
+    {
+        _dummyOf.HandlerMath.Zero_Returns(A);
+        _dummyOfServiceCollection.ConfigureChainLeadSyntax();
+        _dummyOfServiceCollection.Last().ImplementationFactory!(_dummyOfServiceProvider);
 
-            Assert.That(implementation,
-                Is.TypeOf<Extension.CallToken>());
-        }
+        Assert.That(ChainLeadSyntax.Handler<TypeDoesNotMatter>.Zero,
+            Is.SameAs(_dummyOf.Handler(A)));
+    }
 
-        [Test]
-        public void ConfigureChainLeadSyntax__Configures_HandlerMath_ByInstanceFromProvider()
-        {
-            _dummyOf.HandlerMath.Zero_Returns(A);
-            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
-            _dummyOfServiceCollection.Last().ImplementationFactory!(_dummyOfServiceProvider);
+    [Test]
+    public void ConfigureChainLeadSyntax__Configures_ConditionMath_ByInstanceFromProvider()
+    {
+        _dummyOf.ConditionMath.True_Returns(X);
+        _dummyOfServiceCollection.ConfigureChainLeadSyntax();
+        _dummyOfServiceCollection.Last().ImplementationFactory!(_dummyOfServiceProvider);
 
-            Assert.That(ChainLeadSyntax.Handler<TypeDoesNotMatter>.Zero,
-                Is.SameAs(_dummyOf.Handler(A)));
-        }
+        Assert.That(ChainLeadSyntax.Condition<TypeDoesNotMatter>.True,
+            Is.SameAs(_dummyOf.Condition(X)));
+    }
 
-        [Test]
-        public void ConfigureChainLeadSyntax__Configures_ConditionMath_ByInstanceFromProvider()
-        {
-            _dummyOf.ConditionMath.True_Returns(X);
-            _dummyOfServiceCollection.ConfigureChainLeadSyntax();
-            _dummyOfServiceCollection.Last().ImplementationFactory!(_dummyOfServiceProvider);
+    public class DummyServiceCollection :
+        List<ServiceDescriptor>,
+        IServiceCollection;
 
-            Assert.That(ChainLeadSyntax.Condition<TypeDoesNotMatter>.True,
-                Is.SameAs(_dummyOf.Condition(X)));
-        }
+    public class DummyServiceProvider : IServiceProvider
+    {
+        private readonly Dictionary<Type, object> _setup = [];
 
-        public class DummyServiceCollection :
-            List<ServiceDescriptor>,
-            IServiceCollection;
+        public void AddSetup<TContract>(TContract impl) =>
+            _setup.Add(typeof(TContract), impl!);
 
-        public class DummyServiceProvider : IServiceProvider
-        {
-            private readonly Dictionary<Type, object> _setup = [];
-
-            public void AddSetup<TContract>(TContract impl) =>
-                _setup.Add(typeof(TContract), impl!);
-
-            public object? GetService(Type serviceType) =>
-                _setup.GetValueOrDefault(serviceType);
-        }
+        public object? GetService(Type serviceType) =>
+            _setup.GetValueOrDefault(serviceType);
     }
 }

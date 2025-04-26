@@ -1,52 +1,51 @@
-﻿namespace Nuisho.ChainLead.Test
+﻿namespace Nuisho.ChainLead.Test;
+
+public static partial class Dummy
 {
-    public static partial class Dummy
+    public interface ICollection<out TDummy, TIndex>
+            : IEnumerable<TDummy>
+        where TDummy : IChainElement<TIndex>
+        where TIndex : ChainElementIndex
     {
-        public interface ICollection<out TDummy, TIndex>
-                : IEnumerable<TDummy>
-            where TDummy : IChainElement<TIndex>
-            where TIndex : ChainElementIndex
+        IEnumerable<TIndex> Indices => this.Select(x => x.Index);
+
+        TDummy Get(TIndex i);
+
+        void LogInto(IList<ChainElementIndex> acc)
         {
-            IEnumerable<TIndex> Indices => this.Select(x => x.Index);
+            foreach (var x in this)
+                x.LogsInto(acc);
+        }
 
-            TDummy Get(TIndex i);
+        void LogInto(IList<TIndex> acc)
+        {
+            foreach (var x in this)
+                x.LogsInto(acc);
+        }
 
-            void LogInto(IList<ChainElementIndex> acc)
+        void AddCallback(Action f)
+        {
+            foreach (var x in this)
+                x.AddCallback(f);
+        }
+
+        public interface IMutable : ICollection<TDummy, TIndex>
+        {
+            void Generate(TIndex i);
+
+            void Generate(TIndex first, TIndex second, params TIndex[] tail)
             {
-                foreach (var x in this)
-                    x.LogsInto(acc);
+                Generate(first);
+                Generate(second);
+
+                foreach (var i in tail)
+                    Generate(i);
             }
 
-            void LogInto(IList<TIndex> acc)
+            void Generate(IEnumerable<TIndex> indices)
             {
-                foreach (var x in this)
-                    x.LogsInto(acc);
-            }
-
-            void AddCallback(Action f)
-            {
-                foreach (var x in this)
-                    x.AddCallback(f);
-            }
-
-            public interface IMutable : ICollection<TDummy, TIndex>
-            {
-                void Generate(TIndex i);
-
-                void Generate(TIndex first, TIndex second, params TIndex[] tail)
-                {
-                    Generate(first);
-                    Generate(second);
-
-                    foreach (var i in tail)
-                        Generate(i);
-                }
-
-                void Generate(IEnumerable<TIndex> indices)
-                {
-                    foreach (var i in indices)
-                        Generate(i);
-                }
+                foreach (var i in indices)
+                    Generate(i);
             }
         }
     }
