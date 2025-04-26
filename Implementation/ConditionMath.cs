@@ -1,97 +1,96 @@
-﻿namespace Nuisho.ChainLead.Implementation
+﻿namespace Nuisho.ChainLead.Implementation;
+
+//// DO NOT using ChainLead.Contracts.Syntax; HERE
+using System;
+using Contracts;
+
+public class ConditionMath : IConditionMath
 {
-    //// DO NOT using ChainLead.Contracts.Syntax; HERE
-    using System;
-    using Contracts;
+    public ICondition<T> False<T>() => new False<T>();
 
-    public class ConditionMath : IConditionMath
+    public ICondition<T> True<T>() => new True<T>();
+
+    public ICondition<T> MakeCondition<T>(Func<T, bool> predicate) =>
+        new Condition<T>(predicate);
+
+    public bool IsPredictableTrue<T>(ICondition<T> condition) =>
+        condition is ITrue<T>;
+
+    public bool IsPredictableFalse<T>(ICondition<T> condition) =>
+        condition is IFalse<T>;
+
+    public ICondition<T> And<T>(ICondition<T> left, ICondition<T> right)
     {
-        public ICondition<T> False<T>() => new False<T>();
+        if (IsPredictableFalse(left)) return left;
+        if (IsPredictableTrue(left)) return right;
+        if (IsPredictableFalse(right)) return right;
+        if (IsPredictableTrue(right)) return left;
 
-        public ICondition<T> True<T>() => new True<T>();
-
-        public ICondition<T> MakeCondition<T>(Func<T, bool> predicate) =>
-            new Condition<T>(predicate);
-
-        public bool IsPredictableTrue<T>(ICondition<T> condition) =>
-            condition is ITrue<T>;
-
-        public bool IsPredictableFalse<T>(ICondition<T> condition) =>
-            condition is IFalse<T>;
-
-        public ICondition<T> And<T>(ICondition<T> left, ICondition<T> right)
-        {
-            if (IsPredictableFalse(left)) return left;
-            if (IsPredictableTrue(left)) return right;
-            if (IsPredictableFalse(right)) return right;
-            if (IsPredictableTrue(right)) return left;
-
-            return new And<T>(left, right);
-        }
-
-        public ICondition<T> Or<T>(ICondition<T> left, ICondition<T> right)
-        {
-            if (IsPredictableFalse(left)) return right;
-            if (IsPredictableTrue(left)) return left;
-            if (IsPredictableFalse(right)) return left;
-            if (IsPredictableTrue(right)) return right;
-
-            return new Or<T>(left, right);
-        }
-
-        public ICondition<T> Not<T>(ICondition<T> condition)
-        {
-            if (IsPredictableFalse(condition)) return True<T>();
-            if (IsPredictableTrue(condition)) return False<T>();
-
-            return new Not<T>(condition);
-        }
+        return new And<T>(left, right);
     }
 
-    file interface ITrue<in T> : ICondition<T>;
-
-    file sealed class True<T> : ITrue<T>
+    public ICondition<T> Or<T>(ICondition<T> left, ICondition<T> right)
     {
-        public bool Check(T _) => true;
+        if (IsPredictableFalse(left)) return right;
+        if (IsPredictableTrue(left)) return left;
+        if (IsPredictableFalse(right)) return left;
+        if (IsPredictableTrue(right)) return right;
+
+        return new Or<T>(left, right);
     }
 
-    file interface IFalse<in T> : ICondition<T>;
-
-    file sealed class False<T> : IFalse<T>
+    public ICondition<T> Not<T>(ICondition<T> condition)
     {
-        public bool Check(T _) => false;
-    }
+        if (IsPredictableFalse(condition)) return True<T>();
+        if (IsPredictableTrue(condition)) return False<T>();
 
-    file sealed class Condition<T>(
-            Func<T, bool> check)
-        : ICondition<T>
-    {
-        public bool Check(T state) => check(state);
+        return new Not<T>(condition);
     }
+}
 
-    file sealed class And<T>(
-            ICondition<T> left,
-            ICondition<T> right)
-        : ICondition<T>
-    {
-        public bool Check(T state) =>
-            left.Check(state) && right.Check(state);
-    }
+file interface ITrue<in T> : ICondition<T>;
 
-    file sealed class Or<T>(
-            ICondition<T> left,
-            ICondition<T> right)
-        : ICondition<T>
-    {
-        public bool Check(T state) =>
-            left.Check(state) || right.Check(state);
-    }
+file sealed class True<T> : ITrue<T>
+{
+    public bool Check(T _) => true;
+}
 
-    file sealed class Not<T>(
-            ICondition<T> condition)
-        : ICondition<T>
-    {
-        public bool Check(T state) =>
-            !condition.Check(state);
-    }
+file interface IFalse<in T> : ICondition<T>;
+
+file sealed class False<T> : IFalse<T>
+{
+    public bool Check(T _) => false;
+}
+
+file sealed class Condition<T>(
+        Func<T, bool> check)
+    : ICondition<T>
+{
+    public bool Check(T state) => check(state);
+}
+
+file sealed class And<T>(
+        ICondition<T> left,
+        ICondition<T> right)
+    : ICondition<T>
+{
+    public bool Check(T state) =>
+        left.Check(state) && right.Check(state);
+}
+
+file sealed class Or<T>(
+        ICondition<T> left,
+        ICondition<T> right)
+    : ICondition<T>
+{
+    public bool Check(T state) =>
+        left.Check(state) || right.Check(state);
+}
+
+file sealed class Not<T>(
+        ICondition<T> condition)
+    : ICondition<T>
+{
+    public bool Check(T state) =>
+        !condition.Check(state);
 }

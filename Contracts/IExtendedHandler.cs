@@ -1,9 +1,8 @@
-﻿namespace Nuisho.ChainLead.Contracts
-{
-    public interface IExtendedHandler<in T> : IHandler<T>
-    {
-        internal IHandler<T> Origin { get; }
+﻿namespace Nuisho.ChainLead.Contracts;
 
-        void IHandler<T>.Execute(T state) => Origin.Execute(state);
-    }
+public interface IExtendedHandler<in T> : IHandler<T>
+{
+    internal IHandler<T> Origin { get; }
+
+    void IHandler<T>.Execute(T state) => Origin.Execute(state);
 }

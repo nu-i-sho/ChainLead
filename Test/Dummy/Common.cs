@@ -1,12 +1,11 @@
-﻿namespace Nuisho.ChainLead.Test
-{
-    public static partial class Dummy
-    {
-        public static class Common
-        {
-            public record AnyArg;
+﻿namespace Nuisho.ChainLead.Test;
 
-            public static readonly AnyArg Any = new ();
-        }
+public static partial class Dummy
+{
+    public static class Common
+    {
+        public record AnyArg;
+
+        public static readonly AnyArg Any = new ();
     }
 }

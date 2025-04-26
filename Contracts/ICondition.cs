@@ -1,7 +1,6 @@
-﻿namespace Nuisho.ChainLead.Contracts
+﻿namespace Nuisho.ChainLead.Contracts;
+
+public interface ICondition<in T>
 {
-    public interface ICondition<in T>
-    {
-        bool Check(T state);
-    }
+    bool Check(T state);
 }

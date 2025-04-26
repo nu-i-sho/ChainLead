@@ -1,22 +1,21 @@
-﻿namespace Nuisho.ChainLead.Contracts.Syntax.DI
+﻿namespace Nuisho.ChainLead.Contracts.Syntax.DI;
+
+using Microsoft.Extensions.DependencyInjection;
+
+public static class Extension
 {
-    using Microsoft.Extensions.DependencyInjection;
+    internal class CallToken;
 
-    public static class Extension
+    public static IServiceCollection ConfigureChainLeadSyntax(
+        this IServiceCollection services)
     {
-        internal class CallToken;
-
-        public static IServiceCollection ConfigureChainLeadSyntax(
-            this IServiceCollection services)
+        return services.AddSingleton(provider =>
         {
-            return services.AddSingleton(provider =>
-            {
-                ChainLeadSyntax.Configure(
-                    provider.GetRequiredService<IHandlerMath>(),
-                    provider.GetRequiredService<IConditionMath>());
+            ChainLeadSyntax.Configure(
+                provider.GetRequiredService<IHandlerMath>(),
+                provider.GetRequiredService<IConditionMath>());
 
-                return new CallToken();
-            });
-        }
+            return new CallToken();
+        });
     }
 }
