@@ -93,7 +93,7 @@ var addB = MakeHandler<StringBuilder>(acc => acc.Append("B"));
 
 var addAB = printA.Then(printB);
 ```
-So, we can create the chain with any number of handlers. By the fact, it is a tree. We imagine the chain as a collection, but it doesn't matter because all executions of items in our tree have a determined and predictable order. The following code and image show how it works.
+So, we can create the chain with any number of handlers. By the fact that it is a tree. We imagine the chain as a collection, but it doesn't matter because all executions of items in our tree have a determined and predictable order. The following code and image show how it works.
 ```CSharp
 var ab = a.Then(b);
 
@@ -105,7 +105,7 @@ var abcd2 = (a.Then(b)).Than(c.Then(d));
 ```
 ![ab, abc1, abc2, abcd1, abcd2](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/2.svg)
 
-Obviously, circles in the image are handlers, and bars are `Then` calls. 'Then' is directed (it has the first and the second parameters). All vertical bars join the first up handler with the second down and horizontal, and the first left with the second right. Also, we know the order of `Then` calls (black numbers). Based on this, we can easily predict the order of handlers' executions (white numbers). That means `abc1` and `abc2` are logically the same chains (`abcd1` and `abcd2` too). Or, in mathematical terms - `Then` is associative.
+Obviously, circles in the image are handlers, and bars are `Then` calls. 'Then' is directed (it has the first and the second parameters). All vertical bars join the first up handler with the second down and horizontal, and the first left with the second right. Also, we know the order of `Then` calls (black numbers). Based on this, we can easily predict the order of handlers' executions (white numbers). That means `abc1` and `abc2` are logically the same chains (`abcd1` and `abcd2` too). Or, in mathematical terms, `Then` is associative.
 
 ## Conditions creation
 #### `MakeCondition`, `AsCondition`, `True`,  `False`
@@ -165,7 +165,7 @@ IHandler<State> workers = new[]
 Of course, we can do the same aggregation with `Aggregate(Then)`, but it is preferable to use `FirstThenSecond` for consistency with the methods described below.
 
 ## Chain is lazy
-Currently, we have enough functionality described to call our library useful. I was not directly pointed, but everybody understands that chains built with ChainLead are lazy, and no handler or condition will be called without 'Execute' or 'Check' calls. The following images help us to memorize what a chain is. The left image demonstrates the chain as an object, and the right shows it during execution. This image is bound with the following code snipped.
+Currently, we have enough functionality described to call our library useful. I was not directly pointed, but everybody understands that chains built with ChainLead are lazy, and no handler or condition will be called without 'Execute' or 'Check' calls. The following images help us to memorize what a chain is. The left image demonstrates the chain as an object, and the right shows it during execution. This image is bound with the following code snippet.
 ```CSharp
 IHandler<state> handler =
     new[] { a, b.When(f), c, d.When(g), e }
@@ -220,7 +220,7 @@ var handler = new[]
 handler.Execute(new State());
 ...
 ```
-The responsibility of the condition is to check the state to comply with the capsulated *condition* and nothing more. If you add some side effect to the condition, be aware that it is not guaranteed to be called. ChainLead relies on the correct implementation of the `ICondition<T>` and doesn't care about side effects. For example, the following conditions do not call `a` because it doesn't make sense as ChainLead predicts the result without calling.  
+The responsibility of the condition is to check the state to comply with the encapsulated *condition* and nothing more. If you add a side effect to the condition, be aware that it is not guaranteed to be called. ChainLead relies on the correct implementation of the `ICondition<T>` and doesn't care about side effects. For example, the following conditions do not call `a` because it doesn't make sense as ChainLead predicts the result without calling.  
 ```CSharp
 var falseAndA = Condition<State>.False.And(a); // anything and false = false
 var aAndFalse = a.And(Condition<State>.False); // false and anything = false
@@ -289,7 +289,7 @@ var handler = new[] { /* steps list */ }
 ```    
 And our chain will have no extra logging handler calls as we want.
 #### `Use(o).ToCover` 
-The same problem exists when we want to add the handler to the end of each handler in the main list but under conditions attached to them. So, ChainLead has a function for this case too. For example, the following code shows how to open a transaction before each handler call and close it afterward.
+The same problem exists when we want to add the handler to the end of each handler in the main list, but under conditions attached to them. So, ChainLead has a function for this case too. For example, the following code shows how to open a transaction before each handler call and close it afterward.
 ```CSharp
 var handler = new[]
     {
@@ -298,22 +298,22 @@ var handler = new[]
         addDepartment.When(Not(employeeIsFreeContractor))
     }
     .Select(Pack(openTransaction).In)
-    .Select(x => Use(x).ToCover(closeTransactin))
+    .Select(x => Use(x).ToCover(closeTransaction))
     .Aggregete(FirstThenSecond);
 ```
 #### `XCover(o).WhereXIs`
-If you like code free of lambda expressions as I do, you can use `XCover(closseTransactin).WhereXIs` instead of `x => Use(x).ToCover(closseTransactin)`.
+If you like code free of lambda expressions as I do, you can use `XCover(closeTransaction).WhereXIs` instead of `x => Use(x).ToCover(closeTransaction)`.
 ```CSharp
 var handler = new[] { /* db operations handlers list*/ }
     .Select(Pack(openTransaction).In)
-    .Select(XCover(closseTransactin).WhereXIs)
+    .Select(XCover(closeTransaction).WhereXIs)
     .Aggregete(FirstThenSecond);
 ```
 #### `PackXIn(o).WhereXIs`
 Of course, analogical syntax construction for reversed arguments order calls of `Pack(o).In` exists too. It is `PackXIn(o).WhereXIs`. 
 
 #### `PackFirstInSecond`, `FirstCoverSecond`
-'Pack' and 'Cover' have useful non-curried forms for aggregation: `PackFirstInSecond` and `FirstCoverSecond`. It is difficult to find a good example where `Aggaragete(PackFirstInSecond)` or `Aggaragete(FirstCoverSecond)` is useful. But as you remember we are talking about "Advanced chain building" and using it in each real-life situation is not expected. 
+'Pack' and 'Cover' have useful non-curried forms for aggregation: `PackFirstInSecond` and `FirstCoverSecond`. It is difficult to find a good example where `Aggaragete(PackFirstInSecond)` or `Aggaragete(FirstCoverSecond)` is useful. But as you remember, we are talking about "Advanced chain building" and using it in each real-life situation is not expected. 
 
 
 The following image summarizes how the 'Pack' and 'Cover' functions work.
@@ -321,7 +321,7 @@ The following image summarizes how the 'Pack' and 'Cover' functions work.
 
 #### `Inject(o).Into`, `InjectXInto(o).WhereXIs`, `InjectFirstIntoSecond`,
 #### `Use(o).ToWrap`, `XWrap(o).WhereXIs`, `FirstWrapSecond`
-The 'Pack' and 'Cover' functions put coupled handlers only in the top attached condition. If we want to put handlers in all conditions we can use functions from the 'Inject' and 'Wrap' family. And the following image shows how they work. 
+The 'Pack' and 'Cover' functions put coupled handlers only in the top attached condition. If we want to put handlers in all conditions, we can use functions from the 'Inject' and 'Wrap' families. And the following image shows how they work. 
 
 ![Inject and Wrap](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/5.svg)
 
@@ -377,13 +377,13 @@ var handler = new[]
 
 ## Atomizing
 #### `Atomize`
-Handlers have structure, and ChainLead can see their structures and change them. But outside of ChainLead, all these details are invisible and all handlers provide nothing more than declared in `IHandler<T>`. There is no ability to access the handler's structure outside ChainLead.
+Handlers have structure, and ChainLead can see their structures and change them. But outside of ChainLead, all these details are invisible, and all handlers provide nothing more than what is declared in `IHandler<T>`. There is no ability to access the handler's structure outside ChainLead.
 
 ![Handlers (in/out)side ChainLead](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/7.svg)
 
-If you want to hide the handler structure for ChainLead too, you can easily do it with `Atomize`.
+If you want to hide the handler structure for ChainLead, too, you can easily do it with `Atomize`.
 
 ![Handlers (in/out)side ChainLead](https://raw.githubusercontent.com/nu-i-sho/ChainLead/refs/heads/main/readme_img/8.svg)
 
-So, as an example, if you want to restrict the ability to inject something into your handler (under the attached condition) you can atomize this handler. Also, atomized `Zero` loses the attributes of `Zero` and starts to be recognized by ChainLead as a regular handler (which does nothing).
+So, as an example, if you want to restrict the ability to inject something into your handler (under the attached condition), you can atomize this handler. Also, atomized `Zero` loses the attributes of `Zero` and starts to be recognized by ChainLead as a regular handler (which does nothing).
 
